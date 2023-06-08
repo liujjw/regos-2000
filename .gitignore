@@ -8,3 +8,8 @@ mkrom
 *.mcs
 *.img
 
+riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-apple-darwin
+riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-apple-darwin.tar.gz
+
+riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-apple-darwin
+riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-apple-darwin.tar.gz
