@@ -9,7 +9,16 @@ mkrom
 *.img
 
 riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-apple-darwin
+rusty_c/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-ubuntu14
 riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-apple-darwin.tar.gz
 
 riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-apple-darwin
 riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-apple-darwin.tar.gz
+rusty_c/riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-linux-ubuntu14
+
+target
+
+riscv-openocd-0.10.0-2019.02.0-x86_64-linux-ubuntu14
+
+clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-14.04

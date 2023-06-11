@@ -11,4 +11,7 @@ sudo yum install cmake libmpc-devel mpfr-devel gmp-devel gawk bison flex texinfo
 sudo yum install autoconf automake libtool pkg-config
 
 make
-# yunhao qemu, and openocd
+# todo only a subset of the full toolchain needs to be built, only gcc and binutils (objdump and objcopy) 
+# todo export PATH=$PATH:$PWD/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-fedora36/bin
+
+# yunhao qemu

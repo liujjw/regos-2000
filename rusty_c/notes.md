@@ -3,4 +3,4 @@
 3. no_std -> no libstd, no libc, no rust runtime or POSIX 
 4. Use appropriate C attributes like no_mangle and repr(C).
 5. See `main()` and `README.md` of 3210 for ARMv8 or embedded rust book for ARM Cortex-M, [RISC-V](https://github.com/rust-embedded/riscv).
-6. `make` > `make install` > `make qemu` before. Now, `make`, then `cargo build`, modified `make install` > `make qemu`.
+6. `make` > `make install` > `make qemu` before. Now, `cargo build`, modified `make` > `make install` > `make qemu`.
