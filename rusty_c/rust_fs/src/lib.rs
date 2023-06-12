@@ -10,6 +10,14 @@ use core::include;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
+
+// struct treedisk_snapshot {
+//     union treedisk_block superblock; 
+//     union treedisk_block inodeblock; 
+//     block_no inode_blockno;
+//     struct treedisk_inode *inode;
+// };
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
