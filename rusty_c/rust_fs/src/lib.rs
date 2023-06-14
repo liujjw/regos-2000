@@ -10,17 +10,62 @@ use core::include;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-
-// struct treedisk_snapshot {
-//     union treedisk_block superblock; 
-//     union treedisk_block inodeblock; 
-//     block_no inode_blockno;
-//     struct treedisk_inode *inode;
-// };
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+#[repr(C)]
+#[derive(Copy, Clone)]
+struct treedisk_snapshot {
+    superblock: treedisk_block, 
+    inodeblock: treedisk_block,
+    inode_blockno: block_no,
+    inode: *mut treedisk_inode,
 }
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+struct treedisk_state {
+    below: *mut inode_store_t,
+    below_ino: u32,
+    ninodes: u32,
+}
+
+// call within unsafe 
+static mut log_rpb: u32 = 0;
+static mut null_block: block_t = 0;		
+
+fn panic(s: *const i8) {
+    unsafe {
+        FATAL(s);
+    }
+}
+
+fn log_shift_r(x: block_no, nbits: u32) -> block_no {
+    if nbits >= core::mem::size_of::<block_no>() as u32 * 8 {
+        return 0;
+    }
+    x >> nbits
+}
+
+fn treedisk_get_snapshot(snapshot: &mut treedisk_snapshot, 
+                        ts: &mut treedisk_state, inode_no: u32) -> i32 {
+    if ts.below.read().unwrap()(ts.below, ts.below_ino, 0, &mut snapshot.superblock as *mut block_t as *mut i8) < 0 {
+        return -1;
+    }
+
+    if inode_no >= snapshot.superblock.superblock.n_inodeblocks * INODES_PER_BLOCK {
+        panic("!!TDERR: inode number too large\n");
+        return -1;
+    }
+
+    snapshot.inode_blockno = 1 + inode_no / INODES_PER_BLOCK;
+    if ts.below.read.unwrap()(ts.below, ts.below_ino, snapshot.inode_blockno, &mut snapshot.inodeblock as *mut block_t as *mut i8) < 0 {
+        return -1;
+    }
+
+    snapshot.inode = *mut snapshot.inodeblock.inodeblock.inodes[(inode_no % INODES_PER_BLOCK) as usize];
+    return 0;
+}
+
+// #[no_mangle]
+// pub extern "C" 
 
 #[cfg(test)]
 mod tests {
@@ -28,12 +73,5 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
     }
-}
-
-#[no_mangle]
-pub extern "C" fn add_c(left: usize, right: usize) -> usize {
-    add(left, right)
 }

@@ -1,13 +1,15 @@
 # info
-egos-2000 filesystem in rust
+egos-2000 with drop-in rust modules
 
 ## usage
+Install Vagrant by Hashicorp for your host platform. **Follow these steps whenever running or developing.** `vagrant up` in root of this project on your host computer and then `vagrant ssh` with `vagrant` as password. You are now inside a VM if you didn't notice any errors. The root of this project in the VM is at `/vagrant` (it's a "shared" folder between the host OS and the VM, changes in here are preserved between host and VM). 
 ### setup
-Install Vagrant by Hashicorp for your host platform. Run `vagrant up` in root of this project and then `vagrant ssh` with `vagrant` as password. Now `cd /vagrant/rusty_c/rust_fs` into the Rust project and run the setup scripts for the VM platform used by Vagrant (if `bento/ubuntu-14.04 --box-version 201808.24.0`, use the ubuntu setup). 
+Now `cd /vagrant/rusty_c/rust_fs` into the Rust project and run the setup scripts for the VM platform used by the Vagrantfile (for example, if `bento/ubuntu-14.04 --box-version 201808.24.0`, use the ubuntu setup). 
 
-## Rust FFI to C
-Auto-generate Rust FFI bindings for C using `cargo build`, building and linking C files as well. Look for `bindings.rs` and `*.a` archive in `target/`. Uses Rust `bindgen` and `cc` build crates (`build.rs` and `wrapper.h`). If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.
-### FFI API
-The generated FFI bindings are dumped with the `include!` macro. Look for `bindings.rs` in `target/` for raw FFI bindings. Run `cargo test` to verify layout, size, and alignment.
+## Writing Rust modules and integrating them into the current C build system
+### Rust FFI to C
+**If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.**
+Auto-generate Rust FFI bindings for C libraries using `cargo build`, building and linking C files as well (`bindgen`, `cc`, etc. using the build script `build.rs`). Look for `bindings.rs` in `target/` to see what they look like. The generated FFI bindings are dumped with the `include!` macro into your Rust library. Run `cargo test` to verify layout, size, and alignment. 
+
 ### C FFI to Rust
-Same general idea as Rust to C, but instead of `bindings.rs` a header file suffices.
+A header file of the Rust function signatures suffices. Make sure demangling and C ABI is used in your Rust functions if they are to be called by C. Make sure your Rust library is compiled as a static library archive (`.a` file in `target/`) and copy and link it in the Makefile.

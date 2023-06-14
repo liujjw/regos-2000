@@ -4,3 +4,4 @@
 4. Use appropriate C attributes like no_mangle and repr(C).
 5. See `main()` and `README.md` of 3210 for ARMv8 or embedded rust book for ARM Cortex-M, [RISC-V](https://github.com/rust-embedded/riscv).
 6. `make` > `make install` > `make qemu` before. Now, `cargo build`, modified `make` > `make install` > `make qemu`.
+7. No defined `MKFS`, no `#include <stdio.h>`, and no `MKFS` panic because `fdopen` requires `POSIX` interface (`stdio` used for dev purposes? we use `egos.h` instead, but look at `egos.h` comments about the matter).

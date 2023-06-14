@@ -20,13 +20,13 @@ apps: apps/system/*.c apps/user/*.c
 
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(TOOLS)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
+	$(CC) $(TOOLS)/mkfs.c library/file/file.c -std=c99 -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
 	cd $(TOOLS); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf
 	$(OBJCOPY) --remove-section=.image $(TOOLS)/earth.elf
 	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
-	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
+	$(CC) -std=c99 $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
 	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
 
 program:

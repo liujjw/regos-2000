@@ -10,3 +10,7 @@ export PATH=$(pwd)/riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-linux-ubuntu14/bin
 
 # for cargo-generate
 sudo apt install -y libssl-dev pkg-config
+
+# gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.4) needs std=c99 for compiling
+
+# temp glibc version for qemu

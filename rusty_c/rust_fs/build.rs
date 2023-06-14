@@ -15,7 +15,11 @@ fn main() {
   // cargo build scripts can emit environment variables/print to stdout
   // to tell cargo how to link
   println!("cargo:rustc-link-search={}", libdir_path.to_str().unwrap());
+  // let dir_path = std::process::Command::new(cd $(gcc --print-file-name=libc.a)/..)
+  // println!("cargo:rustc-link-search=dir_path);
   println!("cargo:rustc-link-lib=static=egos_file");
+  // println!("cargo:rustc-link-lib=stdlid");
+  // println!("cargo:rustc-link-lib=string");
   println!("cargo:rerun-if-changed={}", headers_path_str);
 
   // use cc to build C static library archive of the egos file/ directory, scraping 
