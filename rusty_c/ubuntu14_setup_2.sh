@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # udev rules for openocd https://docs.rust-embedded.org/book/intro/install/linux.html#udev-rules
 # openocd from sifive
 # echo "[!] Installing openocd and adding to path"

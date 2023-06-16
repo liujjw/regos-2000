@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "fedora36?: $(cat /etc/fedora-release)"
 
 # sifive riscv toolchain
