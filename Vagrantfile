@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.provision "shell", inline: "echo Hello"
+  # config.vm.provision "shell", inline: "echo Hello"
 
   config.vm.define "fourteen" do |fourteen|
     fourteen.vm.box = "bento/ubuntu-14.04"

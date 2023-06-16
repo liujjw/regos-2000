@@ -17,6 +17,7 @@ Now `cd /vagrant/rusty_c/rust_fs` into the Rust project and run the setup script
 ## Writing Rust modules and integrating them into the current C build system
 ### Rust FFI to C
 **If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.**
+**If `cargo` not found restart the terminal after setup.**
 
 Auto-generate Rust FFI bindings for C libraries using `cargo build`, building and linking C files as well (`bindgen`, `cc`, etc. using the build script `build.rs`). Look for `bindings.rs` in `target/` to see what they look like. The generated FFI bindings are dumped with the `include!` macro into your Rust library. Run `cargo test` to verify layout, size, and alignment. 
 
