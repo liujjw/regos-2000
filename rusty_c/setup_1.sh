@@ -34,6 +34,7 @@ echo "[!] Please ensure appropriate risc-v toolchain used by egos-2000 is instal
 echo "[!] Assuming https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only installed"
 echo "[!] Please ensure qemu-system-riscv used by egos-2000 is installed already"
 echo "[!] Assuming https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.5.1 installed"
+echo "[!] Restart terminal if Rust not found"
 echo "[!] Run []_setup_2.sh for your machine"
 
 source "$HOME/.cargo/env"
