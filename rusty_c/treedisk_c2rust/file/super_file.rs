@@ -1,17 +1,31 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
-#![register_tool(c2rust)]
-#![feature(register_tool)]
+use ::libc;
+#[c2rust::header_src = "/usr/include/stdlib.h:2"]
+pub mod stdlib_h {
+    extern "C" {
+        #[c2rust::src_loc = "539:14"]
+        pub fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+    }
+}
+#[c2rust::header_src = "/usr/include/string.h:3"]
+pub mod string_h {
+    extern "C" {
+        #[c2rust::src_loc = "60:14"]
+        pub fn memset(
+            _: *mut libc::c_void,
+            _: libc::c_int,
+            _: libc::c_ulong,
+        ) -> *mut libc::c_void;
+    }
+}
+use self::stdlib_h::malloc;
+use self::string_h::memset;
 extern "C" {
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
-    fn memset(
-        _: *mut libc::c_void,
-        _: libc::c_int,
-        _: libc::c_ulong,
-    ) -> *mut libc::c_void;
-    static mut earth: *mut earth;
+    #[c2rust::src_loc = "59:22"]
+    pub static mut earth: *mut earth;
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "12:8"]
 pub struct earth {
     pub intr_enable: Option::<unsafe extern "C" fn() -> libc::c_int>,
     pub intr_register: Option::<
@@ -66,21 +80,31 @@ pub struct earth {
     pub platform: C2RustUnnamed_0,
     pub translation: C2RustUnnamed,
 }
+#[c2rust::src_loc = "40:5"]
 pub type C2RustUnnamed = libc::c_uint;
+#[c2rust::src_loc = "40:24"]
 pub const SOFT_TLB: C2RustUnnamed = 1;
+#[c2rust::src_loc = "40:12"]
 pub const PAGE_TABLE: C2RustUnnamed = 0;
+#[c2rust::src_loc = "39:5"]
 pub type C2RustUnnamed_0 = libc::c_uint;
+#[c2rust::src_loc = "39:18"]
 pub const ARTY: C2RustUnnamed_0 = 1;
+#[c2rust::src_loc = "39:12"]
 pub const QEMU: C2RustUnnamed_0 = 0;
+#[c2rust::src_loc = "110:1"]
 pub type block_no = libc::c_uint;
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "112:16"]
 pub struct block {
     pub bytes: [libc::c_char; 512],
 }
+#[c2rust::src_loc = "112:1"]
 pub type block_t = block;
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "119:16"]
 pub struct inode_store {
     pub getsize: Option::<
         unsafe extern "C" fn(*mut inode_store, libc::c_uint) -> libc::c_int,
@@ -106,10 +130,13 @@ pub struct inode_store {
     >,
     pub state: *mut libc::c_void,
 }
+#[c2rust::src_loc = "119:1"]
 pub type inode_store_t = inode_store;
+#[c2rust::src_loc = "127:1"]
 pub type inode_intf = *mut inode_store_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "175:8"]
 pub struct treedisk_state {
     pub below: *mut inode_store_t,
     pub below_ino: libc::c_uint,
@@ -117,6 +144,7 @@ pub struct treedisk_state {
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "168:8"]
 pub struct treedisk_snapshot {
     pub superblock: treedisk_block,
     pub inodeblock: treedisk_block,
@@ -125,12 +153,14 @@ pub struct treedisk_snapshot {
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "142:8"]
 pub struct treedisk_inode {
     pub root: block_no,
     pub nblocks: block_no,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "159:7"]
 pub union treedisk_block {
     pub datablock: block_t,
     pub superblock: treedisk_superblock,
@@ -140,39 +170,48 @@ pub union treedisk_block {
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "155:8"]
 pub struct treedisk_indirblock {
     pub refs: [block_no; 128],
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "151:8"]
 pub struct treedisk_freelistblock {
     pub refs: [block_no; 128],
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "147:8"]
 pub struct treedisk_inodeblock {
     pub inodes: [treedisk_inode; 64],
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
+#[c2rust::src_loc = "137:8"]
 pub struct treedisk_superblock {
     pub n_inodeblocks: block_no,
     pub free_list: block_no,
 }
+#[c2rust::src_loc = "181:21"]
 static mut log_rpb: libc::c_uint = 0;
+#[c2rust::src_loc = "182:16"]
 static mut null_block: block_t = block_t { bytes: [0; 512] };
+#[c2rust::src_loc = "184:1"]
 unsafe extern "C" fn panic(mut s: *const libc::c_char) {
     ((*earth).tty_fatal).expect("non-null function pointer")(s);
 }
+#[c2rust::src_loc = "193:1"]
 unsafe extern "C" fn log_shift_r(mut x: block_no, mut nbits: libc::c_uint) -> block_no {
     if nbits as libc::c_ulong
-        >= (::std::mem::size_of::<block_no>() as libc::c_ulong)
+        >= (::core::mem::size_of::<block_no>() as libc::c_ulong)
             .wrapping_mul(8 as libc::c_int as libc::c_ulong)
     {
         return 0 as libc::c_int as block_no;
     }
     return x >> nbits;
 }
+#[c2rust::src_loc = "200:1"]
 unsafe extern "C" fn treedisk_get_snapshot(
     mut snapshot: *mut treedisk_snapshot,
     mut ts: *mut treedisk_state,
@@ -195,7 +234,7 @@ unsafe extern "C" fn treedisk_get_snapshot(
             .wrapping_mul(
                 (512 as libc::c_int as libc::c_ulong)
                     .wrapping_div(
-                        ::std::mem::size_of::<treedisk_inode>() as libc::c_ulong,
+                        ::core::mem::size_of::<treedisk_inode>() as libc::c_ulong,
                     ),
             )
     {
@@ -217,7 +256,7 @@ unsafe extern "C" fn treedisk_get_snapshot(
                 .wrapping_div(
                     (512 as libc::c_int as libc::c_ulong)
                         .wrapping_div(
-                            ::std::mem::size_of::<treedisk_inode>() as libc::c_ulong,
+                            ::core::mem::size_of::<treedisk_inode>() as libc::c_ulong,
                         ),
                 ),
         ) as block_no;
@@ -233,20 +272,21 @@ unsafe extern "C" fn treedisk_get_snapshot(
     {
         return -(1 as libc::c_int);
     }
-    let ref mut fresh0 = (*snapshot).inode;
-    *fresh0 = &mut *((*snapshot).inodeblock.inodeblock.inodes)
+    (*snapshot)
+        .inode = &mut *((*snapshot).inodeblock.inodeblock.inodes)
         .as_mut_ptr()
         .offset(
             (inode_no as libc::c_ulong)
                 .wrapping_rem(
                     (512 as libc::c_int as libc::c_ulong)
                         .wrapping_div(
-                            ::std::mem::size_of::<treedisk_inode>() as libc::c_ulong,
+                            ::core::mem::size_of::<treedisk_inode>() as libc::c_ulong,
                         ),
                 ) as isize,
         ) as *mut treedisk_inode;
     return 0 as libc::c_int;
 }
+#[c2rust::src_loc = "218:1"]
 unsafe extern "C" fn treedisk_alloc_block(
     mut ts: *mut treedisk_state,
     mut snapshot: *mut treedisk_snapshot,
@@ -254,6 +294,7 @@ unsafe extern "C" fn treedisk_alloc_block(
     let mut b: block_no = 0;
     static mut count: libc::c_int = 0;
     count += 1;
+    count;
     b = (*snapshot).superblock.superblock.free_list;
     if b == 0 as libc::c_int as libc::c_uint {
         panic(
@@ -275,7 +316,7 @@ unsafe extern "C" fn treedisk_alloc_block(
     );
     let mut i: libc::c_uint = 0;
     i = (512 as libc::c_int as libc::c_ulong)
-        .wrapping_div(::std::mem::size_of::<block_no>() as libc::c_ulong)
+        .wrapping_div(::core::mem::size_of::<block_no>() as libc::c_ulong)
         as libc::c_uint;
     loop {
         i = i.wrapping_sub(1);
@@ -330,6 +371,7 @@ unsafe extern "C" fn treedisk_alloc_block(
     }
     return free_blockno;
 }
+#[c2rust::src_loc = "254:1"]
 unsafe extern "C" fn treedisk_getsize(
     mut this_bs: *mut inode_store_t,
     mut ino: libc::c_uint,
@@ -350,6 +392,7 @@ unsafe extern "C" fn treedisk_getsize(
     }
     return (*snapshot.inode).nblocks as libc::c_int;
 }
+#[c2rust::src_loc = "263:1"]
 unsafe extern "C" fn treedisk_setsize(
     mut this_bs: *mut inode_store_t,
     mut ino: libc::c_uint,
@@ -357,6 +400,7 @@ unsafe extern "C" fn treedisk_setsize(
 ) -> libc::c_int {
     return -(1 as libc::c_int);
 }
+#[c2rust::src_loc = "267:1"]
 unsafe extern "C" fn treedisk_read(
     mut this_bs: *mut inode_store_t,
     mut ino: libc::c_uint,
@@ -388,6 +432,7 @@ unsafe extern "C" fn treedisk_read(
         ) != 0 as libc::c_int as libc::c_uint
         {
             nlevels = nlevels.wrapping_add(1);
+            nlevels;
         }
     }
     let mut b: block_no = (*snapshot.inode).root;
@@ -411,16 +456,18 @@ unsafe extern "C" fn treedisk_read(
             return 0 as libc::c_int;
         }
         nlevels = nlevels.wrapping_sub(1);
+        nlevels;
         let mut tib: *mut treedisk_indirblock = block as *mut treedisk_indirblock;
         let mut index: libc::c_uint = (log_shift_r(offset, nlevels.wrapping_mul(log_rpb))
             as libc::c_ulong)
             .wrapping_rem(
                 (512 as libc::c_int as libc::c_ulong)
-                    .wrapping_div(::std::mem::size_of::<block_no>() as libc::c_ulong),
+                    .wrapping_div(::core::mem::size_of::<block_no>() as libc::c_ulong),
             ) as libc::c_uint;
         b = (*tib).refs[index as usize];
     };
 }
+#[c2rust::src_loc = "305:1"]
 unsafe extern "C" fn treedisk_write(
     mut this_bs: *mut inode_store_t,
     mut ino: libc::c_uint,
@@ -452,6 +499,7 @@ unsafe extern "C" fn treedisk_write(
         ) != 0 as libc::c_int as libc::c_uint
         {
             nlevels = nlevels.wrapping_add(1);
+            nlevels;
         }
     }
     let mut nlevels_after: libc::c_uint = 0;
@@ -464,6 +512,7 @@ unsafe extern "C" fn treedisk_write(
             != 0 as libc::c_int as libc::c_uint
         {
             nlevels_after = nlevels_after.wrapping_add(1);
+            nlevels_after;
         }
     } else {
         nlevels_after = nlevels;
@@ -500,6 +549,7 @@ unsafe extern "C" fn treedisk_write(
                 );
             }
             nlevels = nlevels.wrapping_add(1);
+            nlevels;
         }
     }
     if dirty_inode != 0 {
@@ -563,11 +613,12 @@ unsafe extern "C" fn treedisk_write(
             }
         }
         nlevels = nlevels.wrapping_sub(1);
+        nlevels;
         let mut index: libc::c_uint = (log_shift_r(offset, nlevels.wrapping_mul(log_rpb))
             as libc::c_ulong)
             .wrapping_rem(
                 (512 as libc::c_int as libc::c_ulong)
-                    .wrapping_div(::std::mem::size_of::<block_no>() as libc::c_ulong),
+                    .wrapping_div(::core::mem::size_of::<block_no>() as libc::c_ulong),
             ) as libc::c_uint;
         parent_no = &mut *(tib_0.refs).as_mut_ptr().offset(index as isize)
             as *mut block_no;
@@ -583,6 +634,7 @@ unsafe extern "C" fn treedisk_write(
     return 0 as libc::c_int;
 }
 #[no_mangle]
+#[c2rust::src_loc = "391:1"]
 pub unsafe extern "C" fn treedisk_init(
     mut below: *mut inode_store_t,
     mut below_ino: libc::c_uint,
@@ -590,8 +642,9 @@ pub unsafe extern "C" fn treedisk_init(
     if log_rpb == 0 as libc::c_int as libc::c_uint {
         loop {
             log_rpb = log_rpb.wrapping_add(1);
+            log_rpb;
             if !((512 as libc::c_int as libc::c_ulong)
-                .wrapping_div(::std::mem::size_of::<block_no>() as libc::c_ulong)
+                .wrapping_div(::core::mem::size_of::<block_no>() as libc::c_ulong)
                 .wrapping_sub(1 as libc::c_int as libc::c_ulong) >> log_rpb
                 != 0 as libc::c_int as libc::c_ulong)
             {
@@ -600,33 +653,31 @@ pub unsafe extern "C" fn treedisk_init(
         }
     }
     let mut ts: *mut treedisk_state = malloc(
-        ::std::mem::size_of::<treedisk_state>() as libc::c_ulong,
+        ::core::mem::size_of::<treedisk_state>() as libc::c_ulong,
     ) as *mut treedisk_state;
     memset(
         ts as *mut libc::c_void,
         0 as libc::c_int,
-        ::std::mem::size_of::<treedisk_state>() as libc::c_ulong,
+        ::core::mem::size_of::<treedisk_state>() as libc::c_ulong,
     );
-    let ref mut fresh1 = (*ts).below;
-    *fresh1 = below;
+    (*ts).below = below;
     (*ts).below_ino = below_ino;
     let mut this_bs: *mut inode_store_t = malloc(
-        ::std::mem::size_of::<inode_store_t>() as libc::c_ulong,
+        ::core::mem::size_of::<inode_store_t>() as libc::c_ulong,
     ) as *mut inode_store_t;
     memset(
         this_bs as *mut libc::c_void,
         0 as libc::c_int,
-        ::std::mem::size_of::<inode_store_t>() as libc::c_ulong,
+        ::core::mem::size_of::<inode_store_t>() as libc::c_ulong,
     );
-    let ref mut fresh2 = (*this_bs).state;
-    *fresh2 = ts as *mut libc::c_void;
-    let ref mut fresh3 = (*this_bs).getsize;
-    *fresh3 = Some(
+    (*this_bs).state = ts as *mut libc::c_void;
+    (*this_bs)
+        .getsize = Some(
         treedisk_getsize
             as unsafe extern "C" fn(*mut inode_store_t, libc::c_uint) -> libc::c_int,
     );
-    let ref mut fresh4 = (*this_bs).setsize;
-    *fresh4 = Some(
+    (*this_bs)
+        .setsize = Some(
         treedisk_setsize
             as unsafe extern "C" fn(
                 *mut inode_store_t,
@@ -634,8 +685,8 @@ pub unsafe extern "C" fn treedisk_init(
                 block_no,
             ) -> libc::c_int,
     );
-    let ref mut fresh5 = (*this_bs).read;
-    *fresh5 = Some(
+    (*this_bs)
+        .read = Some(
         treedisk_read
             as unsafe extern "C" fn(
                 *mut inode_store_t,
@@ -644,8 +695,8 @@ pub unsafe extern "C" fn treedisk_init(
                 *mut block_t,
             ) -> libc::c_int,
     );
-    let ref mut fresh6 = (*this_bs).write;
-    *fresh6 = Some(
+    (*this_bs)
+        .write = Some(
         treedisk_write
             as unsafe extern "C" fn(
                 *mut inode_store_t,
@@ -657,6 +708,7 @@ pub unsafe extern "C" fn treedisk_init(
     return this_bs;
 }
 #[no_mangle]
+#[c2rust::src_loc = "414:1"]
 pub unsafe extern "C" fn setup_freelist(
     mut below: *mut inode_store_t,
     mut below_ino: libc::c_uint,
@@ -668,26 +720,28 @@ pub unsafe extern "C" fn setup_freelist(
     let mut i: libc::c_uint = 0;
     while next_free < nblocks {
         freelist_data[0 as libc::c_int as usize] = freelist_block;
-        let fresh7 = next_free;
+        let fresh0 = next_free;
         next_free = next_free.wrapping_add(1);
-        freelist_block = fresh7;
+        freelist_block = fresh0;
         i = 1 as libc::c_int as libc::c_uint;
         while (i as libc::c_ulong)
             < (512 as libc::c_int as libc::c_ulong)
-                .wrapping_div(::std::mem::size_of::<block_no>() as libc::c_ulong)
+                .wrapping_div(::core::mem::size_of::<block_no>() as libc::c_ulong)
             && next_free < nblocks
         {
-            let fresh8 = next_free;
+            let fresh1 = next_free;
             next_free = next_free.wrapping_add(1);
-            freelist_data[i as usize] = fresh8;
+            freelist_data[i as usize] = fresh1;
             i = i.wrapping_add(1);
+            i;
         }
         while (i as libc::c_ulong)
             < (512 as libc::c_int as libc::c_ulong)
-                .wrapping_div(::std::mem::size_of::<block_no>() as libc::c_ulong)
+                .wrapping_div(::core::mem::size_of::<block_no>() as libc::c_ulong)
         {
             freelist_data[i as usize] = 0 as libc::c_int as block_no;
             i = i.wrapping_add(1);
+            i;
         }
         if (Some(((*below).write).expect("non-null function pointer")))
             .expect(
@@ -705,12 +759,13 @@ pub unsafe extern "C" fn setup_freelist(
     return freelist_block;
 }
 #[no_mangle]
+#[c2rust::src_loc = "434:1"]
 pub unsafe extern "C" fn treedisk_create(
     mut below: *mut inode_store_t,
     mut below_ino: libc::c_uint,
     mut ninodes: libc::c_uint,
 ) -> libc::c_int {
-    if ::std::mem::size_of::<treedisk_block>() as libc::c_ulong
+    if ::core::mem::size_of::<treedisk_block>() as libc::c_ulong
         != 512 as libc::c_int as libc::c_ulong
     {
         panic(
@@ -721,12 +776,12 @@ pub unsafe extern "C" fn treedisk_create(
     let mut n_inodeblocks: libc::c_uint = (ninodes as libc::c_ulong)
         .wrapping_add(
             (512 as libc::c_int as libc::c_ulong)
-                .wrapping_div(::std::mem::size_of::<treedisk_inode>() as libc::c_ulong),
+                .wrapping_div(::core::mem::size_of::<treedisk_inode>() as libc::c_ulong),
         )
         .wrapping_sub(1 as libc::c_int as libc::c_ulong)
         .wrapping_div(
             (512 as libc::c_int as libc::c_ulong)
-                .wrapping_div(::std::mem::size_of::<treedisk_inode>() as libc::c_ulong),
+                .wrapping_div(::core::mem::size_of::<treedisk_inode>() as libc::c_ulong),
         ) as libc::c_uint;
     let mut nblocks: libc::c_uint = (Some(
         ((*below).getsize).expect("non-null function pointer"),
@@ -796,6 +851,7 @@ pub unsafe extern "C" fn treedisk_create(
                 return -(1 as libc::c_int);
             }
             i += 1;
+            i;
         }
     }
     return 0 as libc::c_int;

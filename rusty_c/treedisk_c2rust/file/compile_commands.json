@@ -1,0 +1,11 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "super_file.c"
+        ],
+        "directory": "/vagrant/rusty_c/treedisk_c2rust/file",
+        "file": "super_file.c"
+    }
+]
