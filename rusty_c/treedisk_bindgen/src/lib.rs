@@ -6,14 +6,23 @@
 
 extern crate panic_halt;
 
-use core::include;
+// use core::include;
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+// include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+
+// #[no_mangle]
+// unsafe extern "C" fn log_shift_r(x: block_no, nbits: cty::c_uint) -> block_no {
+//     if nbits >= core::mem::size_of::<block_no>() as cty::c_uint * 8 {
+//         return 0;
+//     }
+//     x >> nbits
+// }
 
 #[no_mangle]
-unsafe extern "C" fn log_shift_r(x: block_no, nbits: u32) -> block_no {
-    if nbits >= core::mem::size_of::<block_no>() as u32 * 8 {
+unsafe extern "C" fn log_shift_r(x: cty::c_uint, nbits: cty::c_uint) -> cty::c_uint {
+    if nbits >= core::mem::size_of::<cty::c_uint>() as cty::c_uint * 8 {
         return 0;
     }
     x >> nbits
 }
+
