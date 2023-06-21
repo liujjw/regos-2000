@@ -18,6 +18,17 @@ apps: apps/system/*.c apps/user/*.c
 	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
 	done
 
+.PHONY: rust_apps
+rust_apps: apps/system/*.c apps/user/*.c
+	@echo "$(CYAN)-------- Compile the Apps Layer with Rust and Overwrite the Usual Apps Layer --------$(END)"
+	for FILE in $^ ; do \
+	  export APP=$$(basename $${FILE} .c);\
+	  echo "Compile" $${FILE} "=>" $(RELEASE)/$${APP}.elf;\
+	  $(RISCV_CC) $(RUST_COMMON) $(APPS_SRCS) $${FILE} $(APPS_LD) -Iapps -o $(RELEASE)/$${APP}.elf -lrusty_fs || exit 1 ;\
+	  echo "Compile" $${FILE} "=>" $(DEBUG)/$${APP}.lst;\
+	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
+	done
+
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
 	$(CC) $(TOOLS)/mkfs.c library/file/file.c -std=c99 -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
@@ -56,9 +67,11 @@ EARTH_SRCS = earth/earth.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*
 
 CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
+RUST_LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib -L $(RUST_LIBRARY_PATH) 
 INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue
 
 COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
+RUST_COMMON = $(CFLAGS) $(RUST_LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
 
 APPS_LD = -Tapps/app.lds -lc -lgcc
 GRASS_LD = -Tgrass/grass.lds -lc -lgcc
@@ -69,6 +82,7 @@ QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
 OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+RUST_LIBRARY_PATH = rusty_c/treedisk_bindgen/target/riscv64gc-unknown-none-elf/release
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

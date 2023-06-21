@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "file.h"
+#include "log_shift_rs.h"
 
 #ifdef MKFS
 #include <stdio.h>
@@ -67,12 +68,12 @@ static void panic(const char *s){
 /* Stupid ANSI C compiler leaves shifting by #bits in unsigned int or more
  * undefined, but the result should clearly be 0...
  */
-static block_no log_shift_r(block_no x, unsigned int nbits){
-    if (nbits >= sizeof(block_no) * 8) {
-        return 0;
-    }
-    return x >> nbits;
-}
+// static block_no log_shift_r(block_no x, unsigned int nbits){
+//     if (nbits >= sizeof(block_no) * 8) {
+//         return 0;
+//     }
+//     return x >> nbits;
+// }
 
 /* Get a snapshot of the file system, including the superblock and the block
  * containing the inode, from the inode store below.
