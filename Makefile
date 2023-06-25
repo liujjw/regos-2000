@@ -40,6 +40,17 @@ install:
 	$(CC) -std=c99 $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
 	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
 
+rust_install:
+	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
+	$(CC) -L$(RUST_HOST_LIBRARY_PATH) $(TOOLS)/mkfs.c library/file/file.c -std=c99 -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs -lrusty_fs
+	cd $(TOOLS); ./mkfs
+	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
+	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf
+	$(OBJCOPY) --remove-section=.image $(TOOLS)/earth.elf
+	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
+	$(CC) -std=c99 $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
+	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
+
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
 	cd $(TOOLS)/fpga/openocd; time openocd -f 7series.txt
@@ -82,7 +93,8 @@ QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
 OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
-RUST_LIBRARY_PATH = rusty_c/treedisk_bindgen/target/riscv64gc-unknown-none-elf/release
+RUST_LIBRARY_PATH = rusty_c/treedisk_bindgen/target/riscv32i-unknown-none-elf/release
+RUST_HOST_LIBRARY_PATH = rusty_c/treedisk_bindgen/target/x86_64-unknown-linux-gnu/debug
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
