@@ -18,7 +18,7 @@ rustup component add clippy
 
 # install precompiled core crate
 # tier 2 target, with single and double precision floating point
-rustup target add riscv64gc-unknown-none-elf
+rustup target add riscv32i-unknown-none-elf
 
 # install binutils
 rustup component add llvm-tools-preview 

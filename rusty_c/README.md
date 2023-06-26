@@ -8,7 +8,7 @@ Install Vagrant by Hashicorp for your (`x86`) OS and a hypervisor (KVM, VirtualB
 
 **Use the following steps whenever running or developing.**  
 
-**NOTE** Specify `fourteen` (`ubuntu14`) or `ateen`(`ubuntu18`) depending on whether you need `QEMU` or not. For example, you need to use `vagrant ssh ateen` to `ssh` into the `ubuntu18` distro and use `ubuntu18_setup_0` to setup `QEMU` and then you can call `make qemu`. `make qemu` does not work in `ubuntu14`.
+**NOTE** `fourteen` is for cargo builds, `ateen` is for `c2rust`, and `twenty` is for make. For example, you need to use `vagrant ssh twenty` after `vagrant up twenty` to `ssh` into the `ubuntu18` distro and use `ubuntu18_setup_0` to setup `QEMU` and then you can call `make qemu`. `make qemu` does not work in `ubuntu14`.
 
 `vagrant up` in root of this project on your host computer and then `vagrant ssh [vm]` with `vagrant` as password. You are now inside a VM if you didn't notice any errors. The root of this project in the VM is at `/vagrant` (it's a "shared" folder between the host OS and the VM, changes in here are preserved between host and VM). 
 ### setup
