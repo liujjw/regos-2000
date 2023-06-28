@@ -1,0 +1,5 @@
+1. Almost semantically equivalent to C basic disk impl, however we are using safe rust references, but in a trivial way
+1.1.5 Thread safe!
+1.5 Using egos malloc implementation wrapper around the alloc crate for Rust references.
+2. Once we have an interface to C code, subsequent Rust code need only be compatible with other Rust code if built on top, we can write idiomatic Rust (draw a diagram for safe, idiomatic with HL abstactions rust -> safe rust -> c )
+3. Start here with SimpleFS traits (interfaces) and impls (methods)

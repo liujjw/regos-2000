@@ -93,8 +93,8 @@ QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
 OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
-RUST_LIBRARY_PATH = rusty_c/treedisk_bindgen/target/riscv32i-unknown-none-elf/release
-RUST_HOST_LIBRARY_PATH = rusty_c/treedisk_bindgen/target/x86_64-unknown-linux-gnu/debug
+RUST_LIBRARY_PATH = rusty_c/logshift/target/riscv32i-unknown-none-elf/release
+RUST_HOST_LIBRARY_PATH = rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

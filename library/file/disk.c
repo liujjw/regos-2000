@@ -11,6 +11,7 @@
 #include "disk.h"
 #include "inode.h"
 
+// # of blocks total
 static int disk_getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
 
 static int disk_setsize() { FATAL("disk: cannot set the size"); }

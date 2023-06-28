@@ -1,0 +1,39 @@
+cc -Lrusty_c/logshift/target/x86_64-unknown-linux-gnu/debug tools/mkfs.c library/file/file.c -std=c99 -DMKFS -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue -o tools/mkfs -lrusty_fs
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread::guard::get_stack_start':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:728: undefined reference to `pthread_getattr_np'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:732: undefined reference to `pthread_attr_getstack'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::get':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:22: undefined reference to `pthread_getspecific'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::set':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:16: undefined reference to `pthread_setspecific'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::weak::fetch':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/weak.rs:138: undefined reference to `dlsym'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread::Thread::new':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:71: undefined reference to `pthread_attr_setstacksize'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:82: undefined reference to `pthread_attr_setstacksize'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:87: undefined reference to `pthread_create'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread::Thread::set_name':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:140: undefined reference to `pthread_setname_np'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread::Thread::join':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:263: undefined reference to `pthread_join'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `<std::sys::unix::thread::Thread as core::ops::drop::Drop>::drop':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:282: undefined reference to `pthread_detach'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread::guard::current':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:865: undefined reference to `pthread_getattr_np'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:868: undefined reference to `pthread_attr_getguardsize'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread.rs:881: undefined reference to `pthread_attr_getstack'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::get':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:22: undefined reference to `pthread_getspecific'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::set':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:16: undefined reference to `pthread_setspecific'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::get':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:22: undefined reference to `pthread_getspecific'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::create':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:10: undefined reference to `pthread_key_create'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:10: undefined reference to `pthread_key_create'
+/usr/bin/ld: rusty_c/logshift/target/x86_64-unknown-linux-gnu/debug/librusty_fs.a(std-8389830094602f5a.std.fd8b77e9-cgu.0.rcgu.o): in function `std::sys::unix::thread_local_key::destroy':
+/rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:27: undefined reference to `pthread_key_delete'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:27: undefined reference to `pthread_key_delete'
+/usr/bin/ld: /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/std/src/sys/unix/thread_local_key.rs:27: undefined reference to `pthread_key_delete'
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:45: rust_install] Error 1

@@ -1,69 +1,140 @@
 !#[no_std]
-!#[feature(alloc)]
-!#[feature(alloc_error_handler)]
 
-extern crate alloc;
-
-use core::panic::PanicInfo;
+mod common;
+use common::*;
 use core::include;
-use core::alloc::{GlobalAlloc, Layout};
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+struct SimpleFS<T: Stackable> {
+    below: T,
+    below_ino: u8,
+    num_inodes: u32,
 }
 
-struct EgosAllocator;
-
-// use egos allocator or another crates.io impl, then Box, since other C code
-// relies on pointers to heap data we cannot use heapless or just the stack
-unsafe impl GlobalAlloc for EgosAllocator {
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        malloc(layout.size() as cty::size_t) as *mut u8
-    }
-
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        free(ptr as *mut cty::c_void);
+impl<T: Stackable> SimpleFS<T> {
+    fn new(below: T, below_ino: u8, num_inodes: u32) -> Self {
+        SimpleFS {
+            below: below,
+            below_ino: below_ino,
+            num_inodes: num_inodes
+        }
     }
 }
 
-#[global_allocator]
-static A: EgosAllocator = EgosAllocator;
+impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
+    fn getsize(&self) -> u32 {
+        return 0;
+    }
 
-#[alloc_error_handler]
-fn alloc_error_handler(layout: Layout) -> ! {
-    panic!("allocation error: {:?}", layout)
+    fn setsize(&mut self, size: u32) -> u32 {
+        return 0;
+    }
+
+    fn read(&self, buf: &mut [u8], size: u32, offset: u32) -> u32 {
+        return 0;
+    }
+
+    fn write(&mut self, buf: &[u8], size: u32, offset: u32) -> u32 {
+        return 0;
+    }
 }
 
-fn main() {
-    
-}
-
-struct state {
-    below: inode_store_t,
+// thread safety within Rust using immutable pointers
+#repr(C)]
+struct SimpleDiskState {
+    below: *const inode_store_t,
     below_ino: cty::c_uint,
+    num_inodes: cty::c_uint,
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn init(below: *mut inode_store_t, below_ino: cty::c_uint) -> inode_store_t {
-    let below;
-    if let Some(below) = below.as_mut() {
-        below = below;
+pub unsafe extern "C" fn init(
+    below: *mut inode_store_t, 
+    below_ino: cty::c_uint,
+    num_inodes: cty::c_uint) 
+-> *mut inode_store_t {
+    // assume below is aligned, initialized, and valid, but can check if non-null
+    if (below.is_null()) {
+        panic!("below is null");
     }
-    let mut state = state {
-        below: below,
+    let mut cur_state = Box::new(SimpleDiskState {
+        below: below as *const inode_store_t,
         below_ino: below_ino,
+        num_inodes: num_inodes
+    });
+    // pointers owned by box must NOT live past their lifetime
+    let mut inode_store = Box::new(inode_store_t {
+        state: Box::into_raw(cur_state),
+        getsize: *const get_size,
+        setsize: *const set_size,
+        read: *const read,
+        write: *const write
+    });
+    return Box::into_raw(inode_store);
+}
+
+// @precondition: assumes below is just the disk
+// @precondition: number of total blocks below >> num_inodes
+// Returns # of blocks in the given inode, which is constant for every inode 
+// (external fragmentation is possible).
+static unsafe extern "C" fn get_size(
+    inode_store: *mut inode_store_t, 
+    ino: cty::c_uint
+) -> cty::c_uint {
+    let cur_state = unsafe {
+        & *inode_store.state
     };
-}   
-    
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
+    let below = & *cur_state.below;
+    let num = below.getsize();
+    let denom = cur_state.num_inodes;
+    if denom == 0 || num == 0 || num < denom {
+        return -1;
     }
+    // implicit floor division
+    num / denom
+} 
+
+static unsafe extern "C" fn set_size(
+    inode_store: *mut inode_store_t, 
+    size: cty::c_int
+) -> cty::c_int {
+    return -1;
+}
+
+// read an inode at block offset return in a block_t
+static unsafe extern "C" fn read(
+    inode_store: *mut inode_store_t,
+    ino: cty::c_uint,
+    offset: block_no,
+    block: *mut block_t 
+) -> cty::c_int {
+    let cur_state = unsafe {
+        & *inode_store.state
+    };
+    let blocks_per_node = inode_store.getsize(inode_store, ino);
+    if ino >= cur_state.num_inodes || offset >= blocks_per_node {
+        return -1;
+    }
+    let below = & *cur_state.below;
+    let full_offset = (ino * blocks_per_node) + offset;
+    return below.read(below, ino, full_offset, block);
+}
+
+static unsafe extern "C" fn write(
+    inode_store: *mut inode_store_t, 
+    ino: cty::c_uint,
+    offset: block_no,
+    block: *mut block_t 
+) -> cty::c_int {
+    let cur_state = unsafe {
+        & *inode_store.state
+    };
+    let blocks_per_node = inode_store.getsize(inode_store, ino);
+    if ino >= cur_state.num_inodes || offset >= blocks_per_node {
+        return -1;
+    }
+    let below = & *state.below;
+    let full_offset = (ino * blocks_per_node) + offset;
+    return below.write(below, ino, full_offset, block);
 }
