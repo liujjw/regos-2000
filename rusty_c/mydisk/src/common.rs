@@ -37,18 +37,28 @@ mod common {
       panic!("allocation error: {:?}", layout)
   }   
 
-  struct Block {
+  pub struct Block {
     // [u8: BLOCK_SIZE]
     bytes: block_t
   }
 
   // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
 
+  pub enum ErrorCode {
+    UnknownFailure
+  }
+
+  pub struct SuccessInfo(u32);
+
   pub trait Stackable {
-    fn get_size(&self) -> u32;
-    fn set_size(&mut self, size: u32) -> Result<u8, u8>;
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<u8, u8>;
-    fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<u8, u8>;
+    fn get_size(&self) -> 
+      Result<SuccessInfo, ErroCode>;
+    fn set_size(&mut self, size: u32) -> 
+      Result<SuccessInfo, ErrorCode>;
+    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
+      Result<SuccessInfo, ErrorCode>;
+    fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> 
+      Result<SuccessInfo, ErrorCode>;
   }
 
   pub trait IsDisk {
