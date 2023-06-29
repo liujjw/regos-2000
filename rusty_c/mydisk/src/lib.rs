@@ -3,6 +3,8 @@
 mod common;
 use common::*;
 use core::include;
+use core::convert::From;   
+use core::convert::Into; 
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
@@ -15,8 +17,10 @@ struct DiskFS {
     set_size: fn() -> cty::c_int,
 }
 
-impl DiskFS {
-    fn from_inode_store(inode_store: *mut inode_store_t) -> Self {
+impl IsDisk for DiskFS {}
+
+impl From<inode_intf> for DiskFS {
+    fn from(inode_store: inode_intf) -> Self {
         if !inode_store.state.is_null() {
             panic!("DiskFS must be the lowest layer, and state is null");
         }
@@ -34,7 +38,6 @@ impl DiskFS {
                 (*inode_store).setsize
             }
         }
-
     }
 }
 
@@ -74,22 +77,33 @@ struct SimpleFS<T: Stackable, 'a> {
     num_inodes: u32,
 }
 
-impl<T: Stackable + IsDisk> SimpleFS<T> {
-    fn new(below: &mut T, below_ino: u8, num_inodes: u32) -> Self {
+impl From<*mut inode_store_t> for SimpleFS<DiskFS> {
+    fn from(inode_store: *mut inode_store_t) -> Self {
+        let cur_state = unsafe {
+            &mut *inode_store.state
+        };
+        let below = DiskFS::from(cur_state.below);
+        let below_ino = cur_state.below_ino;
+        let num_inodes = cur_state.num_inodes;
         SimpleFS {
             below: below,
             below_ino: below_ino,
             num_inodes: num_inodes
         }
     }
+}
 
-    fn to_inode_store(
-        simple_fs: Self,
-        get_size: fn(inode_store: *mut inode_store_t, ino: cty::c_uint) -> cty::c_uint,
-        set_size: fn(inode_store: *mut inode_store_t, size: cty::c_int) -> cty::c_int,
-        read: fn(inode_store: *mut inode_store_t, ino: cty::c_uint, offset: block_no, block: *mut block_t) -> cty::c_int,
-        write: fn(inode_store: *mut inode_store_t, ino: cty::c_uint, offset: block_no, block: *mut block_t) -> cty::c_int
-    ) -> *mut inode_store_t {
+// explicit Into Impl overriding compiler default
+impl Into<*mut inode_store_t> for SimpleFS<DiskFS> {
+    // use of mut not thread safe, however mutation occurs during write
+    #[repr(C)]
+    struct SimpleFS_C {
+        below: *mut inode_store_t,
+        below_ino: cty::c_uint,
+        num_inodes: cty::c_uint,
+    }
+
+    fn into(self) -> *mut inode_store_t {
         let cur_state = Box::new(SimpleFS_C {
             below: simple_fs.below as *mut inode_store_t,
             below_ino: simple_fs.below_ino,
@@ -98,21 +112,17 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         // pointers owned by box must NOT live past their lifetime
         let mut inode_store = Box::new(inode_store_t {
             state: Box::into_raw(cur_state),
-            getsize: get_size,
-            setsize: set_size,
-            read: read,
-            write: write
+            getsize: simfs_get_size,
+            setsize: simfs_set_size,
+            read: simfs_read,
+            write: simfs_write
         });
         return Box::into_raw(inode_store);
     }
+}
 
-    fn from_inode_store(inode_store: *mut inode_store_t) -> Self {
-        let cur_state = unsafe {
-            &mut *inode_store.state
-        };
-        let below = DiskFS::from_inode_store(cur_state.below);
-        let below_ino = cur_state.below_ino;
-        let num_inodes = cur_state.num_inodes;
+impl<T: Stackable + IsDisk> SimpleFS<T> {
+    fn new(below: &mut T, below_ino: u8, num_inodes: u32) -> Self {
         SimpleFS {
             below: below,
             below_ino: below_ino,
@@ -155,14 +165,6 @@ impl<T: Stackable> Stackable for SimpleFS<T> {
     }
 }
 
-// use of mut not thread safe, however mutation occurs during write
-#[repr(C)]
-struct SimpleFS_C {
-    below: *mut inode_store_t,
-    below_ino: cty::c_uint,
-    num_inodes: cty::c_uint,
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn init(
     below: *mut inode_store_t, 
@@ -173,14 +175,9 @@ pub unsafe extern "C" fn init(
     if (below.is_null()) {
         panic!("below is null");
     }
-    let myfs = SimpleFS::new(DiskFS::from_inode_store(below), below_ino, num_inodes);
-    myfs.to_inode_store(
-        simfs_get_size,
-        simfs_set_size,
-        simfs_read,
-        simfs_write
-    )    
-
+    let myfs: *mut inode_store_t = 
+        (SimpleFS::new(DiskFS::from(below), below_ino, num_inodes)).into();
+    return myfs;
 }
 
 // @precondition: assumes below is just the disk
@@ -193,14 +190,14 @@ static unsafe extern "C" fn simfs_get_size(
     inode_store: *mut inode_store_t, 
     ino: cty::c_uint
 ) -> cty::c_uint {
-    SimpleFS::from_inode_store(inode_store).get_size().unwrap_or(-1)
+    SimpleFS::from(inode_store).get_size().unwrap_or(-1)
 } 
 
 static unsafe extern "C" fn simfs_set_size(
     inode_store: *mut inode_store_t, 
     size: cty::c_int
 ) -> cty::c_int {
-    SimpleFS::from_inode_store(inode_store).set_size(size).unwrap_or(-1)
+    SimpleFS::from(inode_store).set_size(size).unwrap_or(-1)
 }
 
 static unsafe extern "C" fn simfs_read(
@@ -209,7 +206,7 @@ static unsafe extern "C" fn simfs_read(
     offset: block_no,
     block: *mut block_t 
 ) -> cty::c_int {
-    SimpleFS::from_inode_store(inode_store).read(ino, offset, block).unwrap_or(-1)
+    SimpleFS::from(inode_store).read(ino, offset, block).unwrap_or(-1)
 }
 
 static unsafe extern "C" fn simfs_write(
@@ -218,5 +215,5 @@ static unsafe extern "C" fn simfs_write(
     offset: block_no,
     block: *mut block_t 
 ) -> cty::c_int {
-    SimpleFS::from_inode_store(inode_store).write(ino, offset, block).unwrap_or(-1)
+    SimpleFS::from(inode_store).write(ino, offset, block).unwrap_or(-1)
 }
