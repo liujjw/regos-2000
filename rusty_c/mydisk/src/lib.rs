@@ -1,4 +1,4 @@
-!#[no_std]
+#![no_std]
 
 mod common;
 use common::*;
@@ -6,55 +6,65 @@ use core::include;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-struct DiskFS;
+struct DiskFS {
+    read: fn(bs: *mut inode_store_t, 
+            ino: cty::c_uint, offset: block_no, block: *mut block_t) -> cty::c_int,
+    write: fn(bs: *mut inode_store_t,
+            ino: cty::c_uint, offset: block_no, block: *mut block_t) -> cty::c_int,
+    get_size: fn() -> cty::c_uint,
+    set_size: fn() -> cty::c_int,
+}
 
 impl DiskFS {
-    fn from_inode_store() -> Self {
-        unimplemented!();
+    fn from_inode_store(inode_store: *mut inode_store_t) -> Self {
+        if !inode_store.state.is_null() {
+            panic!("DiskFS must be the lowest layer, and state is null");
+        }
+        DiskFS {
+            read: unsafe {
+                (*inode_store).read
+            },
+            write: unsafe {
+                (*inode_store).write
+            },
+            get_size: unsafe {
+                (*inode_store).getsize
+            },
+            set_size: unsafe {
+                (*inode_store).setsize
+            }
+        }
+
     }
 }
 
 impl Stackable for DiskFS {
     fn get_size(&self) -> Result<u32, Error> {
-        Ok(BLOCK_SIZE)
+        match self.get_size() {
+            -1 => Err(Error::UnknownFailure),
+            x => Ok(x)
+        }
     }
 
     fn set_size(&mut self, size: u32) -> Result<u32, Error> {
-        return Err(Error::UnknownFailure);
+        match self.set_size() {
+            -1 => Err(Error::UnknownFailure),
+            x => Ok(x)
+        }
     }
 
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<u32, Error> {
-        if offset >= BLOCK_SIZE {
-            return Err(Error::UnknownFailure);
+        match self.read(ino, offset, &mut buf.bytes) {
+            -1 => Err(Error::UnknownFailure),
+            x => Ok(x)
         }
-        let block = unsafe {
-            &mut *buf.bytes
-        };
-        let disk = unsafe {
-            &mut *DISK
-        };
-        let block_no = (ino * BLOCK_SIZE) + offset;
-        unsafe {
-            disk.read(disk, block_no, block);
-        }
-        Ok(BLOCK_SIZE)
     }
 
     fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<u32, Error> {
-        if offset >= BLOCK_SIZE {
-            return Err(Error::UnknownFailure);
+        match self.write(ino, offset, &mut buf.bytes) {
+            -1 => Err(Error::UnknownFailure),
+            x => Ok(x)
         }
-        let block = unsafe {
-            &mut *buf.bytes
-        };
-        let disk = unsafe {
-            &mut *DISK
-        };
-        let block_no = (ino * BLOCK_SIZE) + offset;
-        unsafe {
-            disk.write(disk, block_no, block);
-        }
-        Ok(BLOCK_SIZE)
     }
 }
 
@@ -100,7 +110,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         let cur_state = unsafe {
             &mut *inode_store.state
         };
-        let below = &mut *cur_state.below;
+        let below = DiskFS::from_inode_store(cur_state.below);
         let below_ino = cur_state.below_ino;
         let num_inodes = cur_state.num_inodes;
         SimpleFS {
@@ -134,13 +144,19 @@ impl<T: Stackable> Stackable for SimpleFS<T> {
         let full_offset = (ino * blocks_per_node) + offset;
         self.below.read(self.below_ino, full_offset, buf)
     }
-    fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<u32, Error> {
 
+    fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<u32, Error> {
+        let blocks_per_node = self.get_size()?;
+        if ino >= self.num_inodes || offset >= blocks_per_node {
+            return Err(Error::UnknownFailure);
+        }
+        let full_offset = (ino * blocks_per_node) + offset;
+        self.below.write(self.below_ino, full_offset, buf)
     }
 }
 
 // use of mut not thread safe, however mutation occurs during write
-#repr(C)]
+#[repr(C)]
 struct SimpleFS_C {
     below: *mut inode_store_t,
     below_ino: cty::c_uint,
@@ -187,23 +203,13 @@ static unsafe extern "C" fn simfs_set_size(
     SimpleFS::from_inode_store(inode_store).set_size(size).unwrap_or(-1)
 }
 
-// read an inode at block offset return in a block_t
 static unsafe extern "C" fn simfs_read(
     inode_store: *mut inode_store_t,
     ino: cty::c_uint,
     offset: block_no,
     block: *mut block_t 
 ) -> cty::c_int {
-    let cur_state = unsafe {
-        & *inode_store.state
-    };
-    let blocks_per_node = inode_store.getsize(inode_store, ino);
-    if ino >= cur_state.num_inodes || offset >= blocks_per_node {
-        return -1;
-    }
-    let below = & *cur_state.below;
-    let full_offset = (ino * blocks_per_node) + offset;
-    return below.read(below, ino, full_offset, block);
+    SimpleFS::from_inode_store(inode_store).read(ino, offset, block).unwrap_or(-1)
 }
 
 static unsafe extern "C" fn simfs_write(
@@ -212,14 +218,5 @@ static unsafe extern "C" fn simfs_write(
     offset: block_no,
     block: *mut block_t 
 ) -> cty::c_int {
-    let cur_state = unsafe {
-        &mut *inode_store.state
-    };
-    let blocks_per_node = inode_store.getsize(inode_store, ino);
-    if ino >= cur_state.num_inodes || offset >= blocks_per_node {
-        return -1;
-    }
-    let below = &mut *state.below;
-    let full_offset = (ino * blocks_per_node) + offset;
-    return below.write(below, ino, full_offset, block);
+    SimpleFS::from_inode_store(inode_store).write(ino, offset, block).unwrap_or(-1)
 }
