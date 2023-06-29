@@ -44,21 +44,19 @@ mod common {
 
   // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
 
-  pub enum ErrorCode {
+  pub enum Error {
     UnknownFailure
   }
 
-  pub struct SuccessInfo(u32);
-
   pub trait Stackable {
     fn get_size(&self) -> 
-      Result<SuccessInfo, ErroCode>;
+      Result<u32, Erro>;
     fn set_size(&mut self, size: u32) -> 
-      Result<SuccessInfo, ErrorCode>;
+      Result<u32, Error>;
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
-      Result<SuccessInfo, ErrorCode>;
+      Result<u32, Error>;
     fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> 
-      Result<SuccessInfo, ErrorCode>;
+      Result<u32, Error>;
   }
 
   pub trait IsDisk {
