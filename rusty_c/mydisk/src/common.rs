@@ -37,9 +37,21 @@ mod common {
       panic!("allocation error: {:?}", layout)
   }   
 
+  // pub type Block = block_t;
   pub struct Block {
-    // [u8: BLOCK_SIZE]
-    bytes: block_t
+    bytes: [u8; BLOCK_SIZE]
+  }
+
+  impl Block {
+    pub fn new() -> Block {
+      Block {
+        bytes: [0; BLOCK_SIZE]
+      }
+    }
+
+    pub fn get_bytes<'a>(&'a self) -> &'a mut [u8] {
+      &mut self.bytes
+    }
   }
 
   // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
@@ -62,4 +74,5 @@ mod common {
   pub trait IsDisk {
     pub static info: &str = "Structs implementing this trait are the disk itself"; 
   }
+
 }
