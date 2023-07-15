@@ -24,3 +24,4 @@ riscv-openocd-0.10.0-2019.02.0-x86_64-linux-ubuntu14
 clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
 clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-14.04
 
+*.log

@@ -1,0 +1,1 @@
+1. Uncomment build rs, mkfs, lib.rs, common.rs, headers.h

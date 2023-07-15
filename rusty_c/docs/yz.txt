@@ -1,0 +1,7 @@
+1. Is memory aligned? no issues
+2. Is heap memory implemented? implemented in malloc
+3. 32MB of memory starting from 0x8000000 ->  0xa000000
+4. the small memory may be an issue if rust generates code that is too large 
+in cargo.toml dependencies
+5. Liam Arzola 
+6. Remove file.c call and include a header
