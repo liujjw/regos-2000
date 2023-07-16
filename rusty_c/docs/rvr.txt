@@ -30,3 +30,8 @@ if offset is greater than the
 size 3 block 1 
 offset is 3, grow the file to size 4, write the data to block 3
 write to offset 8 (error) or grow to size 9 and initialize up to block from 3 up to 8
+
+three threads:
+1. my bure symposium notes
+2. getting things to compile ~80 compiler errors 
+3. adding the number of used blocks metadata

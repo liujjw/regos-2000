@@ -12,79 +12,101 @@ use alloc::boxed::Box;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
+// TODO use mutex wrapper over from and a static belows for more memory safety
+// nothing prevents another call and another owned instance referring to the same data:
+// SimpleFS::setup(&mut DiskFS::from(below), below_ino, ninodes).unwrap_or(-1)
+
+// TODO Make SimpleFS own below
+
+// standard c pointers to functions
 struct DiskFS {
-    read: fn(bs: *mut inode_store_t, 
+    ds_read:        unsafe extern "C" fn(bs: *mut inode_store_t, 
             ino: cty::c_uint, offset: block_no, block: *mut block_t) -> cty::c_int,
-    write: fn(bs: *mut inode_store_t,
+    ds_write:       unsafe extern "C" fn(bs: *mut inode_store_t,
             ino: cty::c_uint, offset: block_no, block: *mut block_t) -> cty::c_int,
-    get_size: fn() -> cty::c_uint,
-    set_size: fn() -> cty::c_int,
+    ds_get_size:    unsafe extern "C" fn() -> cty::c_uint,
+    ds_set_size:    unsafe extern "C" fn() -> cty::c_int,
 }
 
 impl IsDisk for DiskFS {}
 
-// TODO use mutex wrapper over from and a static belows for more memory safety
-// nothing prevents another call and another owned instance referring to the same data:
-// SimpleFS::setup(&mut DiskFS::from(below), below_ino, ninodes).unwrap_or(-1)
-impl From<inode_intf> for DiskFS {
-    fn from(inode_store: inode_intf) -> Self {
-        if !inode_store.state.is_null() {
-            panic!("DiskFS must be the lowest layer, and state is null");
-        }
-        DiskFS {
-            read: unsafe {
-                (*inode_store).read
-            },
-            write: unsafe {
-                (*inode_store).write
-            },
-            get_size: unsafe {
-                (*inode_store).getsize
-            },
-            set_size: unsafe {
-                (*inode_store).setsize
-            }
-        }
-    }
-}
-
-impl Into<inode_intf> for DiskFS {
+impl DiskFS {
+    // don't use From or Into traits for simplicity
     fn into(self) -> inode_intf {
+        // inconsistent function signatures, so we need to wrap them
+        unsafe extern "C" fn getsizewrapper(
+            this_bs: *mut inode_store_t,
+            ino: cty::c_uint
+        ) -> cty::c_int {
+            self.ds_get_size()
+        }
+        
+        unsafe extern "C" fn setsizewrapper(
+            this_bs: *mut inode_store_t, 
+            ino: cty::c_uint,
+            newsize: block_no
+        ) -> cty::c_int {
+            self.ds_set_size()
+        }
+        
+        // inode_store_t* is inode_intf
         let mut inode_store = Box::new(inode_store_t {
             state: core::ptr::null_mut(),
-            getsize: self.get_size,
-            setsize: self.set_size,
-            read: self.read,
-            write: self.write
+            getsize: Some(getsizewrapper),
+            setsize: Some(setsizewrapper),
+            read: Some(self.ds_read),
+            write: Some(self.ds_write)
         });
         return Box::into_raw(inode_store);
+    }
+
+    fn from(inode_store: inode_intf) -> Self {
+        if !(*inode_store).state.is_null() {
+            panic!("DiskFS must be the lowest layer, and state is null");
+        }
+
+        unsafe extern "C" fn getsizewrapper() -> cty::c_uint {
+            (*inode_store).getsize.unwrap()()
+        }
+
+        unsafe extern "C" fn setsizewrapper() -> cty::c_int {
+            (*inode_store).setsize.unwrap()()
+        }
+
+        DiskFS {
+            ds_read: unsafe {
+                (*inode_store).read.unwrap()
+            },
+            ds_write: unsafe {
+                (*inode_store).write.unwrap()
+            },
+            ds_get_size: getsizewrapper,
+            ds_set_size: setsizewrapper
+        }
     }
 }
 
 impl Stackable for DiskFS {
-    fn get_size(&self) -> Result<i32, Error> {
-        match self.get_size() {
-            -1 => Err(Error::UnknownFailure),
-            x => Ok(x)
-        }
+    fn get_size(&self) -> Result<u32, Error> {
+        Ok((self.ds_get_size)()) 
     }
 
     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
-        match self.set_size() {
+        match (self.ds_set_size)() {
             -1 => Err(Error::UnknownFailure),
             x => Ok(x)
         }
     }
 
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
-        match self.read(ino, offset, &mut buf.bytes) {
+        match (self.ds_read)(ino, offset, *mut *buf.get_bytes()) {
             -1 => Err(Error::UnknownFailure),
             x => Ok(x)
         }
     }
 
-    fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
-        match self.write(ino, offset, &mut buf.bytes) {
+    fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
+        match (self.ds_write)(ino, offset,*mut *buf.get_bytes()) {
             -1 => Err(Error::UnknownFailure),
             x => Ok(x)
         }
@@ -98,21 +120,9 @@ struct Metadata {
 
 struct SimpleFS<'a, T: Stackable> {
     below: &'a mut T,
-    below_ino: u8,
+    below_ino: u32,
     num_inodes: u32,
     metadata: Option<Metadata>
-}
-
-impl From<*mut inode_store_t> for SimpleFS<DiskFS> {
-    fn from(inode_store: *mut inode_store_t) -> Self {
-        let cur_state = unsafe {
-            &mut *inode_store.state
-        };
-        let below = DiskFS::from(cur_state.below);
-        let below_ino = cur_state.below_ino;
-        let num_inodes = cur_state.num_inodes;
-        SimpleFS::new(below, below_ino, num_inodes)
-    }
 }
 
 #[repr(C)]
@@ -122,8 +132,33 @@ struct SimpleFS_C {
     num_inodes: cty::c_uint,
 }
 
-// explicit Into Impl overriding compiler default
-impl Into<SimpleFS<DiskFS>> for *mut inode_store_t {
+impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
+    pub fn new(below: &mut T, below_ino: u32, num_inodes: u32) -> Self {
+        let tmp = SimpleFS {
+            below: below,
+            below_ino: below_ino,
+            num_inodes: num_inodes,
+            metadata: None
+        };
+        match tmp.compute_metadata() {
+            Ok(data) => {
+                tmp.metadata = Some(data);
+                return tmp;
+            },
+            Err(e) => panic!("failed to compute metadata")
+        }        
+    }
+
+    fn from(inode_store: *mut inode_store_t) -> Self {
+        let cur_state = unsafe {
+            &mut (*((*inode_store).state) as SimpleFS_C)
+        };
+        let below = DiskFS::from(cur_state.below);
+        let below_ino = cur_state.below_ino;
+        let num_inodes = cur_state.num_inodes;
+        SimpleFS::new(&mut below, below_ino, num_inodes)
+    }
+
     // use of mut not thread safe, however mutation occurs during write
     fn into(self) -> *mut inode_store_t {
         let cur_state = Box::new(SimpleFS_C {
@@ -140,24 +175,6 @@ impl Into<SimpleFS<DiskFS>> for *mut inode_store_t {
             write: simfs_write
         });
         return Box::into_raw(inode_store);
-    }
-}
-
-impl<T: Stackable + IsDisk> SimpleFS<T> {
-    pub fn new(below: &mut T, below_ino: u8, num_inodes: u32) -> Self {
-        let tmp = SimpleFS {
-            below: below,
-            below_ino: below_ino,
-            num_inodes: num_inodes,
-            metadata: None
-        };
-        match tmp.compute_metadata() {
-            Ok(data) => {
-                tmp.metadata = Some(data);
-                return tmp;
-            },
-            Err(e) => panic!("failed to compute metadata: {:?}", e)
-        }        
     }
 
     fn compute_metadata(&self) -> Result<Metadata, Error> {
@@ -251,7 +268,7 @@ impl<T: Stackable> Stackable for SimpleFS<'_, T> {
     }
     
     // We will need to shift reads and writes over by the size of the metadata blocks.
-    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         let metadata_offset = self.get_metadata()?.num_blocks_needed;
         let blocks_per_node = self.get_size()?;
         if ino >= self.num_inodes || offset >= blocks_per_node {
@@ -261,7 +278,7 @@ impl<T: Stackable> Stackable for SimpleFS<'_, T> {
         Ok(self.below.read(self.below_ino, full_offset, buf))
     }
 
-    fn write(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
         let metadata_offset = self.get_metadata()?.num_blocks_needed;
         let blocks_per_node = self.get_size()?;
         if ino >= self.num_inodes || offset >= blocks_per_node {
@@ -284,7 +301,7 @@ impl<T: Stackable> Stackable for SimpleFS<'_, T> {
         self.below.write(self.below_ino, block_no, buf);
 
         // success
-        Ok(res)
+        res
     }
 }
 
@@ -299,7 +316,7 @@ pub unsafe extern "C" fn init(
         panic!("below is null");
     }
     let myfs: *mut inode_store_t = 
-        (SimpleFS::new(DiskFS::from(below), below_ino, num_inodes)).into();
+        (SimpleFS::new(&mut DiskFS::from(below), below_ino, num_inodes)).into();
     return myfs;
 }
 
@@ -322,7 +339,10 @@ unsafe extern "C" fn simfs_set_size(
     inode_store: *mut inode_store_t, 
     size: cty::c_int
 ) -> cty::c_int {
-    SimpleFS::from(inode_store).set_size(size).unwrap_or(-1)
+    if size < 0 {
+        panic!("size must be non-negative");
+    }
+    SimpleFS::from(inode_store).set_size(size as u32).unwrap_or(-1)
 }
 
 #[no_mangle]
@@ -332,7 +352,7 @@ unsafe extern "C" fn simfs_read(
     offset: block_no,
     block: *mut block_t 
 ) -> cty::c_int {
-    SimpleFS::from(inode_store).read(ino, offset, block).unwrap_or(-1)
+    SimpleFS::from(inode_store).read(ino, offset, &mut Block::from(block)).unwrap_or(-1)
 }
 
 #[no_mangle]
@@ -342,7 +362,7 @@ unsafe extern "C" fn simfs_write(
     offset: block_no,
     block: *mut block_t 
 ) -> cty::c_int {
-    SimpleFS::from(inode_store).write(ino, offset, block).unwrap_or(-1)
+    SimpleFS::from(inode_store).write(ino, offset, &mut Block::from(block)).unwrap_or(-1)
 }
 
 #[no_mangle]

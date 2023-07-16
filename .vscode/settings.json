@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "app.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "disk.h": "c",
+        "inode.h": "c"
     }
 }

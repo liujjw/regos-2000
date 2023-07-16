@@ -30,11 +30,6 @@ unsafe impl GlobalAlloc for EgosAllocator {
 #[global_allocator]
 static A: EgosAllocator = EgosAllocator;
 
-#[alloc_error_handler]
-fn alloc_error_handler(layout: Layout) -> ! {
-    panic!("allocation error: {:?}", layout)
-}   
-
 // pub type Block = block_t;
 pub struct Block {
   bytes: [u8; BLOCK_SIZE as usize]
@@ -50,6 +45,12 @@ impl Block {
   pub fn get_bytes<'a>(&'a self) -> &'a mut [u8] {
     &mut self.bytes
   }
+
+  pub fn from(block: *mut block_t) -> Self {
+    Block {
+      bytes: (*block).bytes
+    }
+  }
 }
 
 // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
@@ -62,11 +63,11 @@ pub trait Stackable {
   fn get_size(&self) -> 
     Result<u32, Error>;
   fn set_size(&mut self, size: u32) -> 
-    Result<u32, Error>;
+    Result<i32, Error>;
   fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
-    Result<u32, Error>;
-  fn write(&self, ino: u32, offset: u32, buf: &mut Block) -> 
-    Result<u32, Error>;
+    Result<i32, Error>;
+  fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> 
+    Result<i32, Error>;
 }
 
 // Structs implementing this trait are the disk itself
