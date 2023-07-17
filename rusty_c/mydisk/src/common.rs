@@ -47,9 +47,19 @@ impl Block {
   }
 
   pub fn from(block: *mut block_t) -> Self {
-    Block {
-      bytes: (*block).bytes
+    unsafe {
+      Block {
+        bytes: (*block).bytes
+      }
     }
+  }
+
+  pub fn into(self) -> *mut block_t {
+    let mut block = Box::new(block_t {
+      bytes: [0; BLOCK_SIZE as usize]
+    });
+    block.bytes = self.bytes;
+    Box::into_raw(block)
   }
 }
 

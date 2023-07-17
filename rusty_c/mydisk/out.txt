@@ -1,4 +1,4 @@
-warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `/vagrant/rusty_c/mydisk/target/debug/incremental/build_script_build-2tu1pdiw831j2/s-gmu248b4iv-9um98n-working`
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `/vagrant/rusty_c/mydisk/target/debug/incremental/build_script_build-2tu1pdiw831j2/s-gmw5fu1sad-u9wyo7-working`
 
 warning: unused import: `std::process::Command`
  --> build.rs:3:5
@@ -40,67 +40,81 @@ warning: /vagrant/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'i
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                       ~~~~~~~~~~~~~^~~
    Compiling mydisk v0.1.0 (/vagrant/rusty_c/mydisk)
-error: expected expression, found keyword `mut`
-   --> src/lib.rs:102:44
-    |
-102 |         match (self.ds_read)(ino, offset, *mut *buf.get_bytes()) {
-    |                                            ^^^ expected expression
-
-error: expected expression, found keyword `mut`
-   --> src/lib.rs:109:44
-    |
-109 |         match (self.ds_write)(ino, offset,*mut *buf.get_bytes()) {
-    |                                            ^^^ expected expression
-
 error[E0434]: can't capture dynamic environment in a fn item
-  --> src/lib.rs:41:13
+  --> src/lib.rs:42:13
    |
-41 |             self.ds_get_size()
+42 |             self.ds_get_size()
    |             ^^^^
    |
    = help: use the `|| { ... }` closure form instead
 
 error[E0434]: can't capture dynamic environment in a fn item
-  --> src/lib.rs:49:13
+  --> src/lib.rs:50:13
    |
-49 |             self.ds_set_size()
+50 |             self.ds_set_size()
    |             ^^^^
    |
    = help: use the `|| { ... }` closure form instead
 
 error[E0434]: can't capture dynamic environment in a fn item
-  --> src/lib.rs:69:15
+  --> src/lib.rs:70:15
    |
-69 |             (*inode_store).getsize.unwrap()()
+70 |             (*inode_store).getsize.unwrap()()
    |               ^^^^^^^^^^^
    |
    = help: use the `|| { ... }` closure form instead
 
 error[E0434]: can't capture dynamic environment in a fn item
-  --> src/lib.rs:73:15
+  --> src/lib.rs:74:15
    |
-73 |             (*inode_store).setsize.unwrap()()
+74 |             (*inode_store).setsize.unwrap()()
    |               ^^^^^^^^^^^
    |
    = help: use the `|| { ... }` closure form instead
 
 error[E0435]: attempt to use a non-constant value in a constant
-   --> src/lib.rs:185:27
+   --> src/lib.rs:186:27
     |
-183 |         let row_width_in_bytes = libm::ceil(blocks_per_inode as f64 / 8 as f64) as u32;
+184 |         let row_width_in_bytes = libm::ceil(blocks_per_inode as f64 / 8 as f64) as u32;
     |         ---------------------- help: consider using `const` instead of `let`: `const row_width_in_bytes`
-184 |         // assume rows <= 512 bytes (BLOCK_SIZE)
-185 |         if size_of::<[u8; row_width_in_bytes]>() > BLOCK_SIZE {
+185 |         // assume rows <= 512 bytes (BLOCK_SIZE)
+186 |         if size_of::<[u8; row_width_in_bytes]>() > BLOCK_SIZE {
     |                           ^^^^^^^^^^^^^^^^^^ non-constant value
 
 error[E0435]: attempt to use a non-constant value in a constant
-   --> src/lib.rs:189:29
+   --> src/lib.rs:190:29
     |
-183 |         let row_width_in_bytes = libm::ceil(blocks_per_inode as f64 / 8 as f64) as u32;
+184 |         let row_width_in_bytes = libm::ceil(blocks_per_inode as f64 / 8 as f64) as u32;
     |         ---------------------- help: consider using `const` instead of `let`: `const row_width_in_bytes`
 ...
-189 |             (size_of::<[u8; row_width_in_bytes]>() * self.num_inodes) as f64 / 
+190 |             (size_of::<[u8; row_width_in_bytes]>() * self.num_inodes) as f64 / 
     |                             ^^^^^^^^^^^^^^^^^^ non-constant value
+
+error[E0433]: failed to resolve: use of undeclared type `Box`
+  --> src/common.rs:56:21
+   |
+56 |     let mut block = Box::new(block_t {
+   |                     ^^^ use of undeclared type `Box`
+   |
+help: consider importing one of these items
+   |
+5  + use alloc::boxed::Box;
+   |
+5  + use crate::Box;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Box`
+  --> src/common.rs:60:5
+   |
+60 |     Box::into_raw(block)
+   |     ^^^ use of undeclared type `Box`
+   |
+help: consider importing one of these items
+   |
+5  + use alloc::boxed::Box;
+   |
+5  + use crate::Box;
+   |
 
 warning: type `block_no` should have an upper camel case name
   --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:27:10
@@ -160,13 +174,45 @@ error[E0425]: cannot find function `free` in this scope
 26 |         free(ptr as *mut cty::c_void);
    |         ^^^^ not found in this scope
 
-error[E0308]: mismatched types
-   --> src/lib.rs:159:23
+error[E0277]: the trait bound `*mut inode_store: From<&DiskFS>` is not satisfied
+   --> src/lib.rs:103:35
     |
-135 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
+103 |         match (self.ds_read)(self.into(), ino, offset, buf.into()) {
+    |                                   ^^^^ the trait `From<&DiskFS>` is not implemented for `*mut inode_store`
+    |
+    = note: required for `&DiskFS` to implement `Into<*mut inode_store>`
+
+error[E0277]: the trait bound `*mut block: From<&mut common::Block>` is not satisfied
+   --> src/lib.rs:103:60
+    |
+103 |         match (self.ds_read)(self.into(), ino, offset, buf.into()) {
+    |                                                            ^^^^ the trait `From<&mut common::Block>` is not implemented for `*mut block`
+    |
+    = note: required for `&mut common::Block` to implement `Into<*mut block>`
+
+error[E0277]: the trait bound `*mut inode_store: From<&mut DiskFS>` is not satisfied
+   --> src/lib.rs:110:36
+    |
+110 |         match (self.ds_write)(self.into(), ino, offset, buf.into()) {
+    |                                    ^^^^ the trait `From<&mut DiskFS>` is not implemented for `*mut inode_store`
+    |
+    = note: required for `&mut DiskFS` to implement `Into<*mut inode_store>`
+
+error[E0277]: the trait bound `*mut block: From<&common::Block>` is not satisfied
+   --> src/lib.rs:110:61
+    |
+110 |         match (self.ds_write)(self.into(), ino, offset, buf.into()) {
+    |                                                             ^^^^ the trait `From<&common::Block>` is not implemented for `*mut block`
+    |
+    = note: required for `&common::Block` to implement `Into<*mut block>`
+
+error[E0308]: mismatched types
+   --> src/lib.rs:160:23
+    |
+136 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
     |      - this type parameter
 ...
-159 |         SimpleFS::new(&mut below, below_ino, num_inodes)
+160 |         SimpleFS::new(&mut below, below_ino, num_inodes)
     |         ------------- ^^^^^^^^^^ expected `&mut T`, found `&mut DiskFS`
     |         |
     |         arguments to this function are incorrect
@@ -174,30 +220,24 @@ error[E0308]: mismatched types
     = note: expected mutable reference `&mut T`
                found mutable reference `&mut DiskFS`
 note: associated function defined here
-   --> src/lib.rs:136:12
+   --> src/lib.rs:137:12
     |
-136 |     pub fn new(below: &mut T, below_ino: u32, num_inodes: u32) -> Self {
+137 |     pub fn new(below: &mut T, below_ino: u32, num_inodes: u32) -> Self {
     |            ^^^ -------------
 
-error[E0605]: non-primitive cast: `c_void` as `SimpleFS_C`
-   --> src/lib.rs:154:18
-    |
-154 |             &mut (*((*inode_store).state) as SimpleFS_C)
-    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
-
 error[E0277]: the trait bound `*mut inode_store: From<&mut T>` is not satisfied
-   --> src/lib.rs:165:31
+   --> src/lib.rs:166:31
     |
-165 |             below: self.below.into(),
+166 |             below: self.below.into(),
     |                               ^^^^ the trait `From<&mut T>` is not implemented for `*mut inode_store`
     |
     = help: the trait `Into<U>` is implemented for `T`
     = note: required for `&mut T` to implement `Into<*mut inode_store>`
 
 error[E0308]: mismatched types
-   --> src/lib.rs:171:34
+   --> src/lib.rs:172:34
     |
-171 |             state: Box::into_raw(cur_state),
+172 |             state: Box::into_raw(cur_state),
     |                    ------------- ^^^^^^^^^ expected `Box<c_void, _>`, found `Box<SimpleFS_C>`
     |                    |
     |                    arguments to this function are incorrect
@@ -208,72 +248,72 @@ note: associated function defined here
    --> /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/alloc/src/boxed.rs:1042:12
 
 error[E0308]: mismatched types
-   --> src/lib.rs:172:22
+   --> src/lib.rs:173:22
     |
-172 |             getsize: simfs_get_size,
+173 |             getsize: simfs_get_size,
     |                      ^^^^^^^^^^^^^^ expected `Option<unsafe extern "C" fn(..., ...) -> ...>`, found fn item
     |
     = note: expected enum `Option<unsafe extern "C" fn(*mut inode_store, u32) -> i32>`
             found fn item `unsafe extern "C" fn(*mut inode_store, u32) -> u32 {simfs_get_size}`
 
 error[E0308]: mismatched types
-   --> src/lib.rs:173:22
+   --> src/lib.rs:174:22
     |
-173 |             setsize: simfs_set_size,
+174 |             setsize: simfs_set_size,
     |                      ^^^^^^^^^^^^^^ expected `Option<unsafe extern "C" fn(..., ..., ...) -> ...>`, found fn item
     |
     = note: expected enum `Option<unsafe extern "C" fn(*mut inode_store, u32, u32) -> i32>`
             found fn item `unsafe extern "C" fn(*mut inode_store, i32) -> i32 {simfs_set_size}`
 
 error[E0308]: mismatched types
-   --> src/lib.rs:174:19
+   --> src/lib.rs:175:19
     |
-174 |             read: simfs_read,
+175 |             read: simfs_read,
     |                   ^^^^^^^^^^ expected `Option<unsafe extern "C" fn(..., ..., ..., ...) -> ...>`, found fn item
     |
     = note: expected enum `Option<unsafe extern "C" fn(*mut inode_store, u32, u32, *mut block) -> i32>`
             found fn item `unsafe extern "C" fn(*mut inode_store, u32, u32, *mut block) -> i32 {simfs_read}`
 help: try wrapping the expression in `core::prelude::v1::Some`
     |
-174 |             read: core::prelude::v1::Some(simfs_read),
+175 |             read: core::prelude::v1::Some(simfs_read),
     |                   ++++++++++++++++++++++++          +
 
 error[E0308]: mismatched types
-   --> src/lib.rs:175:20
+   --> src/lib.rs:176:20
     |
-175 |             write: simfs_write
+176 |             write: simfs_write
     |                    ^^^^^^^^^^^ expected `Option<unsafe extern "C" fn(..., ..., ..., ...) -> ...>`, found fn item
     |
     = note: expected enum `Option<unsafe extern "C" fn(*mut inode_store, u32, u32, *mut block) -> i32>`
             found fn item `unsafe extern "C" fn(*mut inode_store, u32, u32, *mut block) -> i32 {simfs_write}`
 help: try wrapping the expression in `core::prelude::v1::Some`
     |
-175 |             write: core::prelude::v1::Some(simfs_write)
+176 |             write: core::prelude::v1::Some(simfs_write)
     |                    ++++++++++++++++++++++++           +
 
 error[E0308]: mismatched types
-   --> src/lib.rs:185:52
+   --> src/lib.rs:186:52
     |
-185 |         if size_of::<[u8; row_width_in_bytes]>() > BLOCK_SIZE {
+186 |         if size_of::<[u8; row_width_in_bytes]>() > BLOCK_SIZE {
     |            -------------------------------------   ^^^^^^^^^^ expected `usize`, found `u32`
     |            |
     |            expected because this is `usize`
     |
 help: you can convert a `u32` to a `usize` and panic if the converted value doesn't fit
     |
-185 |         if size_of::<[u8; row_width_in_bytes]>() > BLOCK_SIZE.try_into().unwrap() {
+186 |         if size_of::<[u8; row_width_in_bytes]>() > BLOCK_SIZE.try_into().unwrap() {
     |                                                              ++++++++++++++++++++
 
 error[E0308]: mismatched types
-   --> src/lib.rs:189:54
+   --> src/lib.rs:190:54
     |
-189 |             (size_of::<[u8; row_width_in_bytes]>() * self.num_inodes) as f64 / 
+190 |             (size_of::<[u8; row_width_in_bytes]>() * self.num_inodes) as f64 / 
     |                                                      ^^^^^^^^^^^^^^^ expected `usize`, found `u32`
 
 error[E0277]: cannot multiply `usize` by `u32`
-   --> src/lib.rs:189:52
+   --> src/lib.rs:190:52
     |
-189 |             (size_of::<[u8; row_width_in_bytes]>() * self.num_inodes) as f64 / 
+190 |             (size_of::<[u8; row_width_in_bytes]>() * self.num_inodes) as f64 / 
     |                                                    ^ no implementation for `usize * u32`
     |
     = help: the trait `Mul<u32>` is not implemented for `usize`
@@ -284,51 +324,51 @@ error[E0277]: cannot multiply `usize` by `u32`
               <usize as Mul>
 
 error[E0308]: mismatched types
-   --> src/lib.rs:192:9
+   --> src/lib.rs:193:9
     |
-180 |       fn compute_metadata(&self) -> Result<Metadata, Error> {
+181 |       fn compute_metadata(&self) -> Result<Metadata, Error> {
     |                                     ----------------------- expected `Result<Metadata, common::Error>` because of return type
 ...
-192 | /         Metadata {
-193 | |             row_width: row_width_in_bytes,
-194 | |             num_blocks_needed: num_blocks_needed
-195 | |         }
+193 | /         Metadata {
+194 | |             row_width: row_width_in_bytes,
+195 | |             num_blocks_needed: num_blocks_needed
+196 | |         }
     | |_________^ expected `Result<Metadata, Error>`, found `Metadata`
     |
     = note: expected enum `Result<Metadata, common::Error>`
              found struct `Metadata`
 help: try wrapping the expression in `core::prelude::v1::Ok`
     |
-192 ~         core::prelude::v1::Ok(Metadata {
-193 |             row_width: row_width_in_bytes,
-194 |             num_blocks_needed: num_blocks_needed
-195 ~         })
+193 ~         core::prelude::v1::Ok(Metadata {
+194 |             row_width: row_width_in_bytes,
+195 |             num_blocks_needed: num_blocks_needed
+196 ~         })
     |
 
 error[E0308]: mismatched types
-   --> src/lib.rs:215:21
+   --> src/lib.rs:216:21
     |
-215 |         for i in 0..num_blocks_needed {
+216 |         for i in 0..num_blocks_needed {
     |                     ^^^^^^^^^^^^^^^^^ expected integer, found `&u32`
     |
 help: consider dereferencing the borrow
     |
-215 |         for i in 0..*num_blocks_needed {
+216 |         for i in 0..*num_blocks_needed {
     |                     +
 
 error[E0308]: mismatched types
-   --> src/lib.rs:219:37
+   --> src/lib.rs:220:37
     |
-219 |         for i in num_blocks_needed..num_inodes {
+220 |         for i in num_blocks_needed..num_inodes {
     |                                     ^^^^^^^^^^
     |                                     |
     |                                     expected `&u32`, found `u32`
     |                                     help: consider borrowing here: `&num_inodes`
 
 error[E0277]: the trait bound `&u32: Step` is not satisfied
-   --> src/lib.rs:219:18
+   --> src/lib.rs:220:18
     |
-219 |         for i in num_blocks_needed..num_inodes {
+220 |         for i in num_blocks_needed..num_inodes {
     |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Step` is not implemented for `&u32`
     |
     = help: the trait `Step` is implemented for `u32`
@@ -336,60 +376,60 @@ error[E0277]: the trait bound `&u32: Step` is not satisfied
     = note: required for `core::ops::Range<&u32>` to implement `IntoIterator`
 
 error[E0308]: mismatched types
-   --> src/lib.rs:221:29
+   --> src/lib.rs:222:29
     |
-221 |             simple_fs.write(i, 0, &mut buf)?;
+222 |             simple_fs.write(i, 0, &mut buf)?;
     |                       ----- ^ expected `u32`, found `&u32`
     |                       |
     |                       arguments to this method are incorrect
     |
 note: method defined here
-   --> src/common.rs:69:6
+   --> src/common.rs:77:6
     |
-69  |   fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> 
+77  |   fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> 
     |      ^^^^^
 help: consider dereferencing the borrow
     |
-221 |             simple_fs.write(*i, 0, &mut buf)?;
+222 |             simple_fs.write(*i, 0, &mut buf)?;
     |                             +
 
 error[E0308]: mismatched types
-   --> src/lib.rs:235:13
+   --> src/lib.rs:236:13
     |
-235 |         Ok((block_no, byte_index, bit_index))
+236 |         Ok((block_no, byte_index, bit_index))
     |             ^^^^^^^^ expected `i32`, found `u32`
     |
 help: you can convert a `u32` to an `i32` and panic if the converted value doesn't fit
     |
-235 |         Ok((block_no.try_into().unwrap(), byte_index, bit_index))
+236 |         Ok((block_no.try_into().unwrap(), byte_index, bit_index))
     |                     ++++++++++++++++++++
 
 error[E0308]: mismatched types
-   --> src/lib.rs:235:23
+   --> src/lib.rs:236:23
     |
-235 |         Ok((block_no, byte_index, bit_index))
+236 |         Ok((block_no, byte_index, bit_index))
     |                       ^^^^^^^^^^ expected `i32`, found `u32`
     |
 help: you can convert a `u32` to an `i32` and panic if the converted value doesn't fit
     |
-235 |         Ok((block_no, byte_index.try_into().unwrap(), bit_index))
+236 |         Ok((block_no, byte_index.try_into().unwrap(), bit_index))
     |                                 ++++++++++++++++++++
 
 error[E0308]: mismatched types
-   --> src/lib.rs:235:35
+   --> src/lib.rs:236:35
     |
-235 |         Ok((block_no, byte_index, bit_index))
+236 |         Ok((block_no, byte_index, bit_index))
     |                                   ^^^^^^^^^ expected `i32`, found `u32`
     |
 help: you can convert a `u32` to an `i32` and panic if the converted value doesn't fit
     |
-235 |         Ok((block_no, byte_index, bit_index.try_into().unwrap()))
+236 |         Ok((block_no, byte_index, bit_index.try_into().unwrap()))
     |                                            ++++++++++++++++++++
 
 error[E0277]: `common::Error` doesn't implement `Debug`
-   --> src/lib.rs:243:83
+   --> src/lib.rs:244:83
     |
-243 |         let (block_no, byte_index, bit_index) = self.compute_indices(ino, offset).unwrap();
+244 |         let (block_no, byte_index, bit_index) = self.compute_indices(ino, offset).unwrap();
     |                                                                                   ^^^^^^ `common::Error` cannot be formatted using `{:?}`
     |
     = help: the trait `Debug` is not implemented for `common::Error`
@@ -397,38 +437,38 @@ error[E0277]: `common::Error` doesn't implement `Debug`
 note: required by a bound in `Result::<T, E>::unwrap`
    --> /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/core/src/result.rs:1083:5
 help: consider annotating `common::Error` with `#[derive(Debug)]`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  + #[derive(Debug)]
-59  |             write: Some(self.ds_write)
+66  + #[derive(Debug)]
+67  |             panic!("DiskFS must be the lowest layer, and state is null");
     |
 
 error[E0308]: arguments to this method are incorrect
-   --> src/lib.rs:246:20
+   --> src/lib.rs:247:20
     |
-246 |         self.below.read(self.below_ino, block_no, buf);
+247 |         self.below.read(self.below_ino, block_no, buf);
     |                    ^^^^                 --------  --- expected `&mut Block`, found `Block`
     |                                         |
     |                                         expected `u32`, found `i32`
     |
 note: method defined here
-   --> src/common.rs:67:6
+   --> src/common.rs:75:6
     |
-67  |   fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
+75  |   fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
     |      ^^^^
 help: you can convert an `i32` to a `u32` and panic if the converted value doesn't fit
     |
-246 |         self.below.read(self.below_ino, block_no.try_into().unwrap(), buf);
+247 |         self.below.read(self.below_ino, block_no.try_into().unwrap(), buf);
     |                                                 ++++++++++++++++++++
 help: consider mutably borrowing here
     |
-246 |         self.below.read(self.below_ino, block_no, &mut buf);
+247 |         self.below.read(self.below_ino, block_no, &mut buf);
     |                                                   ~~~~~~~~
 
 error[E0308]: mismatched types
-   --> src/lib.rs:259:33
+   --> src/lib.rs:260:33
     |
-259 |         if denom == 0 || num == 0 || num < denom {
+260 |         if denom == 0 || num == 0 || num < denom {
     |                          ---    ^ expected `Result<u32, Error>`, found integer
     |                          |
     |                          expected because this is `Result<u32, common::Error>`
@@ -437,33 +477,33 @@ error[E0308]: mismatched types
                found type `{integer}`
 help: try wrapping the expression in `core::prelude::v1::Ok`
     |
-259 |         if denom == 0 || num == core::prelude::v1::Ok(0) || num < denom {
+260 |         if denom == 0 || num == core::prelude::v1::Ok(0) || num < denom {
     |                                 ++++++++++++++++++++++ +
 
 error[E0369]: binary operation `==` cannot be applied to type `Result<u32, common::Error>`
-   --> src/lib.rs:259:30
+   --> src/lib.rs:260:30
     |
-259 |         if denom == 0 || num == 0 || num < denom {
+260 |         if denom == 0 || num == 0 || num < denom {
     |                          --- ^^ - Result<u32, common::Error>
     |                          |
     |                          Result<u32, common::Error>
     |
 note: an implementation of `PartialEq` might be missing for `common::Error`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  | pub enum Error {
+66  | pub enum Error {
     | ^^^^^^^^^^^^^^ must implement `PartialEq`
 help: consider annotating `common::Error` with `#[derive(PartialEq)]`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  + #[derive(PartialEq)]
-59  |             write: Some(self.ds_write)
+66  + #[derive(PartialEq)]
+67  |             panic!("DiskFS must be the lowest layer, and state is null");
     |
 
 error[E0308]: mismatched types
-   --> src/lib.rs:259:44
+   --> src/lib.rs:260:44
     |
-259 |         if denom == 0 || num == 0 || num < denom {
+260 |         if denom == 0 || num == 0 || num < denom {
     |                                      ---   ^^^^^ expected `Result<u32, Error>`, found `u32`
     |                                      |
     |                                      expected because this is `Result<u32, common::Error>`
@@ -472,55 +512,55 @@ error[E0308]: mismatched types
                found type `u32`
 help: try wrapping the expression in `core::prelude::v1::Ok`
     |
-259 |         if denom == 0 || num == 0 || num < core::prelude::v1::Ok(denom) {
+260 |         if denom == 0 || num == 0 || num < core::prelude::v1::Ok(denom) {
     |                                            ++++++++++++++++++++++     +
 
 error[E0369]: binary operation `<` cannot be applied to type `Result<u32, common::Error>`
-   --> src/lib.rs:259:42
+   --> src/lib.rs:260:42
     |
-259 |         if denom == 0 || num == 0 || num < denom {
+260 |         if denom == 0 || num == 0 || num < denom {
     |                                      --- ^ ----- Result<u32, common::Error>
     |                                      |
     |                                      Result<u32, common::Error>
     |
 note: an implementation of `PartialOrd` might be missing for `common::Error`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  | pub enum Error {
+66  | pub enum Error {
     | ^^^^^^^^^^^^^^ must implement `PartialOrd`
 help: consider annotating `common::Error` with `#[derive(PartialEq, PartialOrd)]`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  + #[derive(PartialEq, PartialOrd)]
-59  |             write: Some(self.ds_write)
+66  + #[derive(PartialEq, PartialOrd)]
+67  |             panic!("DiskFS must be the lowest layer, and state is null");
     |
 
 error[E0369]: cannot divide `Result<u32, common::Error>` by `u32`
-   --> src/lib.rs:263:16
+   --> src/lib.rs:264:16
     |
-263 |         Ok(num / denom)
+264 |         Ok(num / denom)
     |            --- ^ ----- u32
     |            |
     |            Result<u32, common::Error>
 
 error[E0599]: the method `get_metadata` exists for reference `&SimpleFS<'_, T>`, but its trait bounds were not satisfied
-   --> src/lib.rs:272:36
+   --> src/lib.rs:273:36
     |
-272 |         let metadata_offset = self.get_metadata()?.num_blocks_needed;
+273 |         let metadata_offset = self.get_metadata()?.num_blocks_needed;
     |                                    ^^^^^^^^^^^^ method cannot be called on `&SimpleFS<'_, T>` due to unsatisfied trait bounds
     |
 note: trait bound `T: common::IsDisk` was not satisfied
-   --> src/lib.rs:135:21
+   --> src/lib.rs:136:21
     |
-135 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
+136 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
     |                     ^^^^^^  ---------------
     |                     |
     |                     unsatisfied trait bound introduced here
 
 error[E0308]: mismatched types
-   --> src/lib.rs:278:12
+   --> src/lib.rs:279:12
     |
-278 |         Ok(self.below.read(self.below_ino, full_offset, buf))
+279 |         Ok(self.below.read(self.below_ino, full_offset, buf))
     |         -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `i32`, found `Result<i32, Error>`
     |         |
     |         arguments to this enum variant are incorrect
@@ -528,9 +568,9 @@ error[E0308]: mismatched types
     = note: expected type `i32`
                found enum `Result<i32, common::Error>`
 help: the type constructed contains `Result<i32, common::Error>` due to the type of the argument passed
-   --> src/lib.rs:278:9
+   --> src/lib.rs:279:9
     |
-278 |         Ok(self.below.read(self.below_ino, full_offset, buf))
+279 |         Ok(self.below.read(self.below_ino, full_offset, buf))
     |         ^^^-------------------------------------------------^
     |            |
     |            this argument influences the type of `Ok`
@@ -538,23 +578,23 @@ note: tuple variant defined here
    --> /rustc/90c541806f23a127002de5b4038be731ba1458ca/library/core/src/result.rs:507:5
 
 error[E0599]: the method `get_metadata` exists for mutable reference `&mut SimpleFS<'_, T>`, but its trait bounds were not satisfied
-   --> src/lib.rs:282:36
+   --> src/lib.rs:283:36
     |
-282 |         let metadata_offset = self.get_metadata()?.num_blocks_needed;
+283 |         let metadata_offset = self.get_metadata()?.num_blocks_needed;
     |                                    ^^^^^^^^^^^^ method cannot be called on `&mut SimpleFS<'_, T>` due to unsatisfied trait bounds
     |
 note: trait bound `T: common::IsDisk` was not satisfied
-   --> src/lib.rs:135:21
+   --> src/lib.rs:136:21
     |
-135 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
+136 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
     |                     ^^^^^^  ---------------
     |                     |
     |                     unsatisfied trait bound introduced here
 
 error[E0308]: mismatched types
-   --> src/lib.rs:289:18
+   --> src/lib.rs:290:18
     |
-289 |         if res < 0 {
+290 |         if res < 0 {
     |            ---   ^ expected `Result<i32, Error>`, found integer
     |            |
     |            expected because this is `Result<i32, common::Error>`
@@ -563,47 +603,47 @@ error[E0308]: mismatched types
                found type `{integer}`
 help: try wrapping the expression in `core::prelude::v1::Ok`
     |
-289 |         if res < core::prelude::v1::Ok(0) {
+290 |         if res < core::prelude::v1::Ok(0) {
     |                  ++++++++++++++++++++++ +
 
 error[E0369]: binary operation `<` cannot be applied to type `Result<i32, common::Error>`
-   --> src/lib.rs:289:16
+   --> src/lib.rs:290:16
     |
-289 |         if res < 0 {
+290 |         if res < 0 {
     |            --- ^ - Result<i32, common::Error>
     |            |
     |            Result<i32, common::Error>
     |
 note: an implementation of `PartialOrd` might be missing for `common::Error`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  | pub enum Error {
+66  | pub enum Error {
     | ^^^^^^^^^^^^^^ must implement `PartialOrd`
 help: consider annotating `common::Error` with `#[derive(PartialEq, PartialOrd)]`
-   --> src/common.rs:58:1
+   --> src/common.rs:66:1
     |
-58  + #[derive(PartialEq, PartialOrd)]
-59  |             write: Some(self.ds_write)
+66  + #[derive(PartialEq, PartialOrd)]
+67  |             panic!("DiskFS must be the lowest layer, and state is null");
     |
 
 error[E0599]: the method `compute_indices` exists for mutable reference `&mut SimpleFS<'_, T>`, but its trait bounds were not satisfied
-   --> src/lib.rs:294:54
+   --> src/lib.rs:295:54
     |
-294 |         let (block_no, byte_index, bit_index) = self.compute_indices(ino, offset).unwrap();
+295 |         let (block_no, byte_index, bit_index) = self.compute_indices(ino, offset).unwrap();
     |                                                      ^^^^^^^^^^^^^^^ method cannot be called on `&mut SimpleFS<'_, T>` due to unsatisfied trait bounds
     |
 note: trait bound `T: common::IsDisk` was not satisfied
-   --> src/lib.rs:135:21
+   --> src/lib.rs:136:21
     |
-135 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
+136 | impl<T: Stackable + IsDisk> SimpleFS<'_, T> {
     |                     ^^^^^^  ---------------
     |                     |
     |                     unsatisfied trait bound introduced here
 
 error[E0308]: mismatched types
-   --> src/lib.rs:296:51
+   --> src/lib.rs:297:51
     |
-296 |         self.below.read(self.below_ino, block_no, buf);
+297 |         self.below.read(self.below_ino, block_no, buf);
     |                    ----                           ^^^
     |                    |                              |
     |                    |                              expected `&mut Block`, found `Block`
@@ -611,15 +651,15 @@ error[E0308]: mismatched types
     |                    arguments to this method are incorrect
     |
 note: method defined here
-   --> src/common.rs:67:6
+   --> src/common.rs:75:6
     |
-67  |   fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
+75  |   fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> 
     |      ^^^^
 
 error[E0308]: mismatched types
-   --> src/lib.rs:301:52
+   --> src/lib.rs:302:52
     |
-301 |         self.below.write(self.below_ino, block_no, buf);
+302 |         self.below.write(self.below_ino, block_no, buf);
     |                    -----                           ^^^
     |                    |                               |
     |                    |                               expected `&Block`, found `Block`
@@ -627,15 +667,15 @@ error[E0308]: mismatched types
     |                    arguments to this method are incorrect
     |
 note: method defined here
-   --> src/common.rs:69:6
+   --> src/common.rs:77:6
     |
-69  |   fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> 
+77  |   fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> 
     |      ^^^^^
 
 error[E0600]: cannot apply unary operator `-` to type `u32`
-   --> src/lib.rs:334:54
+   --> src/lib.rs:335:54
     |
-334 |     SimpleFS::from(inode_store).get_size().unwrap_or(-1)
+335 |     SimpleFS::from(inode_store).get_size().unwrap_or(-1)
     |                                                      ^^
     |                                                      |
     |                                                      cannot apply unary operator `-`
@@ -644,20 +684,20 @@ error[E0600]: cannot apply unary operator `-` to type `u32`
     = note: unsigned values cannot be negated
 
 error[E0282]: type annotations needed
-   --> src/lib.rs:345:5
+   --> src/lib.rs:346:5
     |
-345 |     SimpleFS::from(inode_store).set_size(size as u32).unwrap_or(-1)
+346 |     SimpleFS::from(inode_store).set_size(size as u32).unwrap_or(-1)
     |     ^^^^^^^^^^^^^^ cannot infer type of the type parameter `T` declared on the struct `SimpleFS`
     |
 help: consider specifying the generic argument
     |
-345 |     SimpleFS::<T>(inode_store).set_size(size as u32).unwrap_or(-1)
+346 |     SimpleFS::<T>(inode_store).set_size(size as u32).unwrap_or(-1)
     |             ~~~~~
 
 error[E0308]: mismatched types
-   --> src/lib.rs:355:68
+   --> src/lib.rs:356:68
     |
-355 |     SimpleFS::from(inode_store).read(ino, offset, &mut Block::from(block)).unwrap_or(-1)
+356 |     SimpleFS::from(inode_store).read(ino, offset, &mut Block::from(block)).unwrap_or(-1)
     |                                                        ----------- ^^^^^ expected `common::block`, found `block`
     |                                                        |
     |                                                        arguments to this function are incorrect
@@ -680,9 +720,9 @@ note: associated function defined here
     |          ^^^^ -------------------
 
 error[E0308]: mismatched types
-   --> src/lib.rs:365:69
+   --> src/lib.rs:366:69
     |
-365 |     SimpleFS::from(inode_store).write(ino, offset, &mut Block::from(block)).unwrap_or(-1)
+366 |     SimpleFS::from(inode_store).write(ino, offset, &mut Block::from(block)).unwrap_or(-1)
     |                                                         ----------- ^^^^^ expected `common::block`, found `block`
     |                                                         |
     |                                                         arguments to this function are incorrect
@@ -712,7 +752,7 @@ warning: unused import: `core::convert::From`
   |
   = note: `#[warn(unused_imports)]` on by default
 
-Some errors have detailed explanations: E0277, E0282, E0308, E0369, E0425, E0434, E0435, E0599, E0600...
+Some errors have detailed explanations: E0277, E0282, E0308, E0369, E0425, E0433, E0434, E0435, E0599...
 For more information about an error, try `rustc --explain E0277`.
 warning: `mydisk` (lib) generated 8 warnings
 The following warnings were emitted during compilation:
@@ -748,4 +788,4 @@ warning: /vagrant/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'i
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                       ~~~~~~~~~~~~~^~~
 
-error: could not compile `mydisk` (lib) due to 48 previous errors; 8 warnings emitted
+error: could not compile `mydisk` (lib) due to 51 previous errors; 8 warnings emitted

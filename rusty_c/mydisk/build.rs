@@ -37,6 +37,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed={}", headers_path_str);
 
+    // TODO use the artifacts already built by the egos build system
     // use cc to build C static library archive of the egos file/ directory, scraping
     // target and then compiler using .cargo/config, ar is standard archiver
     cc::Build::new()

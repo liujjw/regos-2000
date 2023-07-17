@@ -2,3 +2,4 @@
 0.5 fix all the compilter errors
 1. make rust headers for c code
 2. make install 
+3. fix my todos

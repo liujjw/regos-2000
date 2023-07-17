@@ -17,21 +17,28 @@ next week. he said the direction you wanted to take was implementing raid for a 
 3. theres a few blocks in the lowest indices of the disk containing information about 
 which blocks in the inodes are not allocated
 4. i implemented it with bitflags, i map individual bits to blocks to signal whether they 
-have been allocated 
+have been allocated (dynamic n bytes entry in metadata blocks for each inode based on the number of blocks per inode, currently 1 bit of metadata per 512 bytes blocks of inode data, TODO add layers of indirection to minimize metadata table size)
+    // But why have a freelist anyway? The offset is physically mapped to blocks within inodes,
+    // whereas in treedisk its only logically mapped.
+    // If we want to append to a file, it could be useful to know where we can start, 
+    // i.e. we provide a utility function if the API user forgets which blocks are free.
 5. theres only one layer of bitflags, so for every block theres 1 bit of overhead
 modulo wasted space due to rounding 
 6. so every inode has a row in the metadata blocks, the width of the row is 
 dynamically computed based on the number of blocks in each inode, i.e. the size
 7. code its just arithmetic and bitwise operations
 
-number of blocks 
-write offset less than file 
-if offset is greater than the 
-size 3 block 1 
-offset is 3, grow the file to size 4, write the data to block 3
-write to offset 8 (error) or grow to size 9 and initialize up to block from 3 up to 8
+number of blocks used by each inode 
+if we read/write an offset less than file size, do nothing extra
+if we read offset greater than file size, return error 
+if offset is greater than the size of the file:  
+  if size is 3, offset is 3, grow the file to size 4, write the data to block 3
+  if write to offset 8, error or grow to size 9 and initialize 0 from 3 up to 8
 
 three threads:
 1. my bure symposium notes
-2. getting things to compile ~80 compiler errors 
-3. adding the number of used blocks metadata
+2. getting things to compile ~80 compiler errors - yz 
+3. adding the number of used blocks metadata- yz
+
+next steps:
+compile, test, treedisk
