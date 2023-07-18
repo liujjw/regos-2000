@@ -5,6 +5,7 @@ extern crate alloc;
 use core::panic::PanicInfo;
 use core::alloc::{GlobalAlloc, Layout};
 use core::include;
+use alloc::boxed::Box;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
@@ -30,41 +31,14 @@ unsafe impl GlobalAlloc for EgosAllocator {
 #[global_allocator]
 static A: EgosAllocator = EgosAllocator;
 
-// pub type Block = block_t;
-pub struct Block {
-  bytes: [u8; BLOCK_SIZE as usize]
-}
-
-impl Block {
-  pub fn new() -> Block {
-    Block {
-      bytes: [0; BLOCK_SIZE as usize]
-    }
-  }
-
-  pub fn get_bytes<'a>(&'a self) -> &'a mut [u8] {
-    &mut self.bytes
-  }
-
-  pub fn from(block: *mut block_t) -> Self {
-    unsafe {
-      Block {
-        bytes: (*block).bytes
-      }
-    }
-  }
-
-  pub fn into(self) -> *mut block_t {
-    let mut block = Box::new(block_t {
-      bytes: [0; BLOCK_SIZE as usize]
-    });
-    block.bytes = self.bytes;
-    Box::into_raw(block)
-  }
-}
-
 // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
 
+// pub type Block = block_t;
+pub struct Block {
+  pub bytes: [u8; BLOCK_SIZE as usize]
+}
+
+#[derive(Debug)]
 pub enum Error {
   UnknownFailure
 }

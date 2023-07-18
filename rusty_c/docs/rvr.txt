@@ -38,7 +38,10 @@ if offset is greater than the size of the file:
 three threads:
 1. my bure symposium notes
 2. getting things to compile ~80 compiler errors - yz 
+(rust's stricter type system is complaining about the types imported from C)
 3. adding the number of used blocks metadata- yz
+
+dont worry too much about the treedisk
 
 next steps:
 compile, test, treedisk

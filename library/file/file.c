@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "file.h"
-#include "log_shift_rs.h"
 
 #ifdef MKFS
 #include <stdio.h>
