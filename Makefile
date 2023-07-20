@@ -42,7 +42,7 @@ install:
 
 rust_install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) -L$(RUST_HOST_LIBRARY_PATH) $(TOOLS)/mkfs.c library/file/file.c -std=c99 -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs -lrusty_fs
+	$(CC) -L$(RUST_HOST_LIBRARY_PATH) $(TOOLS)/mkfs.c -std=c99 -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs -lrusty_fs
 	cd $(TOOLS); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf

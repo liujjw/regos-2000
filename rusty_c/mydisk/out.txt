@@ -1,5 +1,3 @@
-warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `/vagrant/rusty_c/mydisk/target/debug/incremental/build_script_build-2tu1pdiw831j2/s-gmw5fu1sad-u9wyo7-working`
-
 warning: unused import: `std::process::Command`
  --> build.rs:3:5
   |
@@ -8,38 +6,38 @@ warning: unused import: `std::process::Command`
   |
   = note: `#[warn(unused_imports)]` on by default
 
-warning: `mydisk` (build script) generated 2 warnings
-warning: /vagrant/rusty_c/mydisk/file/disk.h:1:9: warning: #pragma once in main file
+warning: `mydisk` (build script) generated 1 warning
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.h:1:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/egos.h:1:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/egos.h:1:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/file.h:33:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/file.h:33:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/inode.h:38:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/inode.h:38:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/disk.c: In function 'disk_setsize':
-warning: /vagrant/rusty_c/mydisk/file/disk.c:16:1: warning: no return statement in function returning non-void [-Wreturn-type]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_setsize':
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:16:1: warning: no return statement in function returning non-void [-Wreturn-type]
 warning:  static int disk_setsize() { FATAL("disk: cannot set the size"); }
 warning:  ^~~~~~
-warning: /vagrant/rusty_c/mydisk/file/disk.c: In function 'disk_read':
-warning: /vagrant/rusty_c/mydisk/file/disk.c:18:33: warning: unused parameter 'bs' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_read':
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:33: warning: unused parameter 'bs' [-Wunused-parameter]
 warning:  static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                       ~~~~~~~~~~~^~
-warning: /vagrant/rusty_c/mydisk/file/disk.c:18:50: warning: unused parameter 'ino' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:50: warning: unused parameter 'ino' [-Wunused-parameter]
 warning:  static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                      ~~~~~~~~~~~~~^~~
-warning: /vagrant/rusty_c/mydisk/file/disk.c: In function 'disk_write':
-warning: /vagrant/rusty_c/mydisk/file/disk.c:22:34: warning: unused parameter 'bs' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_write':
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:34: warning: unused parameter 'bs' [-Wunused-parameter]
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                        ~~~~~~~~~~~^~
-warning: /vagrant/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                       ~~~~~~~~~~~~~^~~
-   Compiling mydisk v0.1.0 (/vagrant/rusty_c/mydisk)
+   Compiling mydisk v0.1.0 (/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk)
 warning: unused import: `alloc::boxed::Box`
  --> src/common.rs:8:5
   |
@@ -49,7 +47,7 @@ warning: unused import: `alloc::boxed::Box`
   = note: `#[warn(unused_imports)]` on by default
 
 warning: type `block_no` should have an upper camel case name
-  --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:27:10
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:27:10
    |
 27 | pub type block_no = cty::c_uint;
    |          ^^^^^^^^ help: convert the identifier to upper camel case: `BlockNo`
@@ -57,39 +55,39 @@ warning: type `block_no` should have an upper camel case name
    = note: `#[warn(non_camel_case_types)]` on by default
 
 warning: type `block_t` should have an upper camel case name
-  --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:58:10
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:58:10
    |
 58 | pub type block_t = block;
    |          ^^^^^^^ help: convert the identifier to upper camel case: `BlockT`
 
 warning: type `inode_store_t` should have an upper camel case name
-   --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:155:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:155:10
     |
 155 | pub type inode_store_t = inode_store;
     |          ^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeStoreT`
 
 warning: type `inode_intf` should have an upper camel case name
-   --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:156:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:156:10
     |
 156 | pub type inode_intf = *mut inode_store_t;
     |          ^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeIntf`
 
 warning: type `earth__bindgen_ty_1` should have an upper camel case name
-   --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:488:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:488:10
     |
 488 | pub type earth__bindgen_ty_1 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy1`
 
 warning: type `earth__bindgen_ty_2` should have an upper camel case name
-   --> /vagrant/rusty_c/mydisk/target/riscv64gc-unknown-none-elf/debug/build/mydisk-7b565f6546538fc7/out/bindings.rs:491:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:491:10
     |
 491 | pub type earth__bindgen_ty_2 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy2`
 
 warning: unused import: `core::mem::transmute`
-  --> src/lib.rs:13:5
+  --> src/lib.rs:11:5
    |
-13 | use core::mem::transmute;
+11 | use core::mem::transmute;
    |     ^^^^^^^^^^^^^^^^^^^^
 
 warning: crate-level attribute should be in the root module
@@ -100,51 +98,222 @@ warning: crate-level attribute should be in the root module
   |
   = note: `#[warn(unused_attributes)]` on by default
 
-error[E0425]: cannot find function `malloc` in this scope
-  --> src/common.rs:23:9
+warning: unused variable: `layout`
+  --> src/common.rs:23:28
    |
-23 |         malloc(layout.size() as cty::size_t) as *mut u8
-   |         ^^^^^^ not found in this scope
-
-error[E0425]: cannot find function `free` in this scope
-  --> src/common.rs:27:9
+23 |     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+   |                            ^^^^^^ help: if this is intentional, prefix it with an underscore: `_layout`
    |
-27 |         free(ptr as *mut cty::c_void);
-   |         ^^^^ not found in this scope
+   = note: `#[warn(unused_variables)]` on by default
 
-For more information about this error, try `rustc --explain E0425`.
-warning: `mydisk` (lib) generated 9 warnings
+warning: unused variable: `ptr`
+  --> src/common.rs:29:30
+   |
+29 |     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+   |                              ^^^ help: if this is intentional, prefix it with an underscore: `_ptr`
+
+warning: unused variable: `layout`
+  --> src/common.rs:29:44
+   |
+29 |     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+   |                                            ^^^^^^ help: if this is intentional, prefix it with an underscore: `_layout`
+
+warning: unused variable: `size`
+   --> src/lib.rs:150:28
+    |
+150 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `e`
+   --> src/lib.rs:256:17
+    |
+256 |             Err(e) => panic!("failed to compute metadata")
+    |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
+
+warning: unused variable: `row_width`
+   --> src/lib.rs:284:13
+    |
+284 |             row_width,
+    |             ^^^^^^^^^ help: try ignoring the field: `row_width: _`
+
+warning: unused variable: `num_blocks_needed`
+   --> src/lib.rs:285:13
+    |
+285 |             num_blocks_needed
+    |             ^^^^^^^^^^^^^^^^^ help: try ignoring the field: `num_blocks_needed: _`
+
+warning: unused variable: `below`
+   --> src/lib.rs:282:23
+    |
+282 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+    |                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_below`
+
+warning: unused variable: `below_ino`
+   --> src/lib.rs:282:38
+    |
+282 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+    |                                      ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_below_ino`
+
+warning: unused variable: `size`
+   --> src/lib.rs:373:28
+    |
+373 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ino`
+   --> src/lib.rs:440:5
+    |
+440 |     ino: cty::c_uint
+    |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
+
+warning: unused variable: `ino`
+   --> src/lib.rs:451:5
+    |
+451 |     ino: cty::c_uint,
+    |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
+
+warning: variable does not need to be mutable
+  --> src/lib.rs:87:13
+   |
+87 |         let mut inode_store = Box::new(inode_store_t {
+   |             ----^^^^^^^^^^^
+   |             |
+   |             help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` on by default
+
+warning: variable does not need to be mutable
+  --> src/lib.rs:99:13
+   |
+99 |         let mut inode_store = Box::new(inode_store_t {
+   |             ----^^^^^^^^^^^
+   |             |
+   |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/lib.rs:220:13
+    |
+220 |         let mut tmp: *mut cty::c_void = unsafe {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/lib.rs:224:13
+    |
+224 |         let mut inode_store = Box::new(inode_store_t {
+    |             ----^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+error[E0594]: cannot assign to `tmp.metadata`, as `tmp` is not declared as mutable
+   --> src/lib.rs:253:17
+    |
+253 |                 tmp.metadata = Some(data);
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^ cannot assign
+    |
+help: consider changing this to be mutable
+    |
+245 |         let mut tmp = SimpleFS {
+    |             +++
+
+error[E0507]: cannot move out of `self.metadata` which is behind a mutable reference
+   --> src/lib.rs:306:37
+    |
+306 |         let block_no = ((ino + 1) * self.metadata.unwrap().row_width) / BLOCK_SIZE;
+    |                                     ^^^^^^^^^^^^^ -------- `self.metadata` moved due to this method call
+    |                                     |
+    |                                     help: consider calling `.as_ref()` or `.as_mut()` to borrow the type's contents
+    |                                     move occurs because `self.metadata` has type `Option<Metadata>`, which does not implement the `Copy` trait
+    |
+note: `Option::<T>::unwrap` takes ownership of the receiver `self`, which moves `self.metadata`
+   --> /home/liujjw/.rustup/toolchains/1.70.0-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:947:25
+    |
+947 |     pub const fn unwrap(self) -> T {
+    |                         ^^^^
+
+error[E0507]: cannot move out of `self.metadata` which is behind a mutable reference
+   --> src/lib.rs:308:20
+    |
+308 |             (ino * self.metadata.unwrap().row_width) % BLOCK_SIZE;
+    |                    ^^^^^^^^^^^^^ -------- `self.metadata` moved due to this method call
+    |                    |
+    |                    help: consider calling `.as_ref()` or `.as_mut()` to borrow the type's contents
+    |                    move occurs because `self.metadata` has type `Option<Metadata>`, which does not implement the `Copy` trait
+
+warning: variable does not need to be mutable
+   --> src/lib.rs:323:13
+    |
+323 |         let mut byte_slice = &bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
+    |             ----^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/lib.rs:335:13
+    |
+335 |         let mut byte_slice = &bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
+    |             ----^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+error[E0596]: cannot borrow `*byte_slice` as mutable, as it is behind a `&` reference
+   --> src/lib.rs:336:9
+    |
+336 |         byte_slice.copy_from_slice(&val.to_le_bytes());
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `byte_slice` is a `&` reference, so the data it refers to cannot be borrowed as mutable
+    |
+help: consider changing this to be a mutable reference
+    |
+335 |         let mut byte_slice = &mut bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
+    |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+error[E0596]: cannot borrow `*self` as mutable, as it is behind a `&` reference
+   --> src/lib.rs:380:27
+    |
+380 |         let blocks_used = self.blocks_used(ino);
+    |                           ^^^^^^^^^^^^^^^^^^^^^ `self` is a `&` reference, so the data it refers to cannot be borrowed as mutable
+    |
+help: consider changing that to be a mutable reference
+   --> src/common.rs:54:11
+    |
+54  |   fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> 
+    |           ~~~~~~~~~
+
+Some errors have detailed explanations: E0507, E0594, E0596.
+For more information about an error, try `rustc --explain E0507`.
+warning: `mydisk` (lib) generated 27 warnings
 The following warnings were emitted during compilation:
 
-warning: /vagrant/rusty_c/mydisk/file/disk.h:1:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.h:1:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/egos.h:1:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/egos.h:1:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/file.h:33:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/file.h:33:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/inode.h:38:9: warning: #pragma once in main file
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/inode.h:38:9: warning: #pragma once in main file
 warning:  #pragma once
 warning:          ^~~~
-warning: /vagrant/rusty_c/mydisk/file/disk.c: In function 'disk_setsize':
-warning: /vagrant/rusty_c/mydisk/file/disk.c:16:1: warning: no return statement in function returning non-void [-Wreturn-type]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_setsize':
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:16:1: warning: no return statement in function returning non-void [-Wreturn-type]
 warning:  static int disk_setsize() { FATAL("disk: cannot set the size"); }
 warning:  ^~~~~~
-warning: /vagrant/rusty_c/mydisk/file/disk.c: In function 'disk_read':
-warning: /vagrant/rusty_c/mydisk/file/disk.c:18:33: warning: unused parameter 'bs' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_read':
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:33: warning: unused parameter 'bs' [-Wunused-parameter]
 warning:  static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                       ~~~~~~~~~~~^~
-warning: /vagrant/rusty_c/mydisk/file/disk.c:18:50: warning: unused parameter 'ino' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:50: warning: unused parameter 'ino' [-Wunused-parameter]
 warning:  static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                      ~~~~~~~~~~~~~^~~
-warning: /vagrant/rusty_c/mydisk/file/disk.c: In function 'disk_write':
-warning: /vagrant/rusty_c/mydisk/file/disk.c:22:34: warning: unused parameter 'bs' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_write':
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:34: warning: unused parameter 'bs' [-Wunused-parameter]
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                        ~~~~~~~~~~~^~
-warning: /vagrant/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                       ~~~~~~~~~~~~~^~~
 
-error: could not compile `mydisk` (lib) due to 2 previous errors; 9 warnings emitted
+error: could not compile `mydisk` (lib) due to 5 previous errors; 27 warnings emitted

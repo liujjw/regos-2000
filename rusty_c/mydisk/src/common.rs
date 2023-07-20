@@ -19,12 +19,15 @@ struct EgosAllocator;
 // use egos allocator or another crates.io impl, then Box, since other C code
 // relies on pointers to heap data we cannot use heapless or just the stack
 unsafe impl GlobalAlloc for EgosAllocator {
+    // TODO real malloc and free
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        malloc(layout.size() as cty::size_t) as *mut u8
+      let tmp: *mut u8 = &mut 0u8;
+      return tmp;
+      // malloc(layout.size() as cty::size_t) as *mut u8
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        free(ptr as *mut cty::c_void);
+      // free(ptr as *mut cty::c_void);
     }
 }
 
