@@ -13,6 +13,7 @@ libm = "0.2.7"
 
 [build-dependencies]
 bindgen = "0.65.1"
+cbindgen = "0.24.0"
 cc = "1.0.79"
 
 [profile.dev]

@@ -1,3 +1,56 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded strsim v0.10.0
+  Downloaded textwrap v0.16.0
+  Downloaded ryu v1.0.15
+  Downloaded clap_lex v0.2.4
+  Downloaded itoa v1.0.9
+  Downloaded tempfile v3.7.0
+  Downloaded os_str_bytes v6.5.1
+  Downloaded errno v0.3.1
+  Downloaded fastrand v2.0.0
+  Downloaded bitflags v2.3.3
+  Downloaded serde_derive v1.0.168
+  Downloaded serde_json v1.0.103
+  Downloaded cbindgen v0.24.5
+  Downloaded clap v3.2.25
+  Downloaded rustix v0.38.4
+  Downloaded linux-raw-sys v0.4.3
+  Downloaded libc v0.2.147
+  Downloaded serde v1.0.168
+   Compiling proc-macro2 v1.0.62
+   Compiling quote v1.0.28
+   Compiling libc v0.2.147
+   Compiling autocfg v1.1.0
+   Compiling serde v1.0.168
+   Compiling rustix v0.38.4
+   Compiling os_str_bytes v6.5.1
+   Compiling hashbrown v0.12.3
+   Compiling syn v1.0.109
+   Compiling serde_json v1.0.103
+   Compiling linux-raw-sys v0.4.3
+   Compiling indexmap v1.9.3
+   Compiling bitflags v2.3.3
+   Compiling clap_lex v0.2.4
+   Compiling strsim v0.10.0
+   Compiling cbindgen v0.24.5
+   Compiling atty v0.2.14
+   Compiling syn v2.0.22
+   Compiling fastrand v2.0.0
+   Compiling ryu v1.0.15
+   Compiling textwrap v0.16.0
+   Compiling termcolor v1.2.0
+   Compiling itoa v1.0.9
+   Compiling which v4.4.0
+   Compiling clang-sys v1.6.1
+   Compiling heck v0.4.1
+   Compiling clap v3.2.25
+   Compiling tempfile v3.7.0
+   Compiling prettyplease v0.2.9
+   Compiling bindgen v0.65.1
+   Compiling serde_derive v1.0.168
+   Compiling toml v0.5.11
+   Compiling mydisk v0.1.0 (/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk)
 warning: unused import: `std::process::Command`
  --> build.rs:3:5
   |
@@ -37,7 +90,6 @@ warning:                        ~~~~~~~~~~~^~
 warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                       ~~~~~~~~~~~~~^~~
-   Compiling mydisk v0.1.0 (/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk)
 warning: unused import: `alloc::boxed::Box`
  --> src/common.rs:8:5
   |
@@ -47,7 +99,7 @@ warning: unused import: `alloc::boxed::Box`
   = note: `#[warn(unused_imports)]` on by default
 
 warning: type `block_no` should have an upper camel case name
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:27:10
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:27:10
    |
 27 | pub type block_no = cty::c_uint;
    |          ^^^^^^^^ help: convert the identifier to upper camel case: `BlockNo`
@@ -55,31 +107,31 @@ warning: type `block_no` should have an upper camel case name
    = note: `#[warn(non_camel_case_types)]` on by default
 
 warning: type `block_t` should have an upper camel case name
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:58:10
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:58:10
    |
 58 | pub type block_t = block;
    |          ^^^^^^^ help: convert the identifier to upper camel case: `BlockT`
 
 warning: type `inode_store_t` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:155:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:155:10
     |
 155 | pub type inode_store_t = inode_store;
     |          ^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeStoreT`
 
 warning: type `inode_intf` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:156:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:156:10
     |
 156 | pub type inode_intf = *mut inode_store_t;
     |          ^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeIntf`
 
 warning: type `earth__bindgen_ty_1` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:488:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:488:10
     |
 488 | pub type earth__bindgen_ty_1 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy1`
 
 warning: type `earth__bindgen_ty_2` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-b739b1c258789c93/out/bindings.rs:491:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:491:10
     |
 491 | pub type earth__bindgen_ty_2 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy2`
@@ -119,201 +171,389 @@ warning: unused variable: `layout`
    |                                            ^^^^^^ help: if this is intentional, prefix it with an underscore: `_layout`
 
 warning: unused variable: `size`
-   --> src/lib.rs:150:28
+   --> src/lib.rs:164:28
     |
-150 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+164 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
     |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
 
 warning: unused variable: `e`
-   --> src/lib.rs:256:17
+   --> src/lib.rs:273:17
     |
-256 |             Err(e) => panic!("failed to compute metadata")
+273 |             Err(e) => panic!("failed to compute metadata")
     |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
 
 warning: unused variable: `row_width`
-   --> src/lib.rs:284:13
+   --> src/lib.rs:301:13
     |
-284 |             row_width,
+301 |             row_width,
     |             ^^^^^^^^^ help: try ignoring the field: `row_width: _`
 
 warning: unused variable: `num_blocks_needed`
-   --> src/lib.rs:285:13
+   --> src/lib.rs:302:13
     |
-285 |             num_blocks_needed
+302 |             num_blocks_needed
     |             ^^^^^^^^^^^^^^^^^ help: try ignoring the field: `num_blocks_needed: _`
 
 warning: unused variable: `below`
-   --> src/lib.rs:282:23
+   --> src/lib.rs:299:23
     |
-282 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+299 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
     |                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_below`
 
 warning: unused variable: `below_ino`
-   --> src/lib.rs:282:38
+   --> src/lib.rs:299:38
     |
-282 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+299 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
     |                                      ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_below_ino`
 
 warning: unused variable: `size`
-   --> src/lib.rs:373:28
+   --> src/lib.rs:388:28
     |
-373 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+388 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
     |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
 
 warning: unused variable: `ino`
-   --> src/lib.rs:440:5
+   --> src/lib.rs:455:5
     |
-440 |     ino: cty::c_uint
+455 |     ino: cty::c_uint
     |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
 
 warning: unused variable: `ino`
-   --> src/lib.rs:451:5
+   --> src/lib.rs:467:5
     |
-451 |     ino: cty::c_uint,
+467 |     ino: cty::c_uint,
     |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
 
 warning: variable does not need to be mutable
-  --> src/lib.rs:87:13
+  --> src/lib.rs:50:13
    |
-87 |         let mut inode_store = Box::new(inode_store_t {
-   |             ----^^^^^^^^^^^
+50 |         let mut byte_slice = &mut self.bytes[beg..end];
+   |             ----^^^^^^^^^^
    |             |
    |             help: remove this `mut`
    |
    = note: `#[warn(unused_mut)]` on by default
 
 warning: variable does not need to be mutable
-  --> src/lib.rs:99:13
-   |
-99 |         let mut inode_store = Box::new(inode_store_t {
-   |             ----^^^^^^^^^^^
-   |             |
-   |             help: remove this `mut`
+   --> src/lib.rs:101:13
+    |
+101 |         let mut inode_store = Box::new(inode_store_t {
+    |             ----^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
 
 warning: variable does not need to be mutable
-   --> src/lib.rs:220:13
+   --> src/lib.rs:113:13
     |
-220 |         let mut tmp: *mut cty::c_void = unsafe {
+113 |         let mut inode_store = Box::new(inode_store_t {
+    |             ----^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/lib.rs:237:13
+    |
+237 |         let mut tmp: *mut cty::c_void = unsafe {
     |             ----^^^
     |             |
     |             help: remove this `mut`
 
 warning: variable does not need to be mutable
-   --> src/lib.rs:224:13
+   --> src/lib.rs:241:13
     |
-224 |         let mut inode_store = Box::new(inode_store_t {
+241 |         let mut inode_store = Box::new(inode_store_t {
     |             ----^^^^^^^^^^^
     |             |
     |             help: remove this `mut`
 
-error[E0594]: cannot assign to `tmp.metadata`, as `tmp` is not declared as mutable
-   --> src/lib.rs:253:17
-    |
-253 |                 tmp.metadata = Some(data);
-    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^ cannot assign
-    |
-help: consider changing this to be mutable
-    |
-245 |         let mut tmp = SimpleFS {
-    |             +++
+warning: methods `get_bytes` and `heap_into_` are never used
+  --> src/lib.rs:54:12
+   |
+33 | impl Block {
+   | ---------- methods in this implementation
+...
+54 |     pub fn get_bytes<'a>(&'a mut self) -> &'a mut [u8] {
+   |            ^^^^^^^^^
+...
+76 |     pub fn heap_into_(self) -> *mut block_t {
+   |            ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
 
-error[E0507]: cannot move out of `self.metadata` which is behind a mutable reference
-   --> src/lib.rs:306:37
-    |
-306 |         let block_no = ((ino + 1) * self.metadata.unwrap().row_width) / BLOCK_SIZE;
-    |                                     ^^^^^^^^^^^^^ -------- `self.metadata` moved due to this method call
-    |                                     |
-    |                                     help: consider calling `.as_ref()` or `.as_mut()` to borrow the type's contents
-    |                                     move occurs because `self.metadata` has type `Option<Metadata>`, which does not implement the `Copy` trait
-    |
-note: `Option::<T>::unwrap` takes ownership of the receiver `self`, which moves `self.metadata`
-   --> /home/liujjw/.rustup/toolchains/1.70.0-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:947:25
-    |
-947 |     pub const fn unwrap(self) -> T {
-    |                         ^^^^
+warning: constant `PAGING_DEV_SIZE` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:4:11
+  |
+4 | pub const PAGING_DEV_SIZE: u32 = 1048576;
+  |           ^^^^^^^^^^^^^^^
 
-error[E0507]: cannot move out of `self.metadata` which is behind a mutable reference
-   --> src/lib.rs:308:20
-    |
-308 |             (ino * self.metadata.unwrap().row_width) % BLOCK_SIZE;
-    |                    ^^^^^^^^^^^^^ -------- `self.metadata` moved due to this method call
-    |                    |
-    |                    help: consider calling `.as_ref()` or `.as_mut()` to borrow the type's contents
-    |                    move occurs because `self.metadata` has type `Option<Metadata>`, which does not implement the `Copy` trait
+warning: constant `GRASS_NEXEC` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:5:11
+  |
+5 | pub const GRASS_NEXEC: u32 = 8;
+  |           ^^^^^^^^^^^
 
-warning: variable does not need to be mutable
-   --> src/lib.rs:323:13
-    |
-323 |         let mut byte_slice = &bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
-    |             ----^^^^^^^^^^
-    |             |
-    |             help: remove this `mut`
+warning: constant `GRASS_EXEC_SIZE` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:6:11
+  |
+6 | pub const GRASS_EXEC_SIZE: u32 = 1048576;
+  |           ^^^^^^^^^^^^^^^
 
-warning: variable does not need to be mutable
-   --> src/lib.rs:335:13
-    |
-335 |         let mut byte_slice = &bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
-    |             ----^^^^^^^^^^
-    |             |
-    |             help: remove this `mut`
+warning: constant `FS_DISK_SIZE` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:7:11
+  |
+7 | pub const FS_DISK_SIZE: u32 = 2097152;
+  |           ^^^^^^^^^^^^
 
-error[E0596]: cannot borrow `*byte_slice` as mutable, as it is behind a `&` reference
-   --> src/lib.rs:336:9
-    |
-336 |         byte_slice.copy_from_slice(&val.to_le_bytes());
-    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `byte_slice` is a `&` reference, so the data it refers to cannot be borrowed as mutable
-    |
-help: consider changing this to be a mutable reference
-    |
-335 |         let mut byte_slice = &mut bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
-    |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+warning: constant `GRASS_EXEC_SEGMENT` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:8:11
+  |
+8 | pub const GRASS_EXEC_SEGMENT: u32 = 256;
+  |           ^^^^^^^^^^^^^^^^^^
 
-error[E0596]: cannot borrow `*self` as mutable, as it is behind a `&` reference
-   --> src/lib.rs:380:27
-    |
-380 |         let blocks_used = self.blocks_used(ino);
-    |                           ^^^^^^^^^^^^^^^^^^^^^ `self` is a `&` reference, so the data it refers to cannot be borrowed as mutable
-    |
-help: consider changing that to be a mutable reference
-   --> src/common.rs:54:11
-    |
-54  |   fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> 
-    |           ~~~~~~~~~
+warning: constant `GRASS_EXEC_START` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:9:11
+  |
+9 | pub const GRASS_EXEC_START: u32 = 2048;
+  |           ^^^^^^^^^^^^^^^^
 
-Some errors have detailed explanations: E0507, E0594, E0596.
-For more information about an error, try `rustc --explain E0507`.
-warning: `mydisk` (lib) generated 27 warnings
-The following warnings were emitted during compilation:
+warning: constant `SYS_PROC_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:10:11
+   |
+10 | pub const SYS_PROC_EXEC_START: u32 = 2304;
+   |           ^^^^^^^^^^^^^^^^^^^
 
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.h:1:9: warning: #pragma once in main file
-warning:  #pragma once
-warning:          ^~~~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/egos.h:1:9: warning: #pragma once in main file
-warning:  #pragma once
-warning:          ^~~~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/file.h:33:9: warning: #pragma once in main file
-warning:  #pragma once
-warning:          ^~~~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/inode.h:38:9: warning: #pragma once in main file
-warning:  #pragma once
-warning:          ^~~~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_setsize':
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:16:1: warning: no return statement in function returning non-void [-Wreturn-type]
-warning:  static int disk_setsize() { FATAL("disk: cannot set the size"); }
-warning:  ^~~~~~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_read':
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:33: warning: unused parameter 'bs' [-Wunused-parameter]
-warning:  static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
-warning:                       ~~~~~~~~~~~^~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:50: warning: unused parameter 'ino' [-Wunused-parameter]
-warning:  static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
-warning:                                      ~~~~~~~~~~~~~^~~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function 'disk_write':
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:34: warning: unused parameter 'bs' [-Wunused-parameter]
-warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
-warning:                        ~~~~~~~~~~~^~
-warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
-warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
-warning:                                       ~~~~~~~~~~~~~^~~
+warning: constant `SYS_FILE_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:11:11
+   |
+11 | pub const SYS_FILE_EXEC_START: u32 = 2560;
+   |           ^^^^^^^^^^^^^^^^^^^
 
-error: could not compile `mydisk` (lib) due to 5 previous errors; 27 warnings emitted
+warning: constant `SYS_DIR_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:12:11
+   |
+12 | pub const SYS_DIR_EXEC_START: u32 = 2816;
+   |           ^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYS_SHELL_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:13:11
+   |
+13 | pub const SYS_SHELL_EXEC_START: u32 = 3072;
+   |           ^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GRASS_FS_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:14:11
+   |
+14 | pub const GRASS_FS_START: u32 = 4096;
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `NINODES` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:15:11
+   |
+15 | pub const NINODES: u32 = 128;
+   |           ^^^^^^^
+
+warning: constant `PAGE_SIZE` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:16:11
+   |
+16 | pub const PAGE_SIZE: u32 = 4096;
+   |           ^^^^^^^^^
+
+warning: constant `FRAME_CACHE_END` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:17:11
+   |
+17 | pub const FRAME_CACHE_END: u32 = 2147614720;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `FRAME_CACHE_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:18:11
+   |
+18 | pub const FRAME_CACHE_START: u32 = 2147500032;
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `GRASS_STACK_TOP` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:19:11
+   |
+19 | pub const GRASS_STACK_TOP: u32 = 2147499904;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `APPS_STACK_TOP` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:20:11
+   |
+20 | pub const APPS_STACK_TOP: u32 = 2147491840;
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `SYSCALL_ARG` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:21:11
+   |
+21 | pub const SYSCALL_ARG: u32 = 2147484672;
+   |           ^^^^^^^^^^^
+
+warning: constant `APPS_ARG` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:22:11
+   |
+22 | pub const APPS_ARG: u32 = 2147483648;
+   |           ^^^^^^^^
+
+warning: constant `APPS_SIZE` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:23:11
+   |
+23 | pub const APPS_SIZE: u32 = 12288;
+   |           ^^^^^^^^^
+
+warning: constant `APPS_ENTRY` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:24:11
+   |
+24 | pub const APPS_ENTRY: u32 = 134238208;
+   |           ^^^^^^^^^^
+
+warning: constant `GRASS_SIZE` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:25:11
+   |
+25 | pub const GRASS_SIZE: u32 = 10240;
+   |           ^^^^^^^^^^
+
+warning: constant `GRASS_ENTRY` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:26:11
+   |
+26 | pub const GRASS_ENTRY: u32 = 134227968;
+   |           ^^^^^^^^^^^
+
+warning: type alias `inode_store_t` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:155:10
+    |
+155 | pub type inode_store_t = inode_store;
+    |          ^^^^^^^^^^^^^
+
+warning: type alias `inode_intf` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:156:10
+    |
+156 | pub type inode_intf = *mut inode_store_t;
+    |          ^^^^^^^^^^
+
+warning: constant `earth_QEMU` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:486:11
+    |
+486 | pub const earth_QEMU: earth__bindgen_ty_1 = 0;
+    |           ^^^^^^^^^^
+
+warning: constant `earth_ARTY` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:487:11
+    |
+487 | pub const earth_ARTY: earth__bindgen_ty_1 = 1;
+    |           ^^^^^^^^^^
+
+warning: constant `earth_PAGE_TABLE` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:489:11
+    |
+489 | pub const earth_PAGE_TABLE: earth__bindgen_ty_2 = 0;
+    |           ^^^^^^^^^^^^^^^^
+
+warning: constant `earth_SOFT_TLB` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:490:11
+    |
+490 | pub const earth_SOFT_TLB: earth__bindgen_ty_2 = 1;
+    |           ^^^^^^^^^^^^^^
+
+warning: function `fs_disk_init` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:158:12
+    |
+158 |     pub fn fs_disk_init() -> inode_intf;
+    |            ^^^^^^^^^^^^
+
+warning: function `treedisk_init` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:161:12
+    |
+161 |     pub fn treedisk_init(below: inode_intf, below_ino: cty::c_uint) -> inode_intf;
+    |            ^^^^^^^^^^^^^
+
+warning: function `treedisk_create` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:164:12
+    |
+164 |     pub fn treedisk_create(
+    |            ^^^^^^^^^^^^^^^
+
+warning: static `earth` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:827:20
+    |
+827 |     pub static mut earth: *mut earth;
+    |                    ^^^^^
+
+warning: static `grass` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:830:20
+    |
+830 |     pub static mut grass: *mut grass;
+    |                    ^^^^^
+
+warning: constant `earth_QEMU` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:486:11
+    |
+486 | pub const earth_QEMU: earth__bindgen_ty_1 = 0;
+    |           ^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_QEMU`
+    |
+    = note: `#[warn(non_upper_case_globals)]` on by default
+
+warning: constant `earth_ARTY` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:487:11
+    |
+487 | pub const earth_ARTY: earth__bindgen_ty_1 = 1;
+    |           ^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_ARTY`
+
+warning: constant `earth_PAGE_TABLE` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:489:11
+    |
+489 | pub const earth_PAGE_TABLE: earth__bindgen_ty_2 = 0;
+    |           ^^^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_PAGE_TABLE`
+
+warning: constant `earth_SOFT_TLB` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/riscv32i-unknown-none-elf/debug/build/mydisk-9919724555a4ed0d/out/bindings.rs:490:11
+    |
+490 | pub const earth_SOFT_TLB: earth__bindgen_ty_2 = 1;
+    |           ^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_SOFT_TLB`
+
+warning: unused `Result` that must be used
+   --> src/lib.rs:359:9
+    |
+359 |         self.below.read(self.below_ino, block_no, &mut buf);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+    = note: `#[warn(unused_must_use)]` on by default
+help: use `let _ = ...` to ignore the resulting value
+    |
+359 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+    |         +++++++
+
+warning: unused `Result` that must be used
+   --> src/lib.rs:368:9
+    |
+368 |         self.below.read(self.below_ino, block_no, &mut buf);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+    |
+368 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+    |         +++++++
+
+warning: unused `Result` that must be used
+   --> src/lib.rs:371:9
+    |
+371 |         self.below.write(self.below_ino, block_no, &mut buf);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+    |
+371 |         let _ = self.below.write(self.below_ino, block_no, &mut buf);
+    |         +++++++
+
+warning: comparison is useless due to type limits
+   --> src/lib.rs:470:8
+    |
+470 |     if newsize < 0 {
+    |        ^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_comparisons)]` on by default
+
+warning: `mydisk` (lib) generated 69 warnings (run `cargo fix --lib -p mydisk` to apply 19 suggestions)
+    Finished dev [unoptimized + debuginfo] target(s) in 21.87s

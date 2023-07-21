@@ -31,14 +31,28 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 // TODO Make SimpleFS own below, and change other references to owned values and vice versa
   
 impl Block {
+    pub const BLOCK_SIZE: usize = BLOCK_SIZE as usize;
+
     pub fn new() -> Block {
         Block {
-            bytes: [0; BLOCK_SIZE as usize]
+            bytes: [0; Self::BLOCK_SIZE]
         }
     }
 
-    pub fn get_bytes<'a>(&'a self) -> &'a [u8] {
+    pub fn read_bytes<'a>(&'a self) -> &'a [u8] {
         &self.bytes
+    }
+
+    pub fn write_bytes<'a>(&'a mut self, src: &[u8], beg: usize, end: usize) {
+        if src.len() > Self::BLOCK_SIZE || end - beg != src.len() {
+            panic!("src improperly sized")
+        }
+        let mut byte_slice = &mut self.bytes[beg..end];
+        byte_slice.copy_from_slice(src);
+    }
+
+    pub fn get_bytes<'a>(&'a mut self) -> &'a mut [u8] {
+        &mut self.bytes
     }
 
     pub fn from_(block: *mut block_t) -> Self {
@@ -51,8 +65,8 @@ impl Block {
 
     // TODO stack vs heap *mut block_t
     pub fn into_(&self) -> *mut block_t {
-        let mut bytes_copy: [u8; BLOCK_SIZE as usize] = [0; BLOCK_SIZE as usize];
-        (&mut bytes_copy).copy_from_slice(self.get_bytes());
+        let mut bytes_copy: [u8; Self::BLOCK_SIZE] = [0; Self::BLOCK_SIZE];
+        (&mut bytes_copy).copy_from_slice(self.read_bytes());
         let new_block: *mut block_t = &mut block_t {
             bytes: bytes_copy
         };
@@ -61,7 +75,7 @@ impl Block {
 
     pub fn heap_into_(self) -> *mut block_t {
         let mut block = Box::new(block_t {
-            bytes: [0; BLOCK_SIZE as usize]
+            bytes: [0; Self::BLOCK_SIZE]
         });
         block.bytes = self.bytes;
         Box::into_raw(block)
@@ -175,11 +189,14 @@ impl Stackable for DiskFS {
         }
     }
 }
-// in bytes
-const CONST_ROW_WIDTH: u32 = 4;
 struct Metadata {
     row_width: u32,
     num_blocks_needed: u32,
+}
+
+impl Metadata {
+    // in bytes
+    pub const CONSTANT_ROW_WIDTH: usize = 4;
 }
 
 struct SimpleFS<T: Stackable> {
@@ -242,7 +259,7 @@ impl SimpleFS<DiskFS> {
 
 impl<T: Stackable + IsDisk> SimpleFS<T> {
     pub fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
-        let tmp = SimpleFS {
+        let mut tmp = SimpleFS {
             below: below,
             below_ino: below_ino,
             num_inodes: num_inodes,
@@ -260,17 +277,17 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     /// Have a few blocks in the beginning reserved for metadata about the free blocks.
     /// Each of the N inodes has a 4 bytes entry in the metadata blocks, 
     /// and that entry tells us the number of blocks allocated. 
-    pub fn compute_metadata(num_inodes: u32) -> Result<Metadata, Error> {
+    fn compute_metadata(num_inodes: u32) -> Result<Metadata, Error> {
         // assume rows <= 512 bytes (BLOCK_SIZE)
-        if size_of::<[u8; CONST_ROW_WIDTH as usize]>() > BLOCK_SIZE as usize {
+        if size_of::<[u8; Metadata::CONSTANT_ROW_WIDTH]>() > Block::BLOCK_SIZE {
             panic!("row size exceeds block size");
         }
         let num_blocks_needed = libm::ceil(
-            (size_of::<[u8; CONST_ROW_WIDTH as usize]>() * num_inodes as usize) as f64 / 
-            BLOCK_SIZE as f64
+            (size_of::<[u8; Metadata::CONSTANT_ROW_WIDTH]>() * num_inodes as usize) as f64 / 
+            Block::BLOCK_SIZE as f64
         ) as u32;
         Ok(Metadata {
-            row_width: CONST_ROW_WIDTH,
+            row_width: Metadata::CONSTANT_ROW_WIDTH as u32,
             num_blocks_needed: num_blocks_needed
         })
     }
@@ -301,11 +318,11 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     
     /// Determine which metadata block this inode row lives on and which 4-bytes 
     /// in that block to look at.
-    fn compute_indices(&mut self, ino: u32) -> Result<(u32, u32), Error> {
+    fn compute_indices(&self, ino: u32) -> Result<(u32, u32), Error> {
         // floor since zero indexed ino
-        let block_no = ((ino + 1) * self.metadata.unwrap().row_width) / BLOCK_SIZE;
+        let block_no = ((ino + 1) * self.get_metadata().unwrap().row_width) / Block::BLOCK_SIZE as u32;
         let ino_row_starting_byte_index_in_block = 
-            (ino * self.metadata.unwrap().row_width) % BLOCK_SIZE;
+            (ino * self.get_metadata().unwrap().row_width) % Block::BLOCK_SIZE as u32;
         let byte_index = ino_row_starting_byte_index_in_block / 8; 
         Ok((block_no, byte_index))
     }
@@ -313,31 +330,29 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     // beware endianness and alignment, assume 4 bytes of size info
     // riscv is little endian, so prefer little endian
     fn compute_inode_metadata_at(buf: &mut Block, ibyte: u32) -> u32 {
-        if CONST_ROW_WIDTH != 4 {
+        if Metadata::CONSTANT_ROW_WIDTH != 4 {
             panic!("row width assumed to be 32");
         }
-        if ibyte + 4 > BLOCK_SIZE {
+        if ibyte + 4 > Block::BLOCK_SIZE as u32 {
             panic!("byte index out of bounds");
         }
-        let bytes = buf.get_bytes();
-        let mut byte_slice = &bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
+        let bytes = buf.read_bytes();
+        let byte_slice = &bytes[ibyte as usize..(ibyte as usize + Metadata::CONSTANT_ROW_WIDTH)];
         u32::from_le_bytes(byte_slice.try_into().unwrap())
     }
 
-    fn compute_new_inode_metadata_at(buf: &mut Block, ibyte: u32, val: u32) {
-        if CONST_ROW_WIDTH != 4 {
+    fn set_new_inode_metadata_at(buf: &mut Block, ibyte: u32, val: u32) {
+        if Metadata::CONSTANT_ROW_WIDTH != 4 {
             panic!("row width assumed to be 32");
         }
-        if ibyte + 4 > BLOCK_SIZE {
+        if ibyte + 4 > Block::BLOCK_SIZE as u32 {
             panic!("byte index out of bounds");
         }
-        let bytes = buf.get_bytes();
-        let mut byte_slice = &bytes[ibyte as usize..(ibyte + CONST_ROW_WIDTH) as usize];
-        byte_slice.copy_from_slice(&val.to_le_bytes());
+        buf.write_bytes(&val.to_le_bytes(), ibyte as usize, ibyte as usize + Metadata::CONSTANT_ROW_WIDTH);
     }
 
     /// Number of used blocks per inode.
-    pub fn blocks_used(&mut self, ino: u32) -> u32 {
+    pub fn blocks_used(&self, ino: u32) -> u32 {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -352,7 +367,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         let mut buf = Block::new();
         self.below.read(self.below_ino, block_no, &mut buf);
         
-        Self::compute_new_inode_metadata_at(&mut buf, byte_index, val);
+        Self::set_new_inode_metadata_at(&mut buf, byte_index, val);
         self.below.write(self.below_ino, block_no, &mut buf);
     }
 }
@@ -445,6 +460,7 @@ unsafe extern "C" fn simfs_get_size(
     }
 } 
 
+// TODO unneeded to return C compatible abi for some of these, but included for completeness
 #[no_mangle]
 unsafe extern "C" fn simfs_set_size(
     inode_store: *mut inode_store_t, 

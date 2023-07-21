@@ -1,5 +1,5 @@
-0. get rsicv32i x-compiler installed and running on ubuntu-14 (riscv32i-unknown-none-elf)
 0.5 fix all the compilter errors
+0.0.5 fix important todos
 1. make rust headers for c code
 2. make install 
 3. fix my todos
