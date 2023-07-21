@@ -1,54 +1,33 @@
-\* See `README.md` in `rusty_c/` for "rustification".
-## Vision
+# info
+egos-2000 with drop-in rust modules. regos-2000 invokes rust -> earth -> grass, because rust code permeates the original egos-2000.
 
-This project's vision is to help **every** college student read **all** the code of an operating system.
+## getting the right environment
+**NOTE** ARM Macbooks (the ones with M[n] chips) are not supported.
 
-With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
-It can run on a RISC-V board and also the QEMU software emulator.
+Install Vagrant by Hashicorp for your (`x86`) OS and a hypervisor (KVM, VirtualBox, etc on Linux x86), set those up. Use the provided `Vagrantfile`.
 
-![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
+**Use the following steps whenever running or developing.**  
 
-```shell
-# The cloc utility is used to count the lines of code (LOC).
-# The command below counts the LOC of everything excluding text documents.
-> cloc egos-2000 --exclude-ext=md,txt
-...
-github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-C                               37            510            665           1579
-C/C++ Header                    10             68            105            285
-Assembly                         4              6             31             72
-make                             1             12              0             64
--------------------------------------------------------------------------------
-SUM:                            52            596            801           2000 (exactly 2000!)
--------------------------------------------------------------------------------
-```
+**NOTE** `fourteen` is for cargo builds, `ateen` is for `c2rust`, and `twenty` is for `make` (`twenty` may also make cargo builds easier since its `clang` version should be high enough). `make qemu` does not work in `ubuntu14`. 
 
-## Earth and Grass Operating System
+For example, you need to use `vagrant ssh twenty` after `vagrant up twenty` to `ssh` into the `ubuntu20` distro.
 
-We use egos-2000 as a new teaching OS for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/). It adopts a 3-layer architecture.
+`vagrant up` in root of this project on your host computer and then `vagrant ssh [vm]` with `vagrant` as password. You are now inside a VM if you didn't notice any errors. The root of this project in the VM is at `/vagrant` (it's a "shared" folder between the host OS and the VM, changes in here are preserved between host and VM). 
 
-* The **earth layer** implements hardware-specific abstractions.
-    * tty and disk device interfaces
-    * interrupt and memory management interfaces
-* The **grass layer** implements hardware-independent abstractions.
-    * processes, system calls and inter-process communications
-* The **application layer** implements file system, shell and user commands.
+## setup scripts
+Now `cd /vagrant/rusty_c/rust_fs` into the Rust project and run the setup scripts for the VM platform used by the Vagrantfile. To build just Rust, we need `cargo` and the right target architecture cross-compiler (e.g. `riscv-32i`); to build C inside of Rust we need an up to date version of `clang` that only some later versions of ubuntu may provide, as well as the RISC-V toolchain C compiler.
+**If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.**
+**If `cargo` not found restart the terminal after setup.**
 
-The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
+## Writing Rust modules and integrating them into the current C build system
+### Rust FFI to C
+Auto-generate Rust FFI bindings for C libraries using `cargo build`, building and linking C files as well (`bindgen`, `cc`, etc. using the build script `build.rs`). Look for `bindings.rs` in `target/` to see what they look like. The generated FFI bindings are dumped with the `include!` macro into your Rust library. Run `cargo test` to verify layout, size, and alignment. 
 
-### Usages and Documentation
+### C FFI to Rust
+A header file of the Rust function signatures suffices. Make sure demangling and C ABI is used in your Rust functions if they are to be called by C. Make sure your Rust library is compiled as a static library archive (`.a` file in `target/`) and copy and link it in the Makefile.
 
-For compiling and running egos-2000, please read [this document](references/USAGES.md).
-The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) and [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduce the privileged ISA and processor memory map.
-[This document](references/README.md) further introduces the teaching plans, architecture and development history.
+### Directories explained
+`/mydisk` contains the implementation of a basic filesystem. `treedisk_c2rust` contains the implementation of a transpiled `treedisk.c` into Rust. It needs to be manually reviewed. The `super` prefix in this directory means all the declarations are in one file for simplicity.
 
-For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
-
-## Acknowledgements
-
-Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/), [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/), [Shan Lu](https://people.cs.uchicago.edu/~shanlu/) and [Hakim Weatherspoon](https://www.cs.cornell.edu/~hweather/) for supporting this project.
-Many thanks to Meta for a [Meta fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
-Many thanks to all CS5411/4411 students at Cornell over the years for helping improve this course.
+### Tracking the code size
+The runtime crates installed in Rust take up an extra `~124kB`. Crates are also verified to be under the category "No standard library".
