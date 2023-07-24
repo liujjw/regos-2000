@@ -1,5 +1,4 @@
-0.5 fix all the compilter errors
-0.0.5 fix important todos
-1. make rust headers for c code
-2. make install 
-3. fix my todos
+1. fix important todos (including malloc and free, copy, free, spinlock thats locked forever )
+2. make rust headers for c code and put them in the right directory (make install)
+3. testing
+

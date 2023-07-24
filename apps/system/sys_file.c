@@ -11,12 +11,16 @@
 #include "app.h"
 #include "file.h"
 #include <string.h>
+// MARK where Rust code was imported
+#include "bindings.h"
 
 int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface */
-    inode_intf fs = treedisk_init(fs_disk_init(), 0);
+    // MARK where C code was replaced by Rust code
+    // inode_intf fs = treedisk_init(fs_disk_init(), 0);
+    inode_intf fs = simplefs_init(fs_disk_init(), 0, NINODES);
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];

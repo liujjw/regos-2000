@@ -5,3 +5,11 @@
 in cargo.toml dependencies
 5. Liam Arzola 
 6. Remove file.c call and include a header
+
+
+1. file.c links <stdlib.h>, which includes malloc and free. I can try to link 
+<stdlib.h> to get malloc/free, or I can use a Rust crate. malloc/free contain syscalls,
+such as sbrk, however a lot of the code is a just a library call that doesn't 
+require a syscall, but we have sbrk implemented in kernel space when malloc and free
+need it. In fact, I think in Linux, malloc and free come from libc, but the Linux kernel 
+itself implements the syscalls.

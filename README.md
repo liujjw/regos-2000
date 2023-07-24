@@ -29,5 +29,7 @@ A header file of the Rust function signatures suffices. Make sure demangling and
 ### Directories explained
 `/mydisk` contains the implementation of a basic filesystem. `treedisk_c2rust` contains the implementation of a transpiled `treedisk.c` into Rust. It needs to be manually reviewed. The `super` prefix in this directory means all the declarations are in one file for simplicity.
 
-### Tracking the code size
-The runtime crates installed in Rust take up an extra `~124kB`. Crates are also verified to be under the category "No standard library".
+### Addressing large Rust binaries for the memory layout
+The `/apps` memory region only has `~12KB` of memory, with `~16MB` used in total from text section up to the heap for all three parts of the kernel (earth, grass, apps). Stack pointer starts at roughly the 2048th megabyte. With dead code elimination the size of the full runtime crates don't matter, we just make sure to use as little as possible. Crates are also verified to be under the category "No standard library".
+
+See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `egos` memory layout if possible.

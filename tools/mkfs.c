@@ -21,6 +21,8 @@
 
 #include "disk.h"
 #include "file.h"
+// MARK where Rust code was imported
+#include "bindings.h"
 
 #define NKERNEL_PROC 5
 char* kernel_processes[] = {
@@ -99,16 +101,19 @@ int main() {
 
 
 void mkfs() {
+    // MARK where C code was replaced by Rust code
     inode_intf ramdisk = ramdisk_init();
-    assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    inode_intf treedisk = treedisk_init(ramdisk, 0);
+    // assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
+    assert(simplefs_create(ramdisk, 0, NINODES) >= 0);
+    // inode_intf treedisk = treedisk_init(ramdisk, 0);
+    inode_intf mydisk = simplefs_init(ramdisk, 0, NINODES);
 
     char buf[GRASS_EXEC_SIZE / GRASS_NEXEC];
     for (int ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
-            treedisk->write(treedisk, ino, 0, (void*)buf);
+            mydisk->write(mydisk, ino, 0, (void*)buf);
         } else {
             struct stat st;
             char* file_name = &contents[ino][1];
@@ -120,7 +125,7 @@ void mkfs() {
             
             fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
             for (int b = 0; b * BLOCK_SIZE < st.st_size; b++)
-                treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
+                mydisk->write(mydisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
         }
     }
 }
