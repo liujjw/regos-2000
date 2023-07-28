@@ -13,6 +13,9 @@
 # target = "riscv32i-unknown-none-elf"
 
 
+
+
+
 # [target.riscv64gc-unknown-none-elf]
 # runner = "riscv64-unknown-elf-gdb -q -x gdb_init"
 # rustflags = [
@@ -22,10 +25,15 @@
 # [build]
 # target = "riscv64gc-unknown-none-elf"
 
+
+
+
+
 [target.x86_64-unknown-linux-gnu]
 rustflags = [
-  "-C", "link-arg=-Thifive1-link.x",
+  # "-C", "link-arg=-Thifive1-link.x",
 ]
+# linker = "rust-lld"
 
 [build]
 target = "x86_64-unknown-linux-gnu"

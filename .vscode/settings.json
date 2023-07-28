@@ -4,5 +4,8 @@
         "stdlib.h": "c",
         "disk.h": "c",
         "inode.h": "c"
-    }
+    },
+    "rust-analyzer.linkedProjects": [
+        "/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/Cargo.toml"
+    ]
 }

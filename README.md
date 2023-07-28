@@ -19,6 +19,9 @@ Now `cd /vagrant/rusty_c/rust_fs` into the Rust project and run the setup script
 **If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.**
 **If `cargo` not found restart the terminal after setup.**
 
+## build and run 
+First set the target in `.cargo`, then `cargo build --release`. Then follow the `egos` build process: `make rust_apps` ==> `make rust_install` ==> `make qemu`. 
+
 ## Writing Rust modules and integrating them into the current C build system
 ### Rust FFI to C
 Auto-generate Rust FFI bindings for C libraries using `cargo build`, building and linking C files as well (`bindgen`, `cc`, etc. using the build script `build.rs`). Look for `bindings.rs` in `target/` to see what they look like. The generated FFI bindings are dumped with the `include!` macro into your Rust library. Run `cargo test` to verify layout, size, and alignment. 
@@ -32,4 +35,4 @@ A header file of the Rust function signatures suffices. Make sure demangling and
 ### Addressing large Rust binaries for the memory layout
 The `/apps` memory region only has `~12KB` of memory, with `~16MB` used in total from text section up to the heap for all three parts of the kernel (earth, grass, apps). Stack pointer starts at roughly the 2048th megabyte. With dead code elimination the size of the full runtime crates don't matter, we just make sure to use as little as possible. Crates are also verified to be under the category "No standard library".
 
-See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `egos` memory layout if possible.
+See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `egos` memory layout if possible. Speed and debugging symbols were sacrificed for a smaller binary to fit in `egos` memory.

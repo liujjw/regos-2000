@@ -6,9 +6,10 @@ extern crate cbindgen;
 
 fn main() {
     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let super_directory = PathBuf::from("../riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-ubuntu14/bin")
-        .canonicalize()
-        .expect("couldnt find rv-gcc toolchain");
+    let super_directory =
+        PathBuf::from("../riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-ubuntu14/bin")
+            .canonicalize()
+            .expect("couldnt find rv-gcc toolchain");
     let riscv_gcc_path = super_directory.join("riscv64-unknown-elf-gcc");
     let directory = PathBuf::from("file")
         .canonicalize()
@@ -23,21 +24,31 @@ fn main() {
 
     println!("cargo:rerun-if-changed={}", headers_path_str);
 
-    cc::Build::new()
-        .compiler(riscv_gcc_path)
+    // TODO remove from egos compilation
+    let mut cc_builder = cc::Build::new();
+
+    #[cfg(not(unix))]
+    {
+        cc_builder.compiler(riscv_gcc_path);
+    }
+    cc_builder
         .file(directory.join("disk.h"))
         .file(directory.join("egos.h"))
         .file(directory.join("file.h"))
         .file(directory.join("inode.h"))
-        .file(directory.join("disk.c"))
-        .no_default_flags(true)
-        .flag("-mcmodel=medlow")
-        .flag("-march=rv32i")
-        .flag("-mabi=ilp32")
-        .flag("-ffunction-sections")
-        .flag("-fdata-sections")
-        .out_dir(&directory)
-        .compile("egos_file");
+        .file(directory.join("disk.c"));
+
+    #[cfg(not(unix))]
+    {
+        cc_builder
+            .no_default_flags(true)
+            .flag("-mcmodel=medlow")
+            .flag("-march=rv32i")
+            .flag("-mabi=ilp32")
+            .flag("-ffunction-sections")
+            .flag("-fdata-sections");
+    }
+    cc_builder.out_dir(&directory).compile("egos_file");
 
     let bindings = bindgen::Builder::default()
         .header(headers_path_str)
