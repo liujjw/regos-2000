@@ -92,18 +92,6 @@ warning: type `earth__bindgen_ty_2` should have an upper camel case name
 491 | pub type earth__bindgen_ty_2 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy2`
 
-warning: unused import: `core::mem::transmute`
-  --> src/lib.rs:10:5
-   |
-10 | use core::mem::transmute;
-   |     ^^^^^^^^^^^^^^^^^^^^
-
-warning: unused import: `core::mem::transmute_copy`
-  --> src/lib.rs:11:5
-   |
-11 | use core::mem::transmute_copy;
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
-
 warning: unused variable: `layout`
   --> src/common.rs:23:28
    |
@@ -125,63 +113,63 @@ warning: unused variable: `layout`
    |                                            ^^^^^^ help: if this is intentional, prefix it with an underscore: `_layout`
 
 warning: unused variable: `size`
-   --> src/lib.rs:156:28
+   --> src/lib.rs:154:28
     |
-156 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+154 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
     |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
 
 warning: unused variable: `e`
-   --> src/lib.rs:280:17
+   --> src/lib.rs:278:17
     |
-280 |             Err(e) => panic!("failed to compute metadata"),
+278 |             Err(e) => panic!("failed to compute metadata"),
     |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
 
 warning: unused variable: `row_width`
-   --> src/lib.rs:308:13
+   --> src/lib.rs:306:13
     |
-308 |             row_width,
+306 |             row_width,
     |             ^^^^^^^^^ help: try ignoring the field: `row_width: _`
 
 warning: unused variable: `num_blocks_needed`
-   --> src/lib.rs:309:13
+   --> src/lib.rs:307:13
     |
-309 |             num_blocks_needed,
+307 |             num_blocks_needed,
     |             ^^^^^^^^^^^^^^^^^ help: try ignoring the field: `num_blocks_needed: _`
 
 warning: unused variable: `below`
-   --> src/lib.rs:306:23
+   --> src/lib.rs:304:23
     |
-306 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+304 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
     |                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_below`
 
 warning: unused variable: `below_ino`
-   --> src/lib.rs:306:38
+   --> src/lib.rs:304:38
     |
-306 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+304 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
     |                                      ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_below_ino`
 
 warning: unused variable: `size`
-   --> src/lib.rs:422:28
+   --> src/lib.rs:410:28
     |
-422 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+410 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
     |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
 
 warning: unused variable: `ino`
-   --> src/lib.rs:489:5
+   --> src/lib.rs:484:5
     |
-489 |     ino: cty::c_uint,
+484 |     ino: cty::c_uint,
     |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
 
 warning: unused variable: `ino`
-   --> src/lib.rs:501:5
+   --> src/lib.rs:496:5
     |
-501 |     ino: cty::c_uint,
+496 |     ino: cty::c_uint,
     |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
 
 warning: variable does not need to be mutable
-  --> src/lib.rs:50:13
+  --> src/lib.rs:48:13
    |
-50 |         let mut byte_slice = &mut self.bytes[beg..end];
+48 |         let mut byte_slice = &mut self.bytes[beg..end];
    |             ----^^^^^^^^^^
    |             |
    |             help: remove this `mut`
@@ -189,47 +177,47 @@ warning: variable does not need to be mutable
    = note: `#[warn(unused_mut)]` on by default
 
 warning: variable does not need to be mutable
-   --> src/lib.rs:111:13
+   --> src/lib.rs:109:13
     |
-111 |         let mut inode_store = Box::new(inode_store_t {
+109 |         let mut inode_store = Box::new(inode_store_t {
     |             ----^^^^^^^^^^^
     |             |
     |             help: remove this `mut`
 
 warning: variable does not need to be mutable
-   --> src/lib.rs:123:13
+   --> src/lib.rs:121:13
     |
-123 |         let mut inode_store = Box::new(inode_store_t {
+121 |         let mut inode_store = Box::new(inode_store_t {
     |             ----^^^^^^^^^^^
     |             |
     |             help: remove this `mut`
 
 warning: variable does not need to be mutable
-   --> src/lib.rs:366:17
+   --> src/lib.rs:354:17
     |
-366 |             let mut bytes = val.to_le_bytes();
+354 |             let mut bytes = val.to_le_bytes();
     |                 ----^^^^^
     |                 |
     |                 help: remove this `mut`
 
 warning: unnecessary `unsafe` block
-   --> src/lib.rs:229:30
+   --> src/lib.rs:227:30
     |
-229 |         let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
+227 |         let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
     |                              ^^^^^^ unnecessary `unsafe` block
     |
     = note: `#[warn(unused_unsafe)]` on by default
 
 warning: methods `get_bytes` and `heap_into_` are never used
-  --> src/lib.rs:54:12
+  --> src/lib.rs:52:12
    |
-33 | impl Block {
+31 | impl Block {
    | ---------- methods in this implementation
 ...
-54 |     pub fn get_bytes<'a>(&'a mut self) -> &'a mut [cty::c_char] {
+52 |     pub fn get_bytes<'a>(&'a mut self) -> &'a mut [cty::c_char] {
    |            ^^^^^^^^^
 ...
-74 |     pub fn heap_into_(self) -> *mut block_t {
+72 |     pub fn heap_into_(self) -> *mut block_t {
    |            ^^^^^^^^^^
    |
    = note: `#[warn(dead_code)]` on by default
@@ -477,49 +465,49 @@ warning: constant `earth_SOFT_TLB` should have an upper case name
     |           ^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_SOFT_TLB`
 
 warning: unused `Result` that must be used
-   --> src/lib.rs:393:9
+   --> src/lib.rs:381:9
     |
-393 |         self.below.read(self.below_ino, block_no, &mut buf);
+381 |         self.below.read(self.below_ino, block_no, &mut buf);
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
     = note: this `Result` may be an `Err` variant, which should be handled
     = note: `#[warn(unused_must_use)]` on by default
 help: use `let _ = ...` to ignore the resulting value
     |
-393 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+381 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
     |         +++++++
 
 warning: unused `Result` that must be used
-   --> src/lib.rs:402:9
+   --> src/lib.rs:390:9
     |
-402 |         self.below.read(self.below_ino, block_no, &mut buf);
+390 |         self.below.read(self.below_ino, block_no, &mut buf);
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
     = note: this `Result` may be an `Err` variant, which should be handled
 help: use `let _ = ...` to ignore the resulting value
     |
-402 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+390 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
     |         +++++++
 
 warning: unused `Result` that must be used
-   --> src/lib.rs:405:9
+   --> src/lib.rs:393:9
     |
-405 |         self.below.write(self.below_ino, block_no, &mut buf);
+393 |         self.below.write(self.below_ino, block_no, &mut buf);
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
     = note: this `Result` may be an `Err` variant, which should be handled
 help: use `let _ = ...` to ignore the resulting value
     |
-405 |         let _ = self.below.write(self.below_ino, block_no, &mut buf);
+393 |         let _ = self.below.write(self.below_ino, block_no, &mut buf);
     |         +++++++
 
 warning: comparison is useless due to type limits
-   --> src/lib.rs:504:8
+   --> src/lib.rs:499:8
     |
-504 |     if newsize < 0 {
+499 |     if newsize < 0 {
     |        ^^^^^^^^^^^
     |
     = note: `#[warn(unused_comparisons)]` on by default
 
-warning: `mydisk` (lib) generated 71 warnings (run `cargo fix --lib -p mydisk` to apply 19 suggestions)
-    Finished release [optimized] target(s) in 2.52s
+warning: `mydisk` (lib) generated 69 warnings (run `cargo fix --lib -p mydisk` to apply 17 suggestions)
+    Finished release [optimized] target(s) in 2.39s

@@ -306,17 +306,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
             row_width,
             num_blocks_needed,
         } = Self::compute_metadata(num_inodes)?;
-        // zero out everything for now
-        // TODO zero out another way
-        // for i in 0..num_blocks_needed {
-        //     let mut buf = Block::new();
-        //     simple_fs.write(i, 0, &mut buf)?;
-        // }
-        // for i in num_blocks_needed..num_inodes {
-        //     let mut buf = Block::new();
-        //     simple_fs.write(i, 0, &mut buf)?;
-        // }
-
+        // TODO markers for when reading past already written blocks
         Ok(0)
     }
 
@@ -452,7 +442,14 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
             blocks_used += 1;
             self.set_blocks_used(ino, blocks_used);
         } else if offset > blocks_used {
-            panic!("offset > blocks_used");
+            // fill in with zeroes
+            for zeroes_offset_base in blocks_used..offset {
+                let full_zeroes_offset = 
+                    (ino * blocks_per_node) + zeroes_offset_base + metadata_offset;
+                self.below.write(self.below_ino, full_zeroes_offset, &Block::new())?;
+            }
+            blocks_used = offset + 1;
+            self.set_blocks_used(ino, blocks_used);
         }
 
         // success
