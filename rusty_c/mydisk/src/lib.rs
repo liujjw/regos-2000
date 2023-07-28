@@ -7,8 +7,6 @@ use alloc::boxed::Box;
 use common::*;
 use core::include;
 use core::mem::size_of;
-use core::mem::transmute;
-use core::mem::transmute_copy;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
@@ -208,11 +206,8 @@ struct SimpleFS_C {
 impl SimpleFS<DiskFS> {
     fn from_(inode_store: *mut inode_store_t) -> Self {
         // TODO dangerous transmutation to different sized type
-        let cur_state_void_ptr: *mut cty::c_void = unsafe { ((*inode_store).state as *mut SimpleFS_C) };
-        let mut cur_state: *mut SimpleFS_C = unsafe { transmute_copy(&cur_state_void_ptr)};
-        let cur_state = unsafe { Box::from_raw(cur_state) };
-        // box will drop the copied struct automatically
-        let raw = unsafe { Box::from_raw(inode_store) };
+        let raw_state = unsafe { (*inode_store).state }; 
+        let cur_state: &mut SimpleFS_C = unsafe { &mut *(raw_state as *mut SimpleFS_C) };
         let below = DiskFS::from_(cur_state.below);
         let below_ino = cur_state.below_ino;
         let num_inodes = cur_state.num_inodes;
@@ -228,10 +223,8 @@ impl SimpleFS<DiskFS> {
         });
         
         // pointers owned by box must NOT live past their lifetime
-        let raw = Box::into_raw(cur_state);
-        let mut void_state_ptr: *mut cty::c_void = unsafe { transmute_copy(&raw) };
-        // box will drop the copied struct
-        let _ = unsafe { Box::from_raw(raw) };
+        let raw_state: *mut SimpleFS_C = Box::into_raw(cur_state);
+        let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
         let inode_store = Box::new(inode_store_t {
             state: void_state_ptr,
             getsize: Some(

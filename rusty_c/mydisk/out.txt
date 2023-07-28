@@ -55,7 +55,7 @@ warning: unused import: `alloc::boxed::Box`
   = note: `#[warn(unused_imports)]` on by default
 
 warning: type `block_no` should have an upper camel case name
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:27:10
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:27:10
    |
 27 | pub type block_no = cty::c_uint;
    |          ^^^^^^^^ help: convert the identifier to upper camel case: `BlockNo`
@@ -63,31 +63,31 @@ warning: type `block_no` should have an upper camel case name
    = note: `#[warn(non_camel_case_types)]` on by default
 
 warning: type `block_t` should have an upper camel case name
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:58:10
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:58:10
    |
 58 | pub type block_t = block;
    |          ^^^^^^^ help: convert the identifier to upper camel case: `BlockT`
 
 warning: type `inode_store_t` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:155:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:155:10
     |
 155 | pub type inode_store_t = inode_store;
     |          ^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeStoreT`
 
 warning: type `inode_intf` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:156:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:156:10
     |
 156 | pub type inode_intf = *mut inode_store_t;
     |          ^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeIntf`
 
 warning: type `earth__bindgen_ty_1` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:488:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:488:10
     |
 488 | pub type earth__bindgen_ty_1 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy1`
 
 warning: type `earth__bindgen_ty_2` should have an upper camel case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:491:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:491:10
     |
 491 | pub type earth__bindgen_ty_2 = cty::c_uint;
     |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy2`
@@ -97,6 +97,12 @@ warning: unused import: `core::mem::transmute`
    |
 10 | use core::mem::transmute;
    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `core::mem::transmute_copy`
+  --> src/lib.rs:11:5
+   |
+11 | use core::mem::transmute_copy;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 warning: unused variable: `layout`
   --> src/common.rs:23:28
@@ -124,58 +130,52 @@ warning: unused variable: `size`
 156 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
     |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
 
-warning: unused variable: `raw`
-   --> src/lib.rs:215:13
-    |
-215 |         let raw = unsafe { Box::from_raw(inode_store) };
-    |             ^^^ help: if this is intentional, prefix it with an underscore: `_raw`
-
 warning: unused variable: `e`
-   --> src/lib.rs:285:17
+   --> src/lib.rs:280:17
     |
-285 |             Err(e) => panic!("failed to compute metadata"),
+280 |             Err(e) => panic!("failed to compute metadata"),
     |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
 
 warning: unused variable: `row_width`
-   --> src/lib.rs:313:13
+   --> src/lib.rs:308:13
     |
-313 |             row_width,
+308 |             row_width,
     |             ^^^^^^^^^ help: try ignoring the field: `row_width: _`
 
 warning: unused variable: `num_blocks_needed`
-   --> src/lib.rs:314:13
+   --> src/lib.rs:309:13
     |
-314 |             num_blocks_needed,
+309 |             num_blocks_needed,
     |             ^^^^^^^^^^^^^^^^^ help: try ignoring the field: `num_blocks_needed: _`
 
 warning: unused variable: `below`
-   --> src/lib.rs:311:23
+   --> src/lib.rs:306:23
     |
-311 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+306 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
     |                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_below`
 
 warning: unused variable: `below_ino`
-   --> src/lib.rs:311:38
+   --> src/lib.rs:306:38
     |
-311 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+306 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
     |                                      ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_below_ino`
 
 warning: unused variable: `size`
-   --> src/lib.rs:427:28
+   --> src/lib.rs:422:28
     |
-427 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+422 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
     |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
 
 warning: unused variable: `ino`
-   --> src/lib.rs:494:5
+   --> src/lib.rs:489:5
     |
-494 |     ino: cty::c_uint,
+489 |     ino: cty::c_uint,
     |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
 
 warning: unused variable: `ino`
-   --> src/lib.rs:506:5
+   --> src/lib.rs:501:5
     |
-506 |     ino: cty::c_uint,
+501 |     ino: cty::c_uint,
     |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
 
 warning: variable does not need to be mutable
@@ -205,28 +205,20 @@ warning: variable does not need to be mutable
     |             help: remove this `mut`
 
 warning: variable does not need to be mutable
-   --> src/lib.rs:212:13
+   --> src/lib.rs:366:17
     |
-212 |         let mut cur_state: *mut SimpleFS_C = unsafe { transmute_copy(&cur_state_void_ptr)};
-    |             ----^^^^^^^^^
-    |             |
-    |             help: remove this `mut`
-
-warning: variable does not need to be mutable
-   --> src/lib.rs:232:13
-    |
-232 |         let mut void_state_ptr: *mut cty::c_void = unsafe { transmute_copy(&raw) };
-    |             ----^^^^^^^^^^^^^^
-    |             |
-    |             help: remove this `mut`
-
-warning: variable does not need to be mutable
-   --> src/lib.rs:371:17
-    |
-371 |             let mut bytes = val.to_le_bytes();
+366 |             let mut bytes = val.to_le_bytes();
     |                 ----^^^^^
     |                 |
     |                 help: remove this `mut`
+
+warning: unnecessary `unsafe` block
+   --> src/lib.rs:229:30
+    |
+229 |         let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
+    |                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` on by default
 
 warning: methods `get_bytes` and `heap_into_` are never used
   --> src/lib.rs:54:12
@@ -243,175 +235,175 @@ warning: methods `get_bytes` and `heap_into_` are never used
    = note: `#[warn(dead_code)]` on by default
 
 warning: constant `PAGING_DEV_SIZE` is never used
- --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:4:11
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:4:11
   |
 4 | pub const PAGING_DEV_SIZE: u32 = 1048576;
   |           ^^^^^^^^^^^^^^^
 
 warning: constant `GRASS_NEXEC` is never used
- --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:5:11
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:5:11
   |
 5 | pub const GRASS_NEXEC: u32 = 8;
   |           ^^^^^^^^^^^
 
 warning: constant `GRASS_EXEC_SIZE` is never used
- --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:6:11
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:6:11
   |
 6 | pub const GRASS_EXEC_SIZE: u32 = 1048576;
   |           ^^^^^^^^^^^^^^^
 
 warning: constant `FS_DISK_SIZE` is never used
- --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:7:11
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:7:11
   |
 7 | pub const FS_DISK_SIZE: u32 = 2097152;
   |           ^^^^^^^^^^^^
 
 warning: constant `GRASS_EXEC_SEGMENT` is never used
- --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:8:11
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:8:11
   |
 8 | pub const GRASS_EXEC_SEGMENT: u32 = 256;
   |           ^^^^^^^^^^^^^^^^^^
 
 warning: constant `GRASS_EXEC_START` is never used
- --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:9:11
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:9:11
   |
 9 | pub const GRASS_EXEC_START: u32 = 2048;
   |           ^^^^^^^^^^^^^^^^
 
 warning: constant `SYS_PROC_EXEC_START` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:10:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:10:11
    |
 10 | pub const SYS_PROC_EXEC_START: u32 = 2304;
    |           ^^^^^^^^^^^^^^^^^^^
 
 warning: constant `SYS_FILE_EXEC_START` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:11:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:11:11
    |
 11 | pub const SYS_FILE_EXEC_START: u32 = 2560;
    |           ^^^^^^^^^^^^^^^^^^^
 
 warning: constant `SYS_DIR_EXEC_START` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:12:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:12:11
    |
 12 | pub const SYS_DIR_EXEC_START: u32 = 2816;
    |           ^^^^^^^^^^^^^^^^^^
 
 warning: constant `SYS_SHELL_EXEC_START` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:13:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:13:11
    |
 13 | pub const SYS_SHELL_EXEC_START: u32 = 3072;
    |           ^^^^^^^^^^^^^^^^^^^^
 
 warning: constant `GRASS_FS_START` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:14:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:14:11
    |
 14 | pub const GRASS_FS_START: u32 = 4096;
    |           ^^^^^^^^^^^^^^
 
 warning: constant `NINODES` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:15:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:15:11
    |
 15 | pub const NINODES: u32 = 128;
    |           ^^^^^^^
 
 warning: constant `PAGE_SIZE` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:16:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:16:11
    |
 16 | pub const PAGE_SIZE: u32 = 4096;
    |           ^^^^^^^^^
 
 warning: constant `FRAME_CACHE_END` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:17:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:17:11
    |
 17 | pub const FRAME_CACHE_END: u32 = 2147614720;
    |           ^^^^^^^^^^^^^^^
 
 warning: constant `FRAME_CACHE_START` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:18:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:18:11
    |
 18 | pub const FRAME_CACHE_START: u32 = 2147500032;
    |           ^^^^^^^^^^^^^^^^^
 
 warning: constant `GRASS_STACK_TOP` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:19:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:19:11
    |
 19 | pub const GRASS_STACK_TOP: u32 = 2147499904;
    |           ^^^^^^^^^^^^^^^
 
 warning: constant `APPS_STACK_TOP` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:20:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:20:11
    |
 20 | pub const APPS_STACK_TOP: u32 = 2147491840;
    |           ^^^^^^^^^^^^^^
 
 warning: constant `SYSCALL_ARG` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:21:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:21:11
    |
 21 | pub const SYSCALL_ARG: u32 = 2147484672;
    |           ^^^^^^^^^^^
 
 warning: constant `APPS_ARG` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:22:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:22:11
    |
 22 | pub const APPS_ARG: u32 = 2147483648;
    |           ^^^^^^^^
 
 warning: constant `APPS_SIZE` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:23:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:23:11
    |
 23 | pub const APPS_SIZE: u32 = 12288;
    |           ^^^^^^^^^
 
 warning: constant `APPS_ENTRY` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:24:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:24:11
    |
 24 | pub const APPS_ENTRY: u32 = 134238208;
    |           ^^^^^^^^^^
 
 warning: constant `GRASS_SIZE` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:25:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:25:11
    |
 25 | pub const GRASS_SIZE: u32 = 10240;
    |           ^^^^^^^^^^
 
 warning: constant `GRASS_ENTRY` is never used
-  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:26:11
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:26:11
    |
 26 | pub const GRASS_ENTRY: u32 = 134227968;
    |           ^^^^^^^^^^^
 
 warning: type alias `inode_store_t` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:155:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:155:10
     |
 155 | pub type inode_store_t = inode_store;
     |          ^^^^^^^^^^^^^
 
 warning: type alias `inode_intf` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:156:10
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:156:10
     |
 156 | pub type inode_intf = *mut inode_store_t;
     |          ^^^^^^^^^^
 
 warning: constant `earth_QEMU` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:486:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:486:11
     |
 486 | pub const earth_QEMU: earth__bindgen_ty_1 = 0;
     |           ^^^^^^^^^^
 
 warning: constant `earth_ARTY` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:487:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:487:11
     |
 487 | pub const earth_ARTY: earth__bindgen_ty_1 = 1;
     |           ^^^^^^^^^^
 
 warning: constant `earth_PAGE_TABLE` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:489:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:489:11
     |
 489 | pub const earth_PAGE_TABLE: earth__bindgen_ty_2 = 0;
     |           ^^^^^^^^^^^^^^^^
 
 warning: constant `earth_SOFT_TLB` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:490:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:490:11
     |
 490 | pub const earth_SOFT_TLB: earth__bindgen_ty_2 = 1;
     |           ^^^^^^^^^^^^^^
@@ -429,37 +421,37 @@ warning: static `A` is never used
    |        ^
 
 warning: function `fs_disk_init` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:158:12
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:158:12
     |
 158 |     pub fn fs_disk_init() -> inode_intf;
     |            ^^^^^^^^^^^^
 
 warning: function `treedisk_init` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:161:12
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:161:12
     |
 161 |     pub fn treedisk_init(below: inode_intf, below_ino: cty::c_uint) -> inode_intf;
     |            ^^^^^^^^^^^^^
 
 warning: function `treedisk_create` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:164:12
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:164:12
     |
 164 |     pub fn treedisk_create(
     |            ^^^^^^^^^^^^^^^
 
 warning: static `earth` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:827:20
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:827:20
     |
 827 |     pub static mut earth: *mut earth;
     |                    ^^^^^
 
 warning: static `grass` is never used
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:830:20
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:830:20
     |
 830 |     pub static mut grass: *mut grass;
     |                    ^^^^^
 
 warning: constant `earth_QEMU` should have an upper case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:486:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:486:11
     |
 486 | pub const earth_QEMU: earth__bindgen_ty_1 = 0;
     |           ^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_QEMU`
@@ -467,67 +459,67 @@ warning: constant `earth_QEMU` should have an upper case name
     = note: `#[warn(non_upper_case_globals)]` on by default
 
 warning: constant `earth_ARTY` should have an upper case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:487:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:487:11
     |
 487 | pub const earth_ARTY: earth__bindgen_ty_1 = 1;
     |           ^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_ARTY`
 
 warning: constant `earth_PAGE_TABLE` should have an upper case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:489:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:489:11
     |
 489 | pub const earth_PAGE_TABLE: earth__bindgen_ty_2 = 0;
     |           ^^^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_PAGE_TABLE`
 
 warning: constant `earth_SOFT_TLB` should have an upper case name
-   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug/build/mydisk-adeb2bba620f257e/out/bindings.rs:490:11
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:490:11
     |
 490 | pub const earth_SOFT_TLB: earth__bindgen_ty_2 = 1;
     |           ^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_SOFT_TLB`
 
 warning: unused `Result` that must be used
-   --> src/lib.rs:398:9
+   --> src/lib.rs:393:9
     |
-398 |         self.below.read(self.below_ino, block_no, &mut buf);
+393 |         self.below.read(self.below_ino, block_no, &mut buf);
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
     = note: this `Result` may be an `Err` variant, which should be handled
     = note: `#[warn(unused_must_use)]` on by default
 help: use `let _ = ...` to ignore the resulting value
     |
-398 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+393 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
     |         +++++++
 
 warning: unused `Result` that must be used
-   --> src/lib.rs:407:9
+   --> src/lib.rs:402:9
     |
-407 |         self.below.read(self.below_ino, block_no, &mut buf);
+402 |         self.below.read(self.below_ino, block_no, &mut buf);
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
     = note: this `Result` may be an `Err` variant, which should be handled
 help: use `let _ = ...` to ignore the resulting value
     |
-407 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+402 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
     |         +++++++
 
 warning: unused `Result` that must be used
-   --> src/lib.rs:410:9
+   --> src/lib.rs:405:9
     |
-410 |         self.below.write(self.below_ino, block_no, &mut buf);
+405 |         self.below.write(self.below_ino, block_no, &mut buf);
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
     = note: this `Result` may be an `Err` variant, which should be handled
 help: use `let _ = ...` to ignore the resulting value
     |
-410 |         let _ = self.below.write(self.below_ino, block_no, &mut buf);
+405 |         let _ = self.below.write(self.below_ino, block_no, &mut buf);
     |         +++++++
 
 warning: comparison is useless due to type limits
-   --> src/lib.rs:509:8
+   --> src/lib.rs:504:8
     |
-509 |     if newsize < 0 {
+504 |     if newsize < 0 {
     |        ^^^^^^^^^^^
     |
     = note: `#[warn(unused_comparisons)]` on by default
 
-warning: `mydisk` (lib) generated 72 warnings (run `cargo fix --lib -p mydisk` to apply 21 suggestions)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.20s
+warning: `mydisk` (lib) generated 71 warnings (run `cargo fix --lib -p mydisk` to apply 19 suggestions)
+    Finished release [optimized] target(s) in 2.52s
