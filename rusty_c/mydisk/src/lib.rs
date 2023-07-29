@@ -206,7 +206,7 @@ struct SimpleFS_C {
 impl SimpleFS<DiskFS> {
     fn from_(inode_store: *mut inode_store_t) -> Self {
         // TODO dangerous transmutation to different sized type
-        let raw_state = unsafe { (*inode_store).state }; 
+        let raw_state = unsafe { (*inode_store).state };
         let cur_state: &mut SimpleFS_C = unsafe { &mut *(raw_state as *mut SimpleFS_C) };
         let below = DiskFS::from_(cur_state.below);
         let below_ino = cur_state.below_ino;
@@ -221,7 +221,7 @@ impl SimpleFS<DiskFS> {
             below_ino: self.below_ino,
             num_inodes: self.num_inodes,
         });
-        
+
         // pointers owned by box must NOT live past their lifetime
         let raw_state: *mut SimpleFS_C = Box::into_raw(cur_state);
         let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
@@ -444,9 +444,10 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
         } else if offset > blocks_used {
             // fill in with zeroes
             for zeroes_offset_base in blocks_used..offset {
-                let full_zeroes_offset = 
+                let full_zeroes_offset =
                     (ino * blocks_per_node) + zeroes_offset_base + metadata_offset;
-                self.below.write(self.below_ino, full_zeroes_offset, &Block::new())?;
+                self.below
+                    .write(self.below_ino, full_zeroes_offset, &Block::new())?;
             }
             blocks_used = offset + 1;
             self.set_blocks_used(ino, blocks_used);
@@ -467,6 +468,17 @@ pub unsafe extern "C" fn simplefs_init(
     if below.is_null() {
         panic!("below is null");
     }
+
+    // initialize heap allocator
+    // NOTE do not use in conjunction with other egos heap allocators
+    #[cfg(not(unix))] {
+        let heap_size: usize =
+            unsafe { (&__heap_end as *const _ as usize) - (&__heap_start as *const _ as usize) };
+        unsafe {
+            ALLOCATOR.lock().init(&mut __heap_start as *mut u8, heap_size);
+        }
+    }
+
     let myfs: *mut inode_store_t =
         (SimpleFS::new(DiskFS::from_(below), below_ino, num_inodes)).take_into_();
     return myfs;

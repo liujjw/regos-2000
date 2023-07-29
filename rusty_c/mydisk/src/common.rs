@@ -6,6 +6,8 @@ use alloc::boxed::Box;
 use core::alloc::{GlobalAlloc, Layout};
 use core::include;
 use core::panic::PanicInfo;
+use linked_list_allocator::Heap;
+use spin::Mutex;  
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
@@ -14,25 +16,16 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-struct EgosAllocator;
-
-// use egos allocator or another crates.io impl, then Box, since other C code
-// relies on pointers to heap data we cannot use heapless or just the stack
-unsafe impl GlobalAlloc for EgosAllocator {
-    // TODO real malloc and free
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let tmp: *mut u8 = &mut 0u8;
-        return tmp;
-        // malloc(layout.size() as cty::size_t) as *mut u8
-    }
-
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        // free(ptr as *mut cty::c_void);
-    }
+// defined in .lds file, linker MUST resolve before runtime
+extern "C" {
+    pub static mut __heap_start: u8;
+    pub static mut __heap_end: u8;
 }
 
+// C Code relies on pointers to heap data we cannot use heapless or just the stack
+// TODO prefer static var and LockedHeap, but rsicv32i/rustc has issues with the needed atomics
 #[cfg_attr(not(unix), global_allocator)]
-static A: EgosAllocator = EgosAllocator;
+pub static ALLOCATOR: Mutex<Heap> = Mutex::new(Heap::empty());
 
 // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
 

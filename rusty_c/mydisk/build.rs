@@ -20,11 +20,12 @@ fn main() {
 
     println!("cargo:rustc-link-search={}", directory.to_str().unwrap());
 
+    // also remove this line
     println!("cargo:rustc-link-lib=static=egos_file");
 
     println!("cargo:rerun-if-changed={}", headers_path_str);
 
-    // TODO remove from egos compilation
+    // TODO remove build and linkage from egos compilation or remove from here
     let mut cc_builder = cc::Build::new();
 
     #[cfg(not(unix))]
