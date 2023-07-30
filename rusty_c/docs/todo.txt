@@ -1,5 +1,3 @@
-get mkfs and mkrom to work by fixing transmute_copy and reading FFI/c_void from rustonomicons
-
 using alloc and core with std?
 1. fix important todos (including malloc and free, copy, free, spinlock thats locked forever or moving and an option )
 2. implement HALs

@@ -469,16 +469,6 @@ pub unsafe extern "C" fn simplefs_init(
         panic!("below is null");
     }
 
-    // initialize heap allocator
-    // NOTE do not use in conjunction with other egos heap allocators
-    #[cfg(not(unix))] {
-        let heap_size: usize =
-            unsafe { (&__heap_end as *const _ as usize) - (&__heap_start as *const _ as usize) };
-        unsafe {
-            ALLOCATOR.lock().init(&mut __heap_start as *mut u8, heap_size);
-        }
-    }
-
     let myfs: *mut inode_store_t =
         (SimpleFS::new(DiskFS::from_(below), below_ino, num_inodes)).take_into_();
     return myfs;
