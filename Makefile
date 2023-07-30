@@ -21,6 +21,12 @@ apps: apps/system/*.c apps/user/*.c
 ################################################################################
 .PHONY: rust_apps
 rust_apps: apps/system/*.c apps/user/*.c
+	@echo "$(CYAN)-------- Build Rust archive for ricv32i --------$(END)"
+	cd rusty_c/;\
+	source ./exports.sh;\
+	cd mydisk;\
+	cargo build --release --target riscv32i-unknown-none-elf;\
+	cd ../..
 	@echo "$(CYAN)-------- Compile the Apps Layer with Rust and Overwrite the Usual Apps Layer --------$(END)"
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
@@ -45,6 +51,12 @@ install:
 
 ################################################################################
 rust_install:
+	@echo "$(CYAN)-------- Build Rust archive for x86 linux --------$(END)"
+	cd rusty_c/;\
+	source ./exports.sh;\
+	cd mydisk;\
+	cargo build --release --target x86_64-unknown-linux-gnu;\
+	cd ../..
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
 	$(CC) -L$(RUST_HOST_LIBRARY_PATH) $(TOOLS)/mkfs.c -std=c99 -DMKFS $(RUST_INCLUDE) -o $(TOOLS)/mkfs -l$(RUST_LIB_NAME)
 	cd $(TOOLS); ./mkfs

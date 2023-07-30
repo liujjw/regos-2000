@@ -114,6 +114,12 @@ void mkfs() {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
             mydisk->write(mydisk, ino, 0, (void*)buf);
+            // MARK inserted Rust code
+            char mybuf[GRASS_EXEC_SIZE / GRASS_NEXEC];
+            mydisk->read(mydisk, ino, 0, (void*)mybuf);
+            // print mybuf as a string
+            fprintf(stderr, "[INFO] Checking ino=%d, has contents: %s\n", ino, mybuf);
+            assert(strcmp(buf, mybuf) == 0);
         } else {
             struct stat st;
             char* file_name = &contents[ino][1];
