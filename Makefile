@@ -66,6 +66,10 @@ qemu:
 	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(QEMU)/qemu.elf
 	$(RISCV_QEMU) -readconfig $(QEMU)/sifive-e31.cfg -kernel $(QEMU)/qemu.elf -nographic
 
+################################################################################`
+rust: rust_apps rust_install qemu
+################################################################################
+
 clean:
 	rm -rf build
 	rm -rf $(TOOLS)/qemu/qemu.elf

@@ -1,20 +1,10 @@
-using alloc and core with std?
-1. fix important todos (including malloc and free, copy, free, spinlock thats locked forever or moving and an option )
-2. implement HALs
+1. fix important todos (copy, free, spinlock thats locked forever or moving and an option )
 3. testing (LD_LIBRARY_PATH? since cargo test does not use build.rs get cargo test through .cargo and rustc to work and other testing)
-4. demo?
-run the linter and formatter
+run the linter
 
-or new drivers could use these platform crates for cortex-m or x86_64, dont need egos
-pursue a research direction (papers) and using the riscv crates and extending egos
-egos an easy to understand and extend os to ompl new ideas, like RAID or new drivers in Rust 
-using HAL crates, cs4999, and using static guarantees from the embedded rust book and 
-looking into more of the theory of rust to create something https://faultlore.com/blah/linear-rust/
+-> figure out what the exception handler error is and see if i can run qemu shell commands (read the qemu bootup logs)
+i have the student version of egos so this will be tough to run things
+on qemu, i cannot write to disk
 
-neext idea: RAID disks + HALS + static guarantees on peripherals
-
-strict types for proper configuration of peripherals, access control
-obrm + refernces for memory safety
-
-1byte void, 8 byte pointer to void*, cram inside the void*, hongbo zhang
-toolkit to minimize binary size
+easier to just test on x86? 
+is it enough to have mkfs.c the bootup logs to demonstrate working on x86 and riscv? 

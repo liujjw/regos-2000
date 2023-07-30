@@ -36,3 +36,6 @@ A header file of the Rust function signatures suffices. Make sure demangling and
 The `/apps` memory region only has `~12KB` of memory, with `~16MB` used in total from text section up to the heap for all three parts of the kernel (earth, grass, apps). Stack pointer starts at roughly the 2048th megabyte. With dead code elimination the size of the full runtime crates don't matter, we just make sure to use as little as possible. Crates are also verified to be under the category "No standard library".
 
 See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `egos` memory layout if possible. Speed and debugging symbols were sacrificed for a smaller binary to fit in `egos` memory.
+
+### Running on QEMU
+Writing to disk not possible when running egos on QEMU, as only the memory-mapped ROM is readable.

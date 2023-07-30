@@ -17,19 +17,18 @@ fn panic(_info: &PanicInfo) -> ! {
 struct EgosAllocator;
 
 extern "C" {
-  fn malloc(size: cty::size_t) -> *mut cty::c_void;
-  fn free(ptr: *mut cty::c_void);
+    fn malloc(size: cty::size_t) -> *mut cty::c_void;
+    fn free(ptr: *mut cty::c_void);
 }
 
-// C Code relies on pointers to heap data we cannot use heapless or just the stack
 unsafe impl GlobalAlloc for EgosAllocator {
-  unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-    malloc(layout.size() as cty::size_t) as *mut u8
-  }
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        malloc(layout.size() as cty::size_t) as *mut u8
+    }
 
-  unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-    free(ptr as *mut cty::c_void);
-  }
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        free(ptr as *mut cty::c_void);
+    }
 }
 
 #[cfg_attr(not(unix), global_allocator)]
