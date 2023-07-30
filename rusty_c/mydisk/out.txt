@@ -45,7 +45,6 @@ warning:                        ~~~~~~~~~~~^~
 warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter 'ino' [-Wunused-parameter]
 warning:  static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
 warning:                                       ~~~~~~~~~~~~~^~~
-   Compiling mydisk v0.1.0 (/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk)
 warning: unused import: `alloc::boxed::Box`
  --> src/common.rs:5:5
   |
@@ -494,4 +493,4 @@ warning: comparison is useless due to type limits
     = note: `#[warn(unused_comparisons)]` on by default
 
 warning: `mydisk` (lib) generated 66 warnings (run `cargo fix --lib -p mydisk` to apply 15 suggestions)
-    Finished release [optimized] target(s) in 0.27s
+    Finished release [optimized] target(s) in 0.19s

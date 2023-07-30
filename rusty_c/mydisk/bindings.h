@@ -10,3 +10,7 @@
 inode_store_t *simplefs_init(inode_store_t *below, unsigned int below_ino, unsigned int num_inodes);
 
 int simplefs_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes);
+
+extern void *malloc(size_t size);
+
+extern void free(void *ptr);

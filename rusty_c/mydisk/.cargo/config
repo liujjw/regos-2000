@@ -1,7 +1,7 @@
 [target.riscv32i-unknown-none-elf]
 runner = "riscv64-unknown-elf-gdb -q -x gdb_init"
 rustflags = [
-  "-C", "link-arg=-Thifive1-link.x",
+  # "-C", "link-arg=-Thifive1-link.x",
   #
   # "-march=rv32i", "-mabi=ilp32",
   # "-mcmodel=medlow", "-ffunction-sections", "-fdata-sections"
