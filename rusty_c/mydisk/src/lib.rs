@@ -10,23 +10,12 @@ use core::mem::size_of;
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-/// TODO document: For type inconsistencies from egos C, favor the inode_store_t struct when
-/// interfacing with egos C code as canonical; favor Rust Stackable trait otherwise.
-/// Type inconsistencies may result in undefined behavior, but we leave it to egos C
-/// to handle that if it comes up.
-// The inconsistencies exist in the function signatures of the implementations of the
-// inode_store_t struct for treedisk.c and disk.c.
+/// For type inconsistencies from egos C, favor the inode_store_t struct when interfacing with egos C code as canonical; favor Rust Stackable trait otherwise.
+/// Type inconsistencies may result in undefined behavior, but we leave it to egos C to handle that if it comes up.
 
-/// TODO document: To convert to and from egos C types, we copy memory with the intent
-/// to own it (freeing the memory originating from C). We return copies of heap memory
-/// to egos C if really necessary, otherwise all heap memory originating from Rust
-/// is owned and managed by Rust.
-
-// TODO use mutex wrapper over from and a static belows for more memory safety
-// nothing prevents another call and another owned instance referring to a copy of the data:
-// SimpleFS::setup_disk(&mut DiskFS::from(below), below_ino, ninodes).unwrap_or(-1)
-
-// TODO Make SimpleFS own below, and change other references to owned values and vice versa
+/// To convert to and from egos C types, we take memory pointers with the intent to own them (copying and freeing the original memory has some limitations). We return pointers heap memory to egos C when needed, but then memory management responsibility is on egos C.
+/// TODO To implement this "ownership", we use something like a mutex wrapper for more memory safety. For example, nothing prevents another of the following call and another owned instance referring to the samr data:
+/// SimpleFS::setup_disk(&mut DiskFS::from(below), below_ino, ninodes).unwrap_or(-1)
 
 impl Block {
     pub const BLOCK_SIZE: usize = BLOCK_SIZE as usize;
@@ -49,10 +38,7 @@ impl Block {
         byte_slice.copy_from_slice(src);
     }
 
-    pub fn get_bytes<'a>(&'a mut self) -> &'a mut [cty::c_char] {
-        &mut self.bytes
-    }
-
+    // TODO lock
     pub fn from_(block: *mut block_t) -> Self {
         unsafe {
             Block {
@@ -61,7 +47,6 @@ impl Block {
         }
     }
 
-    // TODO stack vs heap *mut block_t
     pub fn into_(&self) -> *mut block_t {
         let mut bytes_copy: [cty::c_char; Self::BLOCK_SIZE] = [0; Self::BLOCK_SIZE];
         (&mut bytes_copy).copy_from_slice(self.read_bytes());
@@ -69,7 +54,7 @@ impl Block {
         return new_block;
     }
 
-    pub fn heap_into_(self) -> *mut block_t {
+    pub fn take_into_(self) -> *mut block_t {
         let mut block = Box::new(block_t {
             bytes: [0; Self::BLOCK_SIZE],
         });
@@ -79,6 +64,7 @@ impl Block {
 }
 
 // standard c pointers to functions
+#[cfg_attr(unix, derive(Debug))]
 struct DiskFS {
     ds_read: unsafe extern "C" fn(
         bs: *mut inode_store_t,
@@ -118,7 +104,7 @@ impl DiskFS {
 
     fn into_(&self) -> inode_intf {
         // inode_store_t* is inode_intf
-        let mut inode_store = Box::new(inode_store_t {
+        let inode_store = Box::new(inode_store_t {
             state: core::ptr::null_mut(),
             getsize: Some(self.ds_get_size),
             setsize: Some(self.ds_set_size),
@@ -128,11 +114,17 @@ impl DiskFS {
         return Box::into_raw(inode_store);
     }
 
+    // TODO lock
     fn from_(inode_store: inode_intf) -> Self {
         unsafe {
             if !(*inode_store).state.is_null() {
                 panic!("DiskFS must be the lowest layer, and state is null");
             }
+        }
+
+        #[cfg(unix)]
+        {
+            dbg!("ramdisk addr in rust {:p}", inode_store);
         }
 
         DiskFS {
@@ -204,13 +196,16 @@ struct SimpleFS_C {
 }
 
 impl SimpleFS<DiskFS> {
+    // TODO lock
     fn from_(inode_store: *mut inode_store_t) -> Self {
-        // TODO dangerous transmutation to different sized type
         let raw_state = unsafe { (*inode_store).state };
         let cur_state: &mut SimpleFS_C = unsafe { &mut *(raw_state as *mut SimpleFS_C) };
         let below = DiskFS::from_(cur_state.below);
         let below_ino = cur_state.below_ino;
         let num_inodes = cur_state.num_inodes;
+        #[cfg(unix)] {
+            dbg!("ramdisk addr in rust {:p}", cur_state.below);
+        }
         SimpleFS::new(below, below_ino, num_inodes)
     }
 
@@ -302,10 +297,6 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     }
 
     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
-        let Metadata {
-            row_width,
-            num_blocks_needed,
-        } = Self::compute_metadata(num_inodes)?;
         // TODO markers for when reading past already written blocks
         Ok(0)
     }
@@ -396,7 +387,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
 
 impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     /// # of blocks per inode, constant for all inodes
-    // TODO update to the appropriate blocks_used impl
+    // TODO update to the appropriate blocks_used impl?
     fn get_size(&self) -> Result<u32, Error> {
         let num = self.below.get_size()?;
         let denom = self.num_inodes;
@@ -469,17 +460,30 @@ pub unsafe extern "C" fn simplefs_init(
         panic!("below is null");
     }
 
+    #[cfg(unix)]
+    {
+        dbg!("ramdisk addr in rust {:p} before wrapping", below);
+        dbg!("ramdisk write addr in rust {:p} before wrapping", (*below).write);
+    }
+
     let myfs: *mut inode_store_t =
-        (SimpleFS::new(DiskFS::from_(below), below_ino, num_inodes)).take_into_();
+    (SimpleFS::new(DiskFS::from_(below), below_ino, num_inodes)).take_into_();
+
+    #[cfg(unix)] 
+    {
+        let state = (*myfs).state as *mut SimpleFS_C;
+        let below = (*state).below;
+        dbg!("ramdisk addr in rust {:p} after wrapping", below);
+        dbg!("ramdisk write addr in rust {:p} after wrapping", (*below).write);
+    }
+
     return myfs;
 }
 
 /// @precondition: assumes below is just the disk
 /// @precondition: number of total blocks below >> num_inodes
 /// Returns # of blocks in the given inode, which is constant for every inode
-/// (external fragmentation is possible). Semantics of the static keyword may differ
-/// from C to Rust, we can use static here to keep these functions in the same memory
-/// location and not worry about Rust features.
+/// (external fragmentation is possible). Semantics of the static keyword may differ from C to Rust, we can use static here to keep these functions in the same memory location and not worry about Rust features.
 #[no_mangle]
 unsafe extern "C" fn simfs_get_size(
     inode_store: *mut inode_store_t,

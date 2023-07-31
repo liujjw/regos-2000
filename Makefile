@@ -68,6 +68,19 @@ rust_install:
 	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
 ################################################################################
 
+################################################################################
+rust_test:
+	@echo "$(CYAN)-------- Build Rust archive for x86 linux --------$(END)"
+	cd rusty_c/;\
+	source ./exports.sh;\
+	cd mydisk;\
+	cargo build --release --target x86_64-unknown-linux-gnu;\
+	cd ../..
+	@echo "$(YELLOW)-------- Build C program, link with Rust, and call FFI --------$(END)"
+	$(CC) -L$(RUST_HOST_LIBRARY_PATH) $(TOOLS)/rust_test.c -std=c99 -DMKFS $(RUST_INCLUDE) -o $(TOOLS)/rust_test -l$(RUST_LIB_NAME)
+	cd $(TOOLS); ./rust_test
+################################################################################
+
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
 	cd $(TOOLS)/fpga/openocd; time openocd -f 7series.txt

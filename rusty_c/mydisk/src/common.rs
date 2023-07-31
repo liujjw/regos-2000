@@ -37,6 +37,7 @@ static A: EgosAllocator = EgosAllocator;
 // TODO impl core::fmt::write::write_str to use write!() macro or use the core::io version
 
 // pub type Block = block_t;
+#[cfg_attr(unix, derive(Debug))]
 pub struct Block {
     pub bytes: [cty::c_char; BLOCK_SIZE as usize],
 }

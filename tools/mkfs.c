@@ -104,22 +104,18 @@ void mkfs() {
     // MARK where C code was replaced by Rust code
     inode_intf ramdisk = ramdisk_init();
     // assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    assert(simplefs_create(ramdisk, 0, NINODES) >= 0);
+    // TODO ninodes or ninode?
+    assert(simplefs_create(ramdisk, 0, NINODE) >= 0);
     // inode_intf treedisk = treedisk_init(ramdisk, 0);
-    inode_intf mydisk = simplefs_init(ramdisk, 0, NINODES);
+    inode_intf mydisk = simplefs_init(ramdisk, 0, NINODE);
 
     char buf[GRASS_EXEC_SIZE / GRASS_NEXEC];
     for (int ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
+            // MARK inserted Rust code
             mydisk->write(mydisk, ino, 0, (void*)buf);
-            // // MARK inserted Rust code
-            // char mybuf[GRASS_EXEC_SIZE / GRASS_NEXEC];
-            // mydisk->read(mydisk, ino, 0, (void*)mybuf);
-            // // print mybuf as a string
-            // fprintf(stderr, "[INFO] Checking ino=%d, has contents: %s\n", ino, mybuf);
-            // assert(strcmp(buf, mybuf) == 0);
         } else {
             struct stat st;
             char* file_name = &contents[ino][1];
