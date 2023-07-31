@@ -74,10 +74,10 @@ rust_test:
 	cd rusty_c/;\
 	source ./exports.sh;\
 	cd mydisk;\
-	cargo build --release --target x86_64-unknown-linux-gnu;\
+	cargo build --target x86_64-unknown-linux-gnu;\
 	cd ../..
 	@echo "$(YELLOW)-------- Build C program, link with Rust, and call FFI --------$(END)"
-	$(CC) -L$(RUST_HOST_LIBRARY_PATH) $(TOOLS)/rust_test.c -std=c99 -DMKFS $(RUST_INCLUDE) -o $(TOOLS)/rust_test -l$(RUST_LIB_NAME)
+	$(CC) -g -L$(RUST_HOST_LIBRARY_PATH_DBG) $(TOOLS)/rust_test.c -std=c99 -DMKFS $(RUST_INCLUDE) -o $(TOOLS)/rust_test -l$(RUST_LIB_NAME)
 	cd $(TOOLS); ./rust_test
 ################################################################################
 
@@ -114,6 +114,7 @@ EARTH_SRCS = earth/earth.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*
 RUST_LIBRARY_PATH = rusty_c/mydisk/target/riscv32i-unknown-none-elf/release
 RUST_LIB_NAME = mydisk
 RUST_HOST_LIBRARY_PATH = rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release
+RUST_HOST_LIBRARY_PATH_DBG = rusty_c/mydisk/target/x86_64-unknown-linux-gnu/debug
 ################################################################################
 
 CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections

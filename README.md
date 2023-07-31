@@ -29,13 +29,16 @@ Auto-generate Rust FFI bindings for C libraries using `cargo build`, building an
 ### C FFI to Rust
 A header file of the Rust function signatures suffices. Make sure demangling and C ABI is used in your Rust functions if they are to be called by C. Make sure your Rust library is compiled as a static library archive (`.a` file in `target/`) and copy and link it in the Makefile.
 
-### Directories explained
+## Directories explained
 `/mydisk` contains the implementation of a basic filesystem. `treedisk_c2rust` contains the implementation of a transpiled `treedisk.c` into Rust. It needs to be manually reviewed. The `super` prefix in this directory means all the declarations are in one file for simplicity.
 
-### Addressing large Rust binaries for the memory layout
+## Addressing large Rust binaries for the memory layout
 The `/apps` memory region only has `~12KB` of memory, with `~16MB` used in total from text section up to the heap for all three parts of the kernel (earth, grass, apps). Stack pointer starts at roughly the 2048th megabyte. With dead code elimination the size of the full runtime crates don't matter, we just make sure to use as little as possible. Crates are also verified to be under the category "No standard library".
 
 See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `egos` memory layout if possible. Speed and debugging symbols were sacrificed for a smaller binary to fit in `egos` memory.
 
-### Running on QEMU
+## Running on QEMU
 Writing to disk not possible when running egos on QEMU, as only the memory-mapped ROM is readable.
+
+## Debugging, testing, and verifying Rust code is running
+The makefile target `make rust_test` runs a basic test and produces a binary `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`.

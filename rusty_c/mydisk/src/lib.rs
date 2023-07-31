@@ -66,6 +66,7 @@ impl Block {
 // standard c pointers to functions
 #[cfg_attr(unix, derive(Debug))]
 struct DiskFS {
+    _og: inode_intf,
     ds_read: unsafe extern "C" fn(
         bs: *mut inode_store_t,
         ino: cty::c_uint,
@@ -79,7 +80,10 @@ struct DiskFS {
         block: *mut block_t,
     ) -> cty::c_int,
     // in real diskfs.c, inconsistent function signatures with no arguments
-    ds_get_size: unsafe extern "C" fn(this_bs: *mut inode_store, ino: cty::c_uint) -> cty::c_int,
+    ds_get_size: unsafe extern "C" fn(
+        this_bs: *mut inode_store, 
+        ino: cty::c_uint
+    ) -> cty::c_int,
     ds_set_size: unsafe extern "C" fn(
         this_bs: *mut inode_store,
         ino: cty::c_uint,
@@ -91,27 +95,11 @@ impl IsDisk for DiskFS {}
 
 impl DiskFS {
     fn take_into_(self) -> inode_intf {
-        // inode_store_t* is inode_intf
-        let mut inode_store = Box::new(inode_store_t {
-            state: core::ptr::null_mut(),
-            getsize: Some(self.ds_get_size),
-            setsize: Some(self.ds_set_size),
-            read: Some(self.ds_read),
-            write: Some(self.ds_write),
-        });
-        return Box::into_raw(inode_store);
+        return self._og;
     }
 
     fn into_(&self) -> inode_intf {
-        // inode_store_t* is inode_intf
-        let inode_store = Box::new(inode_store_t {
-            state: core::ptr::null_mut(),
-            getsize: Some(self.ds_get_size),
-            setsize: Some(self.ds_set_size),
-            read: Some(self.ds_read),
-            write: Some(self.ds_write),
-        });
-        return Box::into_raw(inode_store);
+        return self._og;
     }
 
     // TODO lock
@@ -122,12 +110,8 @@ impl DiskFS {
             }
         }
 
-        #[cfg(unix)]
-        {
-            dbg!("ramdisk addr in rust {:p}", inode_store);
-        }
-
         DiskFS {
+            _og: inode_store,
             ds_read: unsafe { (*inode_store).read.unwrap() },
             ds_write: unsafe { (*inode_store).write.unwrap() },
             ds_get_size: unsafe { (*inode_store).getsize.unwrap() },
@@ -163,6 +147,7 @@ impl Stackable for DiskFS {
     }
 
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
+        // TODO write is being called twice?
         unsafe {
             match (self.ds_write)(self.into_(), ino, offset, buf.into_()) {
                 -1 => Err(Error::UnknownFailure),
@@ -203,9 +188,6 @@ impl SimpleFS<DiskFS> {
         let below = DiskFS::from_(cur_state.below);
         let below_ino = cur_state.below_ino;
         let num_inodes = cur_state.num_inodes;
-        #[cfg(unix)] {
-            dbg!("ramdisk addr in rust {:p}", cur_state.below);
-        }
         SimpleFS::new(below, below_ino, num_inodes)
     }
 

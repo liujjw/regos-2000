@@ -9,5 +9,7 @@ on qemu, i cannot write to disk
 easier to just test on x86? 
 is it enough to have mkfs.c the bootup logs to demonstrate working on x86 and riscv? 
 
+gdb ./tools/rust_test b 76 and inspect the metadata with a smaller FS_DISK_SIZE
+
 # General improvements
 Negative trait impl of Unpin, PhantomData to have static analysis on lifetimes for FFI with C pointers.

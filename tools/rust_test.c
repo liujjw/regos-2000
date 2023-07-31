@@ -44,7 +44,7 @@ int main() {
         char mybuf[BLOCK_SIZE] = {0};
 
         int numblocks = FS_DISK_SIZE / BLOCK_SIZE;
-        int blocks_per_inode = numblocks / NINODES;
+        int blocks_per_inode = numblocks / NINODE;
         fprintf(stderr, "[INFO] GOAT ino: %d, offset: %d, %s\n", ino, ino * blocks_per_inode, buf);
         
         mydisk->write(mydisk, ino, 0, (void*)buf);

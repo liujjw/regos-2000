@@ -1,0 +1,2573 @@
+\033[1;36m-------- Build Rust archive for x86 linux --------\033[0m
+cd rusty_c/;\
+source ./exports.sh;\
+cd mydisk;\
+cargo build --release --target x86_64-unknown-linux-gnu;\
+cd ../..
+warning: unused import: `std::process::Command`
+ --> build.rs:3:5
+  |
+3 | use std::process::Command;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused variable: `riscv_gcc_path`
+  --> build.rs:13:9
+   |
+13 |     let riscv_gcc_path = super_directory.join("riscv64-unknown-elf-gcc");
+   |         ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_riscv_gcc_path`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: `mydisk` (build script) generated 2 warnings
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.h:1:9: warning: #pragma once in main file
+warning:     1 | #pragma once
+warning:       |         ^~~~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/egos.h:1:9: warning: #pragma once in main file
+warning:     1 | #pragma once
+warning:       |         ^~~~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/file.h:33:9: warning: #pragma once in main file
+warning:    33 | #pragma once
+warning:       |         ^~~~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/inode.h:38:9: warning: #pragma once in main file
+warning:    38 | #pragma once
+warning:       |         ^~~~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function ‘disk_setsize’:
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:16:1: warning: no return statement in function returning non-void [-Wreturn-type]
+warning:    16 | static int disk_setsize() { FATAL("disk: cannot set the size"); }
+warning:       | ^~~~~~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function ‘disk_read’:
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:33: warning: unused parameter ‘bs’ [-Wunused-parameter]
+warning:    18 | static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
+warning:       |                      ~~~~~~~~~~~^~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:18:50: warning: unused parameter ‘ino’ [-Wunused-parameter]
+warning:    18 | static int disk_read(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
+warning:       |                                     ~~~~~~~~~~~~~^~~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c: In function ‘disk_write’:
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:34: warning: unused parameter ‘bs’ [-Wunused-parameter]
+warning:    22 | static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
+warning:       |                       ~~~~~~~~~~~^~
+warning: /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/file/disk.c:22:51: warning: unused parameter ‘ino’ [-Wunused-parameter]
+warning:    22 | static int disk_write(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
+warning:       |                                      ~~~~~~~~~~~~~^~~
+   Compiling mydisk v0.1.0 (/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk)
+warning: unused import: `alloc::boxed::Box`
+ --> src/common.rs:5:5
+  |
+5 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: type `block_no` should have an upper camel case name
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:27:10
+   |
+27 | pub type block_no = cty::c_uint;
+   |          ^^^^^^^^ help: convert the identifier to upper camel case: `BlockNo`
+   |
+   = note: `#[warn(non_camel_case_types)]` on by default
+
+warning: type `block_t` should have an upper camel case name
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:58:10
+   |
+58 | pub type block_t = block;
+   |          ^^^^^^^ help: convert the identifier to upper camel case: `BlockT`
+
+warning: type `inode_store_t` should have an upper camel case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:155:10
+    |
+155 | pub type inode_store_t = inode_store;
+    |          ^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeStoreT`
+
+warning: type `inode_intf` should have an upper camel case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:156:10
+    |
+156 | pub type inode_intf = *mut inode_store_t;
+    |          ^^^^^^^^^^ help: convert the identifier to upper camel case: `InodeIntf`
+
+warning: type `earth__bindgen_ty_1` should have an upper camel case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:488:10
+    |
+488 | pub type earth__bindgen_ty_1 = cty::c_uint;
+    |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy1`
+
+warning: type `earth__bindgen_ty_2` should have an upper camel case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:491:10
+    |
+491 | pub type earth__bindgen_ty_2 = cty::c_uint;
+    |          ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `EarthBindgenTy2`
+
+warning: unused variable: `layout`
+  --> src/common.rs:29:44
+   |
+29 |     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+   |                                            ^^^^^^ help: if this is intentional, prefix it with an underscore: `_layout`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `size`
+   --> src/lib.rs:135:28
+    |
+135 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `e`
+   --> src/lib.rs:259:17
+    |
+259 |             Err(e) => panic!("failed to compute metadata"),
+    |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
+
+warning: unused variable: `below`
+   --> src/lib.rs:285:23
+    |
+285 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+    |                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_below`
+
+warning: unused variable: `below_ino`
+   --> src/lib.rs:285:38
+    |
+285 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+    |                                      ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_below_ino`
+
+warning: unused variable: `num_inodes`
+   --> src/lib.rs:285:54
+    |
+285 |     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+    |                                                      ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_num_inodes`
+
+warning: unused variable: `size`
+   --> src/lib.rs:387:28
+    |
+387 |     fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ino`
+   --> src/lib.rs:476:5
+    |
+476 |     ino: cty::c_uint,
+    |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
+
+warning: unused variable: `ino`
+   --> src/lib.rs:488:5
+    |
+488 |     ino: cty::c_uint,
+    |     ^^^ help: if this is intentional, prefix it with an underscore: `_ino`
+
+warning: variable does not need to be mutable
+  --> src/lib.rs:37:13
+   |
+37 |         let mut byte_slice = &mut self.bytes[beg..end];
+   |             ----^^^^^^^^^^
+   |             |
+   |             help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` on by default
+
+warning: variable does not need to be mutable
+   --> src/lib.rs:331:17
+    |
+331 |             let mut bytes = val.to_le_bytes();
+    |                 ----^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: unnecessary `unsafe` block
+   --> src/lib.rs:208:30
+    |
+208 |         let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
+    |                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` on by default
+
+warning: method `take_into_` is never used
+  --> src/lib.rs:62:12
+   |
+20 | impl Block {
+   | ---------- method in this implementation
+...
+62 |     pub fn take_into_(self) -> *mut block_t {
+   |            ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: constant `PAGING_DEV_SIZE` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:4:11
+  |
+4 | pub const PAGING_DEV_SIZE: u32 = 1048576;
+  |           ^^^^^^^^^^^^^^^
+
+warning: constant `GRASS_NEXEC` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:5:11
+  |
+5 | pub const GRASS_NEXEC: u32 = 8;
+  |           ^^^^^^^^^^^
+
+warning: constant `GRASS_EXEC_SIZE` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:6:11
+  |
+6 | pub const GRASS_EXEC_SIZE: u32 = 1048576;
+  |           ^^^^^^^^^^^^^^^
+
+warning: constant `FS_DISK_SIZE` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:7:11
+  |
+7 | pub const FS_DISK_SIZE: u32 = 2097152;
+  |           ^^^^^^^^^^^^
+
+warning: constant `GRASS_EXEC_SEGMENT` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:8:11
+  |
+8 | pub const GRASS_EXEC_SEGMENT: u32 = 256;
+  |           ^^^^^^^^^^^^^^^^^^
+
+warning: constant `GRASS_EXEC_START` is never used
+ --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:9:11
+  |
+9 | pub const GRASS_EXEC_START: u32 = 2048;
+  |           ^^^^^^^^^^^^^^^^
+
+warning: constant `SYS_PROC_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:10:11
+   |
+10 | pub const SYS_PROC_EXEC_START: u32 = 2304;
+   |           ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYS_FILE_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:11:11
+   |
+11 | pub const SYS_FILE_EXEC_START: u32 = 2560;
+   |           ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYS_DIR_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:12:11
+   |
+12 | pub const SYS_DIR_EXEC_START: u32 = 2816;
+   |           ^^^^^^^^^^^^^^^^^^
+
+warning: constant `SYS_SHELL_EXEC_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:13:11
+   |
+13 | pub const SYS_SHELL_EXEC_START: u32 = 3072;
+   |           ^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `GRASS_FS_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:14:11
+   |
+14 | pub const GRASS_FS_START: u32 = 4096;
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `NINODES` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:15:11
+   |
+15 | pub const NINODES: u32 = 128;
+   |           ^^^^^^^
+
+warning: constant `PAGE_SIZE` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:16:11
+   |
+16 | pub const PAGE_SIZE: u32 = 4096;
+   |           ^^^^^^^^^
+
+warning: constant `FRAME_CACHE_END` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:17:11
+   |
+17 | pub const FRAME_CACHE_END: u32 = 2147614720;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `FRAME_CACHE_START` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:18:11
+   |
+18 | pub const FRAME_CACHE_START: u32 = 2147500032;
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `GRASS_STACK_TOP` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:19:11
+   |
+19 | pub const GRASS_STACK_TOP: u32 = 2147499904;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `APPS_STACK_TOP` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:20:11
+   |
+20 | pub const APPS_STACK_TOP: u32 = 2147491840;
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `SYSCALL_ARG` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:21:11
+   |
+21 | pub const SYSCALL_ARG: u32 = 2147484672;
+   |           ^^^^^^^^^^^
+
+warning: constant `APPS_ARG` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:22:11
+   |
+22 | pub const APPS_ARG: u32 = 2147483648;
+   |           ^^^^^^^^
+
+warning: constant `APPS_SIZE` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:23:11
+   |
+23 | pub const APPS_SIZE: u32 = 12288;
+   |           ^^^^^^^^^
+
+warning: constant `APPS_ENTRY` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:24:11
+   |
+24 | pub const APPS_ENTRY: u32 = 134238208;
+   |           ^^^^^^^^^^
+
+warning: constant `GRASS_SIZE` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:25:11
+   |
+25 | pub const GRASS_SIZE: u32 = 10240;
+   |           ^^^^^^^^^^
+
+warning: constant `GRASS_ENTRY` is never used
+  --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:26:11
+   |
+26 | pub const GRASS_ENTRY: u32 = 134227968;
+   |           ^^^^^^^^^^^
+
+warning: type alias `inode_store_t` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:155:10
+    |
+155 | pub type inode_store_t = inode_store;
+    |          ^^^^^^^^^^^^^
+
+warning: type alias `inode_intf` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:156:10
+    |
+156 | pub type inode_intf = *mut inode_store_t;
+    |          ^^^^^^^^^^
+
+warning: constant `earth_QEMU` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:486:11
+    |
+486 | pub const earth_QEMU: earth__bindgen_ty_1 = 0;
+    |           ^^^^^^^^^^
+
+warning: constant `earth_ARTY` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:487:11
+    |
+487 | pub const earth_ARTY: earth__bindgen_ty_1 = 1;
+    |           ^^^^^^^^^^
+
+warning: constant `earth_PAGE_TABLE` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:489:11
+    |
+489 | pub const earth_PAGE_TABLE: earth__bindgen_ty_2 = 0;
+    |           ^^^^^^^^^^^^^^^^
+
+warning: constant `earth_SOFT_TLB` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:490:11
+    |
+490 | pub const earth_SOFT_TLB: earth__bindgen_ty_2 = 1;
+    |           ^^^^^^^^^^^^^^
+
+warning: function `panic` is never used
+  --> src/common.rs:13:4
+   |
+13 | fn panic(_info: &PanicInfo) -> ! {
+   |    ^^^^^
+
+warning: static `A` is never used
+  --> src/common.rs:35:8
+   |
+35 | static A: EgosAllocator = EgosAllocator;
+   |        ^
+
+warning: function `fs_disk_init` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:158:12
+    |
+158 |     pub fn fs_disk_init() -> inode_intf;
+    |            ^^^^^^^^^^^^
+
+warning: function `treedisk_init` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:161:12
+    |
+161 |     pub fn treedisk_init(below: inode_intf, below_ino: cty::c_uint) -> inode_intf;
+    |            ^^^^^^^^^^^^^
+
+warning: function `treedisk_create` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:164:12
+    |
+164 |     pub fn treedisk_create(
+    |            ^^^^^^^^^^^^^^^
+
+warning: static `earth` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:827:20
+    |
+827 |     pub static mut earth: *mut earth;
+    |                    ^^^^^
+
+warning: static `grass` is never used
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:830:20
+    |
+830 |     pub static mut grass: *mut grass;
+    |                    ^^^^^
+
+warning: constant `earth_QEMU` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:486:11
+    |
+486 | pub const earth_QEMU: earth__bindgen_ty_1 = 0;
+    |           ^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_QEMU`
+    |
+    = note: `#[warn(non_upper_case_globals)]` on by default
+
+warning: constant `earth_ARTY` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:487:11
+    |
+487 | pub const earth_ARTY: earth__bindgen_ty_1 = 1;
+    |           ^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_ARTY`
+
+warning: constant `earth_PAGE_TABLE` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:489:11
+    |
+489 | pub const earth_PAGE_TABLE: earth__bindgen_ty_2 = 0;
+    |           ^^^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_PAGE_TABLE`
+
+warning: constant `earth_SOFT_TLB` should have an upper case name
+   --> /home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/target/x86_64-unknown-linux-gnu/release/build/mydisk-4e63a64f90d42591/out/bindings.rs:490:11
+    |
+490 | pub const earth_SOFT_TLB: earth__bindgen_ty_2 = 1;
+    |           ^^^^^^^^^^^^^^ help: convert the identifier to upper case: `EARTH_SOFT_TLB`
+
+warning: unused `Result` that must be used
+   --> src/lib.rs:358:9
+    |
+358 |         self.below.read(self.below_ino, block_no, &mut buf);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+    = note: `#[warn(unused_must_use)]` on by default
+help: use `let _ = ...` to ignore the resulting value
+    |
+358 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+    |         +++++++
+
+warning: unused `Result` that must be used
+   --> src/lib.rs:367:9
+    |
+367 |         self.below.read(self.below_ino, block_no, &mut buf);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+    |
+367 |         let _ = self.below.read(self.below_ino, block_no, &mut buf);
+    |         +++++++
+
+warning: unused `Result` that must be used
+   --> src/lib.rs:370:9
+    |
+370 |         self.below.write(self.below_ino, block_no, &mut buf);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+    |
+370 |         let _ = self.below.write(self.below_ino, block_no, &mut buf);
+    |         +++++++
+
+warning: comparison is useless due to type limits
+   --> src/lib.rs:491:8
+    |
+491 |     if newsize < 0 {
+    |        ^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_comparisons)]` on by default
+
+warning: `mydisk` (lib) generated 64 warnings (run `cargo fix --lib -p mydisk` to apply 12 suggestions)
+    Finished release [optimized] target(s) in 2.53s
+\033[1;33m-------- Build C program, link with Rust, and call FFI --------\033[0m
+cc -Lrusty_c/mydisk/target/x86_64-unknown-linux-gnu/release tools/rust_test.c -std=c99 -DMKFS -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue -Ilibrary/rust -o tools/rust_test -lmydisk
+cd tools; ./rust_test
+[src/lib.rs:451] "ramdisk addr in rust {:p} before wrapping" = "ramdisk addr in rust {:p} before wrapping"
+[src/lib.rs:451] below = 0x00000000007472a0
+[src/lib.rs:452] "ramdisk write addr in rust {:p} before wrapping" = "ramdisk write addr in rust {:p} before wrapping"
+[src/lib.rs:452] (*below).write = Some(
+    0x0000000000403e79,
+)
+[src/lib.rs:462] "ramdisk addr in rust {:p} after wrapping" = "ramdisk addr in rust {:p} after wrapping"
+[src/lib.rs:462] below = 0x00000000007472a0
+[src/lib.rs:463] "ramdisk write addr in rust {:p} after wrapping" = "ramdisk write addr in rust {:p} after wrapping"
+[src/lib.rs:463] (*below).write = Some(
+    0x0000000000403e79,
+)
+[INFO] ramdisk address in c: 0x7472a0
+[INFO] ramdisk write address in c: 0x403e79
+[INFO] Loading ino=0, 66 bytes
+[INFO] GOAT ino: 0, offset: 0, With only 2000 lines of code, egos-2000 implements all the basics.
+[src/lib.rs:56] "MEESE {:?}" = "MEESE {:?}"
+[src/lib.rs:56] *new_block = block {
+    bytes: [
+        87,
+        105,
+        116,
+        104,
+        32,
+        111,
+        110,
+        108,
+        121,
+        32,
+        50,
+        48,
+        48,
+        48,
+        32,
+        108,
+        105,
+        110,
+        101,
+        115,
+        32,
+        111,
+        102,
+        32,
+        99,
+        111,
+        100,
+        101,
+        44,
+        32,
+        101,
+        103,
+        111,
+        115,
+        45,
+        50,
+        48,
+        48,
+        48,
+        32,
+        105,
+        109,
+        112,
+        108,
+        101,
+        109,
+        101,
+        110,
+        116,
+        115,
+        32,
+        97,
+        108,
+        108,
+        32,
+        116,
+        104,
+        101,
+        32,
+        98,
+        97,
+        115,
+        105,
+        99,
+        115,
+        46,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+}
+[src/lib.rs:56] "MEESE {:?}" = "MEESE {:?}"
+[src/lib.rs:56] *new_block = block {
+    bytes: [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+}
+[src/lib.rs:56] "MEESE {:?}" = "MEESE {:?}"
+[src/lib.rs:56] *new_block = block {
+    bytes: [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+}
+[src/lib.rs:56] "MEESE {:?}" = "MEESE {:?}"
+[src/lib.rs:56] *new_block = block {
+    bytes: [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+}
+[INFO] Checking ino=0, has contents: 
+, should match: With only 2000 lines of code, egos-2000 implements all the basics.
+rust_test: tools/rust_test.c:57: main: Assertion `strcmp(buf, mybuf) == 0' failed.
+make: *** [Makefile:77: rust_test] Aborted (core dumped)
