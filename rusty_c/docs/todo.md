@@ -21,3 +21,27 @@ direction: disk drivers and a raid controller in Rust on top of the filesystem a
 
 # General improvements
 Negative trait impl of Unpin, PhantomData to have static analysis on lifetimes for FFI with C pointers.
+
+
+b r_359, b r_365, b c_74
+
+
+
+kernel modules in rust, as well as rust in userspace in terms of applications
+egos kernel written in rust 
+
+more realistic filesystem like the treedisk or the fatdisk running in egos
+entire operating system kernel in rust, look at egos kernel written entirely in rust
+run rust programs on top of egos
+
+
+RAID 0 and RAID 1 disk exists in egos 
+
+init (read, write, getsize, setsize)
+clockdisk
+fatdisk
+ramdisk/sddisk (sd driver readblock and writeblock interface (make the same interface))
+
+make raid layers in rust
+
+make demo may be hard for presentation, focus more on motivation and challenges

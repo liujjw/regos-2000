@@ -147,7 +147,6 @@ impl Stackable for DiskFS {
     }
 
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
-        // TODO write is being called twice?
         unsafe {
             match (self.ds_write)(self.into_(), ino, offset, buf.into_()) {
                 -1 => Err(Error::UnknownFailure),
@@ -291,7 +290,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
             ((ino + 1) * self.get_metadata().unwrap().row_width) / Block::BLOCK_SIZE as u32;
         let ino_row_starting_byte_index_in_block =
             (ino * self.get_metadata().unwrap().row_width) % Block::BLOCK_SIZE as u32;
-        let byte_index = ino_row_starting_byte_index_in_block / 8;
+        let byte_index = ino_row_starting_byte_index_in_block;
         Ok((block_no, byte_index))
     }
 
@@ -347,7 +346,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     }
 
     /// Number of used blocks per inode.
-    pub fn blocks_used(&self, ino: u32) -> u32 {
+    pub fn get_blocks_used(&self, ino: u32) -> u32 {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -369,7 +368,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
 
 impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     /// # of blocks per inode, constant for all inodes
-    // TODO update to the appropriate blocks_used impl?
+    // TODO update to the appropriate get_blocks_used impl?
     fn get_size(&self) -> Result<u32, Error> {
         let num = self.below.get_size()?;
         let denom = self.num_inodes;
@@ -387,7 +386,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     // We will need to shift reads and writes over by the size of the metadata blocks.
     // Assume we start writing at offset 0.
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
-        let blocks_used = self.blocks_used(ino);
+        let blocks_used = self.get_blocks_used(ino);
         if offset >= blocks_used {
             return Err(Error::UnknownFailure);
         }
@@ -410,7 +409,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
         let res = self.below.write(self.below_ino, full_offset, buf)?;
 
         // update metadata
-        let mut blocks_used = self.blocks_used(ino);
+        let mut blocks_used = self.get_blocks_used(ino);
         if offset == blocks_used {
             blocks_used += 1;
             self.set_blocks_used(ino, blocks_used);

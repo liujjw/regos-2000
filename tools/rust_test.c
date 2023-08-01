@@ -48,6 +48,7 @@ int main() {
         int blocks_per_inode = numblocks / NINODE;
         // fprintf(stderr, "[INFO] GOAT ino: %d, offset: %d, %s\n", ino, ino * blocks_per_inode, buf);
         
+        // TODO metadata incorrect? 
         mydisk->write(mydisk, ino, 0, (void*)buf);
         // ramdisk->write(ramdisk, ino, (ino * blocks_per_inode) + 0, (void*)buf);
 
