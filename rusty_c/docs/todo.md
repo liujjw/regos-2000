@@ -2,14 +2,22 @@
 3. testing (LD_LIBRARY_PATH? since cargo test does not use build.rs get cargo test through .cargo and rustc to work and other testing)
 run the linter
 
+
+go through the makefile targets
+
 -> figure out what the exception handler error is and see if i can run qemu shell commands (read the qemu bootup logs)
 i have the student version of egos so this will be tough to run things
 on qemu, i cannot write to disk
 
 easier to just test on x86? 
 is it enough to have mkfs.c the bootup logs to demonstrate working on x86 and riscv? 
+gdb ./tools/rust_test b 76 and inspect the metadata and fs array with a smaller FS_DISK_SIZE
 
-gdb ./tools/rust_test b 76 and inspect the metadata with a smaller FS_DISK_SIZE
+
+i think i have a conclusion (diagram): the ffi boundary is a dangerous place where pointers are passed around in unsafe blocks, leading to memory issues (sharing memory), the exact thing we want to avoid, however, once wrapped properly, we should get the benefits of rust safe?, C is danger!
+extra danger from sharing memory we are sharing memory at the ffi boundary, hence locks needed for example 
+
+direction: disk drivers and a raid controller in Rust on top of the filesystem abstractions to see the benefits of static guarantees and state machines and encoding state in types with rust, sounds fancy, but hard to measure the benefits
 
 # General improvements
 Negative trait impl of Unpin, PhantomData to have static analysis on lifetimes for FFI with C pointers.

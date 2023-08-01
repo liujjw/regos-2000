@@ -11,11 +11,9 @@
 #include "bindings.h"
 
 
-#define NINODE 5
+#define NINODE 3
 char* contents[] = {
     "With only 2000 lines of code, egos-2000 implements all the basics.",
-    "The quick brown fox jumps over the lazy dog.",
-    "There are only two hard things in Computer Science: cache invalidation and naming things.",
     "If debugging is the process of removing bugs, then programming must be the process of putting them in.",
     "The world is coming to an end... SAVE YOUR BUFFERS!"
 };
@@ -24,7 +22,11 @@ char* multi_block_contents[] = {
 
 };
 
-char fs[FS_DISK_SIZE];
+#define DEBUG_SIZE 2048
+// add one for each (4 * NINODE) > 512 bytes block 
+#define METADATA_BLOCK_OFFSET 1 
+int numblocks = DEBUG_SIZE / BLOCK_SIZE;
+char fs[DEBUG_SIZE];
 
 inode_intf ramdisk_init();
 
@@ -43,25 +45,27 @@ int main() {
         strncpy(buf, contents[ino], BLOCK_SIZE);
         char mybuf[BLOCK_SIZE] = {0};
 
-        int numblocks = FS_DISK_SIZE / BLOCK_SIZE;
         int blocks_per_inode = numblocks / NINODE;
-        fprintf(stderr, "[INFO] GOAT ino: %d, offset: %d, %s\n", ino, ino * blocks_per_inode, buf);
+        // fprintf(stderr, "[INFO] GOAT ino: %d, offset: %d, %s\n", ino, ino * blocks_per_inode, buf);
         
         mydisk->write(mydisk, ino, 0, (void*)buf);
         // ramdisk->write(ramdisk, ino, (ino * blocks_per_inode) + 0, (void*)buf);
 
+        // TODO smth wrong with read, not memory related?
         // mydisk->read(mydisk, ino, 0, (void*)mybuf);
-        ramdisk->read(ramdisk, ino, (ino * blocks_per_inode) + 0, (void*)mybuf);
+        ramdisk->read(ramdisk, ino, (ino * blocks_per_inode) + METADATA_BLOCK_OFFSET, (void*)mybuf);
 
         fprintf(stderr, "[INFO] Checking ino=%d, has contents: %s\n, should match: %s\n", ino, mybuf, buf);
         assert(strcmp(buf, mybuf) == 0);    
+        fprintf(stderr, "[INFO] Success!\n");
+
     }
     free(ramdisk);
     return 0;
 }
 
 
-int getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
+int getsize() { return DEBUG_SIZE / BLOCK_SIZE; }
 
 int setsize() { assert(0); }
 

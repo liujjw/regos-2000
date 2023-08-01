@@ -2,6 +2,8 @@ build
 mkfs
 mkrom
 
+out.txt
+
 *.elf
 *.lst
 *.bin
