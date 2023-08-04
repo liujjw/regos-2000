@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <stdbool.h>
 
 #include "disk.h"
 #include "file.h"
@@ -23,12 +24,22 @@ char* multi_block_contents[] = {
 };
 
 #define DEBUG_SIZE 2048
-// add one for each (4 * NINODE) > 512 bytes block 
+// add one to the metadata offset for each (4 * NINODE) > 512 bytes block 
+// each inode takes 4 bytes of metadata
 #define METADATA_BLOCK_OFFSET 1 
 int numblocks = DEBUG_SIZE / BLOCK_SIZE;
+
+// 1 block for metadata, 1 block for each inode, 4 blocks total
 char fs[DEBUG_SIZE];
+char expected_metadata[] = {
+    '\x01', '\x00', '\x00', '\x00',
+    '\x01', '\x00', '\x00', '\x00',
+    '\x01', '\x00', '\x00', '\x00'
+}; 
+#define NUM_METADATA_BYTES NINODE * 4
 
 inode_intf ramdisk_init();
+bool areArraysEqual(const char array1[], const char array2[], int size);
 
 // modified from mkfs.c to ony write and check ram, not disk image
 int main() {
@@ -62,9 +73,18 @@ int main() {
 
     }
     free(ramdisk);
+    assert(areArraysEqual(expected_metadata, fs, NUM_METADATA_BYTES));
     return 0;
 }
 
+bool areArraysEqual(const char array1[], const char array2[], int size) {
+    for (int i = 0; i < size; i++) {
+        if (array1[i] != array2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 int getsize() { return DEBUG_SIZE / BLOCK_SIZE; }
 

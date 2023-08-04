@@ -38,6 +38,7 @@ static A: EgosAllocator = EgosAllocator;
 
 // pub type Block = block_t;
 #[cfg_attr(unix, derive(Debug))]
+#[repr(C)]
 pub struct Block {
     pub bytes: [cty::c_char; BLOCK_SIZE as usize],
 }

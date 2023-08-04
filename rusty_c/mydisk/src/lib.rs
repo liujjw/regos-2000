@@ -47,19 +47,16 @@ impl Block {
         }
     }
 
-    pub fn into_(&self) -> *mut block_t {
+    pub fn copy_into_(&self) -> *mut block_t {
         let mut bytes_copy: [cty::c_char; Self::BLOCK_SIZE] = [0; Self::BLOCK_SIZE];
         (&mut bytes_copy).copy_from_slice(self.read_bytes());
         let new_block: *mut block_t = &mut block_t { bytes: bytes_copy };
         return new_block;
     }
 
-    pub fn take_into_(self) -> *mut block_t {
-        let mut block = Box::new(block_t {
-            bytes: [0; Self::BLOCK_SIZE],
-        });
-        block.bytes = self.bytes;
-        Box::into_raw(block)
+    // TODO lock
+    pub fn share_into_(&mut self) -> *mut block_t {
+        self as *mut block_t
     }
 }
 
@@ -98,7 +95,9 @@ impl DiskFS {
         return self._og;
     }
 
-    fn into_(&self) -> inode_intf {
+    // TODO lock
+    // immut ref, but share semantics when returning raw pointer
+    fn share_into_(&self) -> inode_intf {
         return self._og;
     }
 
@@ -139,7 +138,7 @@ impl Stackable for DiskFS {
 
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         unsafe {
-            match (self.ds_read)(self.into_(), ino, offset, buf.into_()) {
+            match (self.ds_read)(self.share_into_(), ino, offset, buf.share_into_()) {
                 -1 => Err(Error::UnknownFailure),
                 x => Ok(x),
             }
@@ -148,7 +147,7 @@ impl Stackable for DiskFS {
 
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
         unsafe {
-            match (self.ds_write)(self.into_(), ino, offset, buf.into_()) {
+            match (self.ds_write)(self.share_into_(), ino, offset, buf.copy_into_()) {
                 -1 => Err(Error::UnknownFailure),
                 x => Ok(x),
             }
@@ -346,7 +345,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     }
 
     /// Number of used blocks per inode.
-    pub fn get_blocks_used(&self, ino: u32) -> u32 {
+    pub fn read_blocks_used(&self, ino: u32) -> u32 {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -355,7 +354,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         Self::compute_inode_metadata_at(&mut buf, byte_index)
     }
 
-    pub fn set_blocks_used(&mut self, ino: u32, val: u32) {
+    pub fn write_blocks_used(&mut self, ino: u32, val: u32) {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -368,7 +367,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
 
 impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     /// # of blocks per inode, constant for all inodes
-    // TODO update to the appropriate get_blocks_used impl?
+    // TODO update to the appropriate read_blocks_used impl?
     fn get_size(&self) -> Result<u32, Error> {
         let num = self.below.get_size()?;
         let denom = self.num_inodes;
@@ -386,7 +385,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     // We will need to shift reads and writes over by the size of the metadata blocks.
     // Assume we start writing at offset 0.
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
-        let blocks_used = self.get_blocks_used(ino);
+        let blocks_used = self.read_blocks_used(ino);
         if offset >= blocks_used {
             return Err(Error::UnknownFailure);
         }
@@ -409,10 +408,10 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
         let res = self.below.write(self.below_ino, full_offset, buf)?;
 
         // update metadata
-        let mut blocks_used = self.get_blocks_used(ino);
+        let mut blocks_used = self.read_blocks_used(ino);
         if offset == blocks_used {
             blocks_used += 1;
-            self.set_blocks_used(ino, blocks_used);
+            self.write_blocks_used(ino, blocks_used);
         } else if offset > blocks_used {
             // fill in with zeroes
             for zeroes_offset_base in blocks_used..offset {
@@ -422,7 +421,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
                     .write(self.below_ino, full_zeroes_offset, &Block::new())?;
             }
             blocks_used = offset + 1;
-            self.set_blocks_used(ino, blocks_used);
+            self.write_blocks_used(ino, blocks_used);
         }
 
         // success
