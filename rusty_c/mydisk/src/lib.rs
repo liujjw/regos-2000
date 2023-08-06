@@ -38,12 +38,19 @@ impl Block {
         byte_slice.copy_from_slice(src);
     }
 
-    // TODO lock
-    pub fn from_(block: *mut block_t) -> Self {
+    pub fn copy_from_(block: *mut block_t) -> Self {
         unsafe {
             Block {
                 bytes: (*block).bytes,
             }
+        }
+    }
+    
+    // TODO lock
+    // TODO better lifetime bound
+    pub fn share_from_(block: *mut block_t) -> &'static mut Self {
+        unsafe {
+            &mut *(block as *mut _ as *mut Block)
         }
     }
 
@@ -498,7 +505,7 @@ unsafe extern "C" fn simfs_read(
     block: *mut block_t,
 ) -> cty::c_int {
     SimpleFS::from_(inode_store)
-        .read(ino, offset, &mut Block::from_(block))
+        .read(ino, offset, Block::share_from_(block))
         .unwrap_or(-1)
 }
 
@@ -510,7 +517,7 @@ unsafe extern "C" fn simfs_write(
     block: *mut block_t,
 ) -> cty::c_int {
     SimpleFS::from_(inode_store)
-        .write(ino, offset, &mut Block::from_(block))
+        .write(ino, offset, &mut Block::copy_from_(block))
         .unwrap_or(-1)
 }
 

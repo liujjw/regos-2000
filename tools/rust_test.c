@@ -59,20 +59,20 @@ int main() {
         int blocks_per_inode = numblocks / NINODE;
         // fprintf(stderr, "[INFO] GOAT ino: %d, offset: %d, %s\n", ino, ino * blocks_per_inode, buf);
         
-        // TODO metadata incorrect? 
         mydisk->write(mydisk, ino, 0, (void*)buf);
         // ramdisk->write(ramdisk, ino, (ino * blocks_per_inode) + 0, (void*)buf);
 
-        // TODO smth wrong with read, not memory related?
-        // mydisk->read(mydisk, ino, 0, (void*)mybuf);
-        ramdisk->read(ramdisk, ino, (ino * blocks_per_inode) + METADATA_BLOCK_OFFSET, (void*)mybuf);
+        mydisk->read(mydisk, ino, 0, (void*)mybuf);
+        // ramdisk->read(ramdisk, ino, (ino * blocks_per_inode) + METADATA_BLOCK_OFFSET, (void*)mybuf);
 
         fprintf(stderr, "[INFO] Checking ino=%d, has contents: %s\n, should match: %s\n", ino, mybuf, buf);
+        // TEST write and read
         assert(strcmp(buf, mybuf) == 0);    
         fprintf(stderr, "[INFO] Success!\n");
 
     }
     free(ramdisk);
+    // TEST metadata
     assert(areArraysEqual(expected_metadata, fs, NUM_METADATA_BYTES));
     return 0;
 }
