@@ -56,7 +56,7 @@ impl Block {
 
     // TODO lock
     pub fn share_into_(&mut self) -> *mut block_t {
-        self as *mut block_t
+        self as *mut _ as *mut block_t
     }
 }
 
