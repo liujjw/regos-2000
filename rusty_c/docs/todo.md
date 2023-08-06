@@ -13,9 +13,10 @@ on qemu, i cannot write to disk
 # Debugging
 gdb b r_359, b r_365, b c_74
 valgrind
-## 2 memory bugs at the FFI boundary (encapsulation/decapsulation of pointers)
+## 3 memory bugs at the FFI boundary (encapsulation/decapsulation of pointers)
 1. creating a new pointer instead of returning the original one
 2. read persistence to a buffer
+3. when returning pointers to C, C must take care to free them
 
 # More of the same future
 more realistic filesystem like the treedisk or the fatdisk running in egos

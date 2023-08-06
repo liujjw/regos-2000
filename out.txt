@@ -1,128 +1,128 @@
-==2222518== Memcheck, a memory error detector
-==2222518== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
-==2222518== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
-==2222518== Command: tools/rust_test
-==2222518== 
-[src/lib.rs:446] "ramdisk addr in rust {:p} before wrapping" = "ramdisk addr in rust {:p} before wrapping"
-[src/lib.rs:446] below = 0x0000000004a8e040
-[src/lib.rs:447] "ramdisk write addr in rust {:p} before wrapping" = "ramdisk write addr in rust {:p} before wrapping"
-[src/lib.rs:447] (*below).write = Some(
-    0x00000000004092bc,
+==2329397== Memcheck, a memory error detector
+==2329397== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==2329397== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==2329397== Command: tools/rust_test
+==2329397== 
+[src/lib.rs:448] "ramdisk addr in rust {:p} before wrapping" = "ramdisk addr in rust {:p} before wrapping"
+[src/lib.rs:448] below = 0x0000000004a8e040
+[src/lib.rs:449] "ramdisk write addr in rust {:p} before wrapping" = "ramdisk write addr in rust {:p} before wrapping"
+[src/lib.rs:449] (*below).write = Some(
+    0x00000000004092cc,
 )
-[src/lib.rs:457] "ramdisk addr in rust {:p} after wrapping" = "ramdisk addr in rust {:p} after wrapping"
-[src/lib.rs:457] below = 0x0000000004a8e040
-[src/lib.rs:458] "ramdisk write addr in rust {:p} after wrapping" = "ramdisk write addr in rust {:p} after wrapping"
-[src/lib.rs:458] (*below).write = Some(
-    0x00000000004092bc,
+[src/lib.rs:459] "ramdisk addr in rust {:p} after wrapping" = "ramdisk addr in rust {:p} after wrapping"
+[src/lib.rs:459] below = 0x0000000004a8e040
+[src/lib.rs:460] "ramdisk write addr in rust {:p} after wrapping" = "ramdisk write addr in rust {:p} after wrapping"
+[src/lib.rs:460] (*below).write = Some(
+    0x00000000004092cc,
 )
 [INFO] ramdisk address in c: 0x4a8e040
-[INFO] ramdisk write address in c: 0x4092bc
+[INFO] ramdisk write address in c: 0x4092cc
 [INFO] Loading ino=0, 66 bytes
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F35D: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4867: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:409)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffe058 is on thread 1's stack
-==2222518==  976 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F36F: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4867: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:409)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffe060 is on thread 1's stack
-==2222518==  968 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F377: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4867: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:409)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffe068 is on thread 1's stack
-==2222518==  960 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F37F: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4867: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:409)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffe070 is on thread 1's stack
-==2222518==  952 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F364: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4867: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:409)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffe078 is on thread 1's stack
-==2222518==  944 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F35D: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4325: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:365)
-==2222518==    by 0x4C4940: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:415)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffde08 is on thread 1's stack
-==2222518==  976 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F36F: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4325: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:365)
-==2222518==    by 0x4C4940: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:415)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffde10 is on thread 1's stack
-==2222518==  968 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F377: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4325: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:365)
-==2222518==    by 0x4C4940: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:415)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffde18 is on thread 1's stack
-==2222518==  960 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F37F: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4325: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:365)
-==2222518==    by 0x4C4940: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:415)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffde20 is on thread 1's stack
-==2222518==  952 bytes below stack pointer
-==2222518== 
-==2222518== Invalid read of size 8
-==2222518==    at 0x484F364: memmove (vg_replace_strmem.c:1385)
-==2222518==    by 0x4092F4: ramwrite (rust_test.c:102)
-==2222518==    by 0x409636: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:151)
-==2222518==    by 0x4C4325: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:365)
-==2222518==    by 0x4C4940: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:415)
-==2222518==    by 0x40C884: simfs_write (lib.rs:513)
-==2222518==    by 0x4090FA: main (rust_test.c:62)
-==2222518==  Address 0x1ffeffde28 is on thread 1's stack
-==2222518==  944 bytes below stack pointer
-==2222518== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F35D: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4877: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:411)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffe058 is on thread 1's stack
+==2329397==  976 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F36F: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4877: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:411)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffe060 is on thread 1's stack
+==2329397==  968 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F377: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4877: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:411)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffe068 is on thread 1's stack
+==2329397==  960 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F37F: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4877: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:411)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffe070 is on thread 1's stack
+==2329397==  952 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F364: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4877: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:411)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffe078 is on thread 1's stack
+==2329397==  944 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F35D: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4335: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:367)
+==2329397==    by 0x4C4950: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:417)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffde08 is on thread 1's stack
+==2329397==  976 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F36F: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4335: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:367)
+==2329397==    by 0x4C4950: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:417)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffde10 is on thread 1's stack
+==2329397==  968 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F377: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4335: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:367)
+==2329397==    by 0x4C4950: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:417)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffde18 is on thread 1's stack
+==2329397==  960 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F37F: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4335: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:367)
+==2329397==    by 0x4C4950: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:417)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffde20 is on thread 1's stack
+==2329397==  952 bytes below stack pointer
+==2329397== 
+==2329397== Invalid read of size 8
+==2329397==    at 0x484F364: memmove (vg_replace_strmem.c:1385)
+==2329397==    by 0x409304: ramwrite (rust_test.c:103)
+==2329397==    by 0x409646: <mydisk::DiskFS as mydisk::common::Stackable>::write (lib.rs:153)
+==2329397==    by 0x4C4335: mydisk::SimpleFS<T>::write_blocks_used (lib.rs:367)
+==2329397==    by 0x4C4950: <mydisk::SimpleFS<T> as mydisk::common::Stackable>::write (lib.rs:417)
+==2329397==    by 0x40C894: simfs_write (lib.rs:515)
+==2329397==    by 0x4090FA: main (rust_test.c:62)
+==2329397==  Address 0x1ffeffde28 is on thread 1's stack
+==2329397==  944 bytes below stack pointer
+==2329397== 
 [INFO] Checking ino=0, has contents: With only 2000 lines of code, egos-2000 implements all the basics.
 , should match: With only 2000 lines of code, egos-2000 implements all the basics.
 [INFO] Success!
@@ -134,28 +134,12 @@
 [INFO] Checking ino=2, has contents: The world is coming to an end... SAVE YOUR BUFFERS!
 , should match: The world is coming to an end... SAVE YOUR BUFFERS!
 [INFO] Success!
-==2222518== 
-==2222518== HEAP SUMMARY:
-==2222518==     in use at exit: 16 bytes in 1 blocks
-==2222518==   total heap usage: 3 allocs, 2 frees, 96 bytes allocated
-==2222518== 
-==2222518== 16 bytes in 1 blocks are definitely lost in loss record 1 of 1
-==2222518==    at 0x484586F: malloc (vg_replace_malloc.c:381)
-==2222518==    by 0x4C4DE9: alloc (alloc.rs:93)
-==2222518==    by 0x4C4DE9: alloc::alloc::Global::alloc_impl (alloc.rs:175)
-==2222518==    by 0x4C4BE2: allocate (alloc.rs:235)
-==2222518==    by 0x4C4BE2: alloc::alloc::exchange_malloc (alloc.rs:324)
-==2222518==    by 0x4097C1: new<mydisk::SimpleFS_C> (boxed.rs:217)
-==2222518==    by 0x4097C1: mydisk::SimpleFS<mydisk::DiskFS>::take_into_ (lib.rs:195)
-==2222518==    by 0x40AFD7: simplefs_init (lib.rs:451)
-==2222518==    by 0x408FB7: main (rust_test.c:48)
-==2222518== 
-==2222518== LEAK SUMMARY:
-==2222518==    definitely lost: 16 bytes in 1 blocks
-==2222518==    indirectly lost: 0 bytes in 0 blocks
-==2222518==      possibly lost: 0 bytes in 0 blocks
-==2222518==    still reachable: 0 bytes in 0 blocks
-==2222518==         suppressed: 0 bytes in 0 blocks
-==2222518== 
-==2222518== For lists of detected and suppressed errors, rerun with: -s
-==2222518== ERROR SUMMARY: 385 errors from 11 contexts (suppressed: 0 from 0)
+==2329397== 
+==2329397== HEAP SUMMARY:
+==2329397==     in use at exit: 0 bytes in 0 blocks
+==2329397==   total heap usage: 3 allocs, 3 frees, 96 bytes allocated
+==2329397== 
+==2329397== All heap blocks were freed -- no leaks are possible
+==2329397== 
+==2329397== For lists of detected and suppressed errors, rerun with: -s
+==2329397== ERROR SUMMARY: 384 errors from 10 contexts (suppressed: 0 from 0)

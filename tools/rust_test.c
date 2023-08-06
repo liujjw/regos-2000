@@ -74,6 +74,7 @@ int main() {
     // TEST metadata
     assert(areArraysEqual(expected_metadata, fs, NUM_METADATA_BYTES));
     free(ramdisk);
+    free(mydisk->state);
     free(mydisk);
     return 0;
 }

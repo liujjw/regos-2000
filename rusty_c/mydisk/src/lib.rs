@@ -200,6 +200,7 @@ impl SimpleFS<DiskFS> {
         });
 
         // pointers owned by box must NOT live past their lifetime
+        // TODO every into_raw'ed pointer must be freed by C, what api is cleanest?
         let raw_state: *mut SimpleFS_C = Box::into_raw(cur_state);
         let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
         let inode_store = Box::new(inode_store_t {
