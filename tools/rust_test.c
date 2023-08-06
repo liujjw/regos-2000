@@ -71,9 +71,10 @@ int main() {
         fprintf(stderr, "[INFO] Success!\n");
 
     }
-    free(ramdisk);
     // TEST metadata
     assert(areArraysEqual(expected_metadata, fs, NUM_METADATA_BYTES));
+    free(ramdisk);
+    free(mydisk);
     return 0;
 }
 

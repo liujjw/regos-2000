@@ -98,6 +98,7 @@ struct DiskFS {
 impl IsDisk for DiskFS {}
 
 impl DiskFS {
+    // release lock
     fn take_into_(self) -> inode_intf {
         return self._og;
     }
@@ -108,14 +109,9 @@ impl DiskFS {
         return self._og;
     }
 
-    // TODO lock
+    // TODO lock from >1 instantiation
+    // TODO lock _og from being freed
     fn from_(inode_store: inode_intf) -> Self {
-        unsafe {
-            if !(*inode_store).state.is_null() {
-                panic!("DiskFS must be the lowest layer, and state is null");
-            }
-        }
-
         DiskFS {
             _og: inode_store,
             ds_read: unsafe { (*inode_store).read.unwrap() },
@@ -196,7 +192,6 @@ impl SimpleFS<DiskFS> {
         SimpleFS::new(below, below_ino, num_inodes)
     }
 
-    // use of mut not thread safe, however mutation occurs during write
     fn take_into_(self) -> *mut inode_store_t {
         let cur_state = Box::new(SimpleFS_C {
             below: self.below.take_into_(),
@@ -245,6 +240,7 @@ impl SimpleFS<DiskFS> {
 }
 
 impl<T: Stackable + IsDisk> SimpleFS<T> {
+    // @invariant below should never be freed until the current layer is freed
     pub fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
         let mut tmp = SimpleFS {
             below: below,
