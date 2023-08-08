@@ -51,7 +51,8 @@ pub enum Error {
 pub trait Stackable {
     fn get_size(&self) -> Result<u32, Error>;
     fn set_size(&mut self, size: u32) -> Result<i32, Error>;
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
+    // &mut for compatiblity with C, since below will call read and needs a *mut 
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error>;
 }
 

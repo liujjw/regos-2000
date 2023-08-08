@@ -38,6 +38,7 @@ impl Block {
         byte_slice.copy_from_slice(src);
     }
 
+    // TODO lock
     pub fn copy_from_(block: *mut block_t) -> Self {
         unsafe {
             Block {
@@ -61,7 +62,6 @@ impl Block {
         return new_block;
     }
 
-    // TODO lock
     pub fn share_into_(&mut self) -> *mut block_t {
         self as *mut _ as *mut block_t
     }
@@ -98,19 +98,16 @@ struct DiskFS {
 impl IsDisk for DiskFS {}
 
 impl DiskFS {
-    // release lock
     fn take_into_(self) -> inode_intf {
         return self._og;
     }
 
-    // TODO lock
-    // immut ref, but share semantics when returning raw pointer
-    fn share_into_(&self) -> inode_intf {
+    fn share_into_(&mut self) -> inode_intf {
         return self._og;
     }
 
     // TODO lock from >1 instantiation
-    // TODO lock _og from being freed
+    // TODO lock _og from being freed before take_into
     fn from_(inode_store: inode_intf) -> Self {
         DiskFS {
             _og: inode_store,
@@ -139,7 +136,7 @@ impl Stackable for DiskFS {
         }
     }
 
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         unsafe {
             match (self.ds_read)(self.share_into_(), ino, offset, buf.share_into_()) {
                 -1 => Err(Error::UnknownFailure),
@@ -349,7 +346,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     }
 
     /// Number of used blocks per inode.
-    pub fn read_blocks_used(&self, ino: u32) -> u32 {
+    pub fn read_blocks_used(&mut self, ino: u32) -> u32 {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -388,7 +385,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
 
     // We will need to shift reads and writes over by the size of the metadata blocks.
     // Assume we start writing at offset 0.
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         let blocks_used = self.read_blocks_used(ino);
         if offset >= blocks_used {
             return Err(Error::UnknownFailure);
