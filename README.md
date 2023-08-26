@@ -1,7 +1,8 @@
 # info
 egos-2000 with drop-in rust modules. regos-2000 invokes rust -> earth -> grass, because rust code permeates the original egos-2000.
 
-## getting the right environment
+# getting the right environment
+**NOTE** Fedora 36 seems to work just fine, and none of the below is necessary.
 **NOTE** ARM Macbooks (the ones with M[n] chips) are not supported.
 
 Install Vagrant by Hashicorp for your (`x86`) OS and a hypervisor (KVM, VirtualBox, etc on Linux x86), set those up. Use the provided `Vagrantfile`.
@@ -14,19 +15,25 @@ For example, you need to use `vagrant ssh twenty` after `vagrant up twenty` to `
 
 `vagrant up` in root of this project on your host computer and then `vagrant ssh [vm]` with `vagrant` as password. You are now inside a VM if you didn't notice any errors. The root of this project in the VM is at `/vagrant` (it's a "shared" folder between the host OS and the VM, changes in here are preserved between host and VM). 
 
-## setup scripts
+# setup scripts
 Now `cd /vagrant/rusty_c/rust_fs` into the Rust project and run the setup scripts for the VM platform used by the Vagrantfile. To build just Rust, we need `cargo` and the right target architecture cross-compiler (e.g. `riscv-32i`); to build C inside of Rust we need an up to date version of `clang` that only some later versions of ubuntu may provide, as well as the RISC-V toolchain C compiler.
 **If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.**
 **If `cargo` not found restart the terminal after setup.**
 
-## build and run 
-First set the target in `.cargo`, then `cargo build --release`. Then follow the `egos` build process: `make rust_apps` ==> `make rust_install` ==> `make qemu`. 
+# build and run 
+Make sure the `build.rs` file is setup properly. It does not need to build the `C` files since we link them later, but it is needed to generate the `C` bindings for the Rust code. Set the target in `.cargo`, then `cargo build --release`. Make sure the generated `C` bindings are up to date and placed in the right folders for the `C` code. Then follow the `egos` build process: `make rust_apps` ==> `make rust_install` ==> `make qemu`. 
 
-## Writing Rust modules and integrating them into the current C build system
-### Rust FFI to C
+# Debugging, testing, and verifying Rust code is running
+The makefile target `make rust_test` runs a basic test and produces a binary `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`.
+
+# c2rust treedisk
+Similar process as before, but can now use instructions in `c2rust/` to generate a raw transpilation, which you can modify for `cargo build`.
+
+# miscellaneous
+## Rust FFI to C
 Auto-generate Rust FFI bindings for C libraries using `cargo build`, building and linking C files as well (`bindgen`, `cc`, etc. using the build script `build.rs`). Look for `bindings.rs` in `target/` to see what they look like. The generated FFI bindings are dumped with the `include!` macro into your Rust library. Run `cargo test` to verify layout, size, and alignment. 
 
-### C FFI to Rust
+## C FFI to Rust
 A header file of the Rust function signatures suffices. Make sure demangling and C ABI is used in your Rust functions if they are to be called by C. Make sure your Rust library is compiled as a static library archive (`.a` file in `target/`) and copy and link it in the Makefile.
 
 ## Directories explained
@@ -39,6 +46,3 @@ See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `e
 
 ## Running on QEMU
 Writing to disk not possible when running egos on QEMU, as only the memory-mapped ROM is readable.
-
-## Debugging, testing, and verifying Rust code is running
-The makefile target `make rust_test` runs a basic test and produces a binary `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`.

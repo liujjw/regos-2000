@@ -27,14 +27,15 @@ valgrind check
 # Fall 2023 CS4999
 ## Concurrency + full filesystem 
 ### Step 1
-More realisitic filesystem (treedisk). Can use c2rust and then create safe wrappers.
+More realisitic filesystem (treedisk). Can use c2rust and then create safe wrappers. Incoporate into build system and existing test file.
 
 ### Step 2
-See Rust for Linux async bindings, RFC locks.
-
 Adding IO concurrency to the filesystem (async io, callbacks). E.g. Make a read to the filesystem, but return the results asynchronously, and give the read call a callback to run when the result is returned.
 
 Need to update the inode interface to allow async IO.
+#### Rust for Egos/Linux
+async, abstractions, build, coould write something directly in linux. i have to write all abstractions from scratch, but can take inspriation from the rust for linux project. make some OS component useful for an embedded system, but niche enough. along the flavor of a 9p networked filesystem.
+See Rust for Linux async bindings, RFC locks.
 
 ### Step 3
 Add a cache access layer (another filesystem layer) that is properly tuned so that it is appropriately updated on reads and writes. This cache layer is below the filesystem layer but above the disk layer.
@@ -42,24 +43,7 @@ Add a cache access layer (another filesystem layer) that is properly tuned so th
 ### Step 4
 Block access in parallel, locks may come in so you need to lock a piece of memory or a whole inode or some other granularity, sync comes in as well. UI for user may still be sync (RW lock the inodes) (freelist needs its own lock).
 
-### Misc
-Meeting back when school starts.
-
-## Rust for Linux
-async, abstractions, build, coould write something directly in linux 
-
-## Rust for Egos
-i have to write all abstractions from scratch, but can take inspriation from the rust for linux project. make some OS component useful for an embedded system, but niche enough. along the flavor of a 9p networked filesystem.
-
-## More of the same future
-more realistic filesystem like the treedisk or the fatdisk running in egos
-entire operating system kernel in rust, look at egos kernel written entirely in rust
-run rust programs on top of egos
-kernel modules in rust, as well as rust in userspace in terms of applications
-egos kernel written in rust 
-
-
-## Peripheral Future 
+### Step 5: Peripherals
 RAID 0 and RAID 1 disk exists in egos 
 init (read, write, getsize, setsize)
 clockdisk
@@ -68,7 +52,6 @@ ramdisk/sddisk (sd driver readblock and writeblock interface (make the same inte
 make raid layers in rust
 direction: disk drivers and a raid controller in Rust on top of the filesystem abstractions to see the benefits of static guarantees and state machines and encoding state in types with rust, sounds fancy, but hard to measure the benefits
 
-## obsidian
 or new drivers could use these platform crates for cortex-m or x86_64, dont need egos
 pursue a research direction (papers) and using the riscv crates and extending egos
 egos an easy to understand and extend os to ompl new ideas, like RAID or new drivers in Rust 
