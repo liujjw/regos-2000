@@ -1,5 +1,5 @@
 # info
-egos-2000 with drop-in rust modules. regos-2000 invokes rust -> earth -> grass, because rust code permeates the original egos-2000.
+See the [slides](https://docs.google.com/presentation/d/10hhuhs7llfoi1PVC1HcoEz6FisEelULdneU84EUE_8o/edit?usp=sharing) for a high level overview and more context. egos-2000 with drop-in rust modules. regos-2000 invokes rust -> earth -> grass, because rust code permeates the original egos-2000.
 
 # getting the right environment
 **NOTE** Fedora 36 seems to work just fine, and none of the below is necessary.
@@ -46,3 +46,6 @@ See `Cargo.toml` for `--release` optimizations. We try to avoid enlarging the `e
 
 ## Running on QEMU
 Writing to disk not possible when running egos on QEMU, as only the memory-mapped ROM is readable.
+
+## Debugging, testing, and verifying Rust code is running
+The makefile target `make rust_test` runs a basic test and produces a binary `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`.
