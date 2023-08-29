@@ -27,7 +27,7 @@ valgrind check
 # Fall 2023 CS4999
 ## Concurrency + full filesystem 
 ### Step 1
-More realisitic filesystem (treedisk). Can use c2rust and then create safe wrappers. Incoporate into build system and existing test file.
+More realisitic filesystem (treedisk). Can use c2rust and then create safe wrappers. Incoporate into build system and existing test file. Get rid if mallocs
 
 ### Step 2
 Adding IO concurrency to the filesystem (async io, callbacks). E.g. Make a read to the filesystem, but return the results asynchronously, and give the read call a callback to run when the result is returned.
@@ -61,3 +61,11 @@ looking into more of the theory of rust to create something https://faultlore.co
 RAID controllers disks built with HALS and state machines, get static guarantees on peripherals for proper configuration and access control
 strict types for proper configuration of peripherals, access control
 obrm + refernces for memory safety
+
+
+# Aug 29
+(real rust filesystem for egos)
+1. refactoring and modularizing existing code to reuse
+2. automation of porting c code to rust? not there yet...
+3. rewriting, fatdisk with existing code simpler, asap
+4. TDD
