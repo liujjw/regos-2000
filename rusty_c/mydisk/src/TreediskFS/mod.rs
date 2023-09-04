@@ -3,66 +3,35 @@
 // #![register_tool(c2rust)]
 extern "C" {
     fn malloc(_: cty::c_ulong) -> *mut cty::c_void;
-    fn memset(
-        _: *mut cty::c_void,
-        _: cty::c_int,
-        _: cty::c_ulong,
-    ) -> *mut cty::c_void;
+    fn memset(_: *mut cty::c_void, _: cty::c_int, _: cty::c_ulong) -> *mut cty::c_void;
     static mut earth: *mut earth;
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct earth {
-    pub intr_enable: Option::<unsafe extern "C" fn() -> cty::c_int>,
-    pub intr_register: Option::<
-        unsafe extern "C" fn(
-            Option::<unsafe extern "C" fn(cty::c_int) -> ()>,
-        ) -> cty::c_int,
-    >,
-    pub excp_register: Option::<
-        unsafe extern "C" fn(
-            Option::<unsafe extern "C" fn(cty::c_int) -> ()>,
-        ) -> cty::c_int,
-    >,
-    pub mmu_alloc: Option::<
-        unsafe extern "C" fn(*mut cty::c_int, *mut *mut cty::c_void) -> cty::c_int,
-    >,
-    pub mmu_free: Option::<unsafe extern "C" fn(cty::c_int) -> cty::c_int>,
-    pub mmu_map: Option::<
-        unsafe extern "C" fn(cty::c_int, cty::c_int, cty::c_int) -> cty::c_int,
-    >,
-    pub mmu_switch: Option::<unsafe extern "C" fn(cty::c_int) -> cty::c_int>,
-    pub mmu_translate: Option::<
-        unsafe extern "C" fn(cty::c_int, cty::c_int) -> cty::c_int,
-    >,
-    pub disk_read: Option::<
-        unsafe extern "C" fn(cty::c_int, cty::c_int, *mut cty::c_char) -> cty::c_int,
-    >,
-    pub disk_write: Option::<
-        unsafe extern "C" fn(cty::c_int, cty::c_int, *mut cty::c_char) -> cty::c_int,
-    >,
-    pub tty_intr: Option::<unsafe extern "C" fn() -> cty::c_int>,
-    pub tty_read: Option::<
-        unsafe extern "C" fn(*mut cty::c_char, cty::c_int) -> cty::c_int,
-    >,
-    pub tty_write: Option::<
-        unsafe extern "C" fn(*mut cty::c_char, cty::c_int) -> cty::c_int,
-    >,
-    pub tty_printf: Option::<
-        unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int,
-    >,
-    pub tty_info: Option::<
-        unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int,
-    >,
-    pub tty_fatal: Option::<
-        unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int,
-    >,
-    pub tty_success: Option::<
-        unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int,
-    >,
-    pub tty_critical: Option::<
-        unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int,
-    >,
+    pub intr_enable: Option<unsafe extern "C" fn() -> cty::c_int>,
+    pub intr_register:
+        Option<unsafe extern "C" fn(Option<unsafe extern "C" fn(cty::c_int) -> ()>) -> cty::c_int>,
+    pub excp_register:
+        Option<unsafe extern "C" fn(Option<unsafe extern "C" fn(cty::c_int) -> ()>) -> cty::c_int>,
+    pub mmu_alloc:
+        Option<unsafe extern "C" fn(*mut cty::c_int, *mut *mut cty::c_void) -> cty::c_int>,
+    pub mmu_free: Option<unsafe extern "C" fn(cty::c_int) -> cty::c_int>,
+    pub mmu_map: Option<unsafe extern "C" fn(cty::c_int, cty::c_int, cty::c_int) -> cty::c_int>,
+    pub mmu_switch: Option<unsafe extern "C" fn(cty::c_int) -> cty::c_int>,
+    pub mmu_translate: Option<unsafe extern "C" fn(cty::c_int, cty::c_int) -> cty::c_int>,
+    pub disk_read:
+        Option<unsafe extern "C" fn(cty::c_int, cty::c_int, *mut cty::c_char) -> cty::c_int>,
+    pub disk_write:
+        Option<unsafe extern "C" fn(cty::c_int, cty::c_int, *mut cty::c_char) -> cty::c_int>,
+    pub tty_intr: Option<unsafe extern "C" fn() -> cty::c_int>,
+    pub tty_read: Option<unsafe extern "C" fn(*mut cty::c_char, cty::c_int) -> cty::c_int>,
+    pub tty_write: Option<unsafe extern "C" fn(*mut cty::c_char, cty::c_int) -> cty::c_int>,
+    pub tty_printf: Option<unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int>,
+    pub tty_info: Option<unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int>,
+    pub tty_fatal: Option<unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int>,
+    pub tty_success: Option<unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int>,
+    pub tty_critical: Option<unsafe extern "C" fn(*const cty::c_char, ...) -> cty::c_int>,
     pub platform: C2RustUnnamed_0,
     pub translation: C2RustUnnamed,
 }
@@ -82,27 +51,14 @@ pub type block_t = block;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct inode_store {
-    pub getsize: Option::<
-        unsafe extern "C" fn(*mut inode_store, cty::c_uint) -> cty::c_int,
+    pub getsize: Option<unsafe extern "C" fn(*mut inode_store, cty::c_uint) -> cty::c_int>,
+    pub setsize:
+        Option<unsafe extern "C" fn(*mut inode_store, cty::c_uint, block_no) -> cty::c_int>,
+    pub read: Option<
+        unsafe extern "C" fn(*mut inode_store, cty::c_uint, block_no, *mut block_t) -> cty::c_int,
     >,
-    pub setsize: Option::<
-        unsafe extern "C" fn(*mut inode_store, cty::c_uint, block_no) -> cty::c_int,
-    >,
-    pub read: Option::<
-        unsafe extern "C" fn(
-            *mut inode_store,
-            cty::c_uint,
-            block_no,
-            *mut block_t,
-        ) -> cty::c_int,
-    >,
-    pub write: Option::<
-        unsafe extern "C" fn(
-            *mut inode_store,
-            cty::c_uint,
-            block_no,
-            *mut block_t,
-        ) -> cty::c_int,
+    pub write: Option<
+        unsafe extern "C" fn(*mut inode_store, cty::c_uint, block_no, *mut block_t) -> cty::c_int,
     >,
     pub state: *mut cty::c_void,
 }
@@ -182,9 +138,7 @@ unsafe extern "C" fn treedisk_get_snapshot(
     mut inode_no: cty::c_uint,
 ) -> cty::c_int {
     if (Some(((*(*ts).below).read).expect("non-null function pointer")))
-        .expect(
-            "non-null function pointer",
-        )(
+        .expect("non-null function pointer")(
         (*ts).below,
         (*ts).below_ino,
         0 as cty::c_int as block_no,
@@ -194,40 +148,26 @@ unsafe extern "C" fn treedisk_get_snapshot(
         return -(1 as cty::c_int);
     }
     if inode_no as cty::c_ulong
-        >= ((*snapshot).superblock.superblock.n_inodeblocks as cty::c_ulong)
-            .wrapping_mul(
-                (512 as cty::c_int as cty::c_ulong)
-                    .wrapping_div(
-                        ::std::mem::size_of::<treedisk_inode>() as cty::c_ulong,
-                    ),
-            )
+        >= ((*snapshot).superblock.superblock.n_inodeblocks as cty::c_ulong).wrapping_mul(
+            (512 as cty::c_int as cty::c_ulong)
+                .wrapping_div(::std::mem::size_of::<treedisk_inode>() as cty::c_ulong),
+        )
     {
-        ((*earth).tty_printf)
-            .expect(
-                "non-null function pointer",
-            )(
-            b"!!TDERR: inode number too large %u %u\n\0" as *const u8
-                as *const cty::c_char,
+        ((*earth).tty_printf).expect("non-null function pointer")(
+            b"!!TDERR: inode number too large %u %u\n\0" as *const u8 as *const cty::c_char,
             inode_no,
             (*snapshot).superblock.superblock.n_inodeblocks,
         );
         return -(1 as cty::c_int);
     }
-    (*snapshot)
-        .inode_blockno = (1 as cty::c_int as cty::c_ulong)
-        .wrapping_add(
-            (inode_no as cty::c_ulong)
-                .wrapping_div(
-                    (512 as cty::c_int as cty::c_ulong)
-                        .wrapping_div(
-                            ::std::mem::size_of::<treedisk_inode>() as cty::c_ulong,
-                        ),
-                ),
-        ) as block_no;
+    (*snapshot).inode_blockno = (1 as cty::c_int as cty::c_ulong).wrapping_add(
+        (inode_no as cty::c_ulong).wrapping_div(
+            (512 as cty::c_int as cty::c_ulong)
+                .wrapping_div(::std::mem::size_of::<treedisk_inode>() as cty::c_ulong),
+        ),
+    ) as block_no;
     if (Some(((*(*ts).below).read).expect("non-null function pointer")))
-        .expect(
-            "non-null function pointer",
-        )(
+        .expect("non-null function pointer")(
         (*ts).below,
         (*ts).below_ino,
         (*snapshot).inode_blockno,
@@ -240,13 +180,10 @@ unsafe extern "C" fn treedisk_get_snapshot(
     *fresh0 = &mut *((*snapshot).inodeblock.inodeblock.inodes)
         .as_mut_ptr()
         .offset(
-            (inode_no as cty::c_ulong)
-                .wrapping_rem(
-                    (512 as cty::c_int as cty::c_ulong)
-                        .wrapping_div(
-                            ::std::mem::size_of::<treedisk_inode>() as cty::c_ulong,
-                        ),
-                ) as isize,
+            (inode_no as cty::c_ulong).wrapping_rem(
+                (512 as cty::c_int as cty::c_ulong)
+                    .wrapping_div(::std::mem::size_of::<treedisk_inode>() as cty::c_ulong),
+            ) as isize,
         ) as *mut treedisk_inode;
     return 0 as cty::c_int;
 }
@@ -259,18 +196,13 @@ unsafe extern "C" fn treedisk_alloc_block(
     count += 1;
     b = (*snapshot).superblock.superblock.free_list;
     if b == 0 as cty::c_int as cty::c_uint {
-        panic(
-            b"treedisk_alloc_block: inode store is full\n\0" as *const u8
-                as *const cty::c_char,
-        );
+        panic(b"treedisk_alloc_block: inode store is full\n\0" as *const u8 as *const cty::c_char);
     }
     let mut freelistblock: treedisk_block = treedisk_block {
         datablock: block_t { bytes: [0; 512] },
     };
     (Some(((*(*ts).below).read).expect("non-null function pointer")))
-        .expect(
-            "non-null function pointer",
-        )(
+        .expect("non-null function pointer")(
         (*ts).below,
         (*ts).below_ino,
         b,
@@ -278,57 +210,43 @@ unsafe extern "C" fn treedisk_alloc_block(
     );
     let mut i: cty::c_uint = 0;
     i = (512 as cty::c_int as cty::c_ulong)
-        .wrapping_div(::std::mem::size_of::<block_no>() as cty::c_ulong)
-        as cty::c_uint;
+        .wrapping_div(::std::mem::size_of::<block_no>() as cty::c_ulong) as cty::c_uint;
     loop {
         i = i.wrapping_sub(1);
         if !(i > 0 as cty::c_int as cty::c_uint) {
             break;
         }
-        if freelistblock.freelistblock.refs[i as usize]
-            != 0 as cty::c_int as cty::c_uint
-        {
+        if freelistblock.freelistblock.refs[i as usize] != 0 as cty::c_int as cty::c_uint {
             break;
         }
     }
     let mut free_blockno: block_no = 0;
     if i == 0 as cty::c_int as cty::c_uint {
         free_blockno = b;
-        (*snapshot)
-            .superblock
-            .superblock
-            .free_list = freelistblock.freelistblock.refs[0 as cty::c_int as usize];
+        (*snapshot).superblock.superblock.free_list =
+            freelistblock.freelistblock.refs[0 as cty::c_int as usize];
         if (Some(((*(*ts).below).write).expect("non-null function pointer")))
-            .expect(
-                "non-null function pointer",
-            )(
+            .expect("non-null function pointer")(
             (*ts).below,
             (*ts).below_ino,
             0 as cty::c_int as block_no,
             &mut (*snapshot).superblock as *mut treedisk_block as *mut block_t,
         ) < 0 as cty::c_int
         {
-            panic(
-                b"treedisk_alloc_block: superblock\0" as *const u8 as *const cty::c_char,
-            );
+            panic(b"treedisk_alloc_block: superblock\0" as *const u8 as *const cty::c_char);
         }
     } else {
         free_blockno = freelistblock.freelistblock.refs[i as usize];
         freelistblock.freelistblock.refs[i as usize] = 0 as cty::c_int as block_no;
         if (Some(((*(*ts).below).write).expect("non-null function pointer")))
-            .expect(
-                "non-null function pointer",
-            )(
+            .expect("non-null function pointer")(
             (*ts).below,
             (*ts).below_ino,
             b,
             &mut freelistblock as *mut treedisk_block as *mut block_t,
         ) < 0 as cty::c_int
         {
-            panic(
-                b"treedisk_alloc_block: freelistblock\0" as *const u8
-                    as *const cty::c_char,
-            );
+            panic(b"treedisk_alloc_block: freelistblock\0" as *const u8 as *const cty::c_char);
         }
     }
     return free_blockno;
@@ -403,10 +321,11 @@ unsafe extern "C" fn treedisk_read(
             );
             return 0 as cty::c_int;
         }
-        let mut result: cty::c_int = (Some(
-            ((*(*ts).below).read).expect("non-null function pointer"),
-        ))
-            .expect("non-null function pointer")((*ts).below, (*ts).below_ino, b, block);
+        let mut result: cty::c_int =
+            (Some(((*(*ts).below).read).expect("non-null function pointer")))
+                .expect("non-null function pointer")(
+                (*ts).below, (*ts).below_ino, b, block
+            );
         if result < 0 as cty::c_int {
             return result;
         }
@@ -415,14 +334,13 @@ unsafe extern "C" fn treedisk_read(
         }
         nlevels = nlevels.wrapping_sub(1);
         let mut tib: *mut treedisk_indirblock = block as *mut treedisk_indirblock;
-        let mut index: cty::c_uint = (log_shift_r(offset, nlevels.wrapping_mul(log_rpb))
-            as cty::c_ulong)
-            .wrapping_rem(
+        let mut index: cty::c_uint =
+            (log_shift_r(offset, nlevels.wrapping_mul(log_rpb)) as cty::c_ulong).wrapping_rem(
                 (512 as cty::c_int as cty::c_ulong)
                     .wrapping_div(::std::mem::size_of::<block_no>() as cty::c_ulong),
             ) as cty::c_uint;
         b = (*tib).refs[index as usize];
-    };
+    }
 }
 unsafe extern "C" fn treedisk_write(
     mut this_bs: *mut inode_store_t,
@@ -449,8 +367,7 @@ unsafe extern "C" fn treedisk_write(
     let mut nlevels: cty::c_uint = 0 as cty::c_int as cty::c_uint;
     if (*(*snapshot).inode).nblocks > 0 as cty::c_int as cty::c_uint {
         while log_shift_r(
-            ((*(*snapshot).inode).nblocks)
-                .wrapping_sub(1 as cty::c_int as cty::c_uint),
+            ((*(*snapshot).inode).nblocks).wrapping_sub(1 as cty::c_int as cty::c_uint),
             nlevels.wrapping_mul(log_rpb),
         ) != 0 as cty::c_int as cty::c_uint
         {
@@ -459,8 +376,7 @@ unsafe extern "C" fn treedisk_write(
     }
     let mut nlevels_after: cty::c_uint = 0;
     if offset >= (*(*snapshot).inode).nblocks {
-        (*(*snapshot).inode)
-            .nblocks = offset.wrapping_add(1 as cty::c_int as cty::c_uint);
+        (*(*snapshot).inode).nblocks = offset.wrapping_add(1 as cty::c_int as cty::c_uint);
         dirty_inode = 1 as cty::c_int;
         nlevels_after = 0 as cty::c_int as cty::c_uint;
         while log_shift_r(offset, nlevels_after.wrapping_mul(log_rpb))
@@ -476,9 +392,7 @@ unsafe extern "C" fn treedisk_write(
     } else if nlevels_after > nlevels {
         while nlevels_after > nlevels {
             let mut indir: block_no = treedisk_alloc_block(ts, snapshot);
-            let mut tib: treedisk_indirblock = treedisk_indirblock {
-                refs: [0; 128],
-            };
+            let mut tib: treedisk_indirblock = treedisk_indirblock { refs: [0; 128] };
             memset(
                 &mut tib as *mut treedisk_indirblock as *mut cty::c_void,
                 0 as cty::c_int,
@@ -488,28 +402,21 @@ unsafe extern "C" fn treedisk_write(
             (*(*snapshot).inode).root = indir;
             dirty_inode = 1 as cty::c_int;
             if (Some(((*(*ts).below).write).expect("non-null function pointer")))
-                .expect(
-                    "non-null function pointer",
-                )(
+                .expect("non-null function pointer")(
                 (*ts).below,
                 (*ts).below_ino,
                 indir,
                 &mut tib as *mut treedisk_indirblock as *mut block_t,
             ) < 0 as cty::c_int
             {
-                panic(
-                    b"treedisk_write: indirect block\0" as *const u8
-                        as *const cty::c_char,
-                );
+                panic(b"treedisk_write: indirect block\0" as *const u8 as *const cty::c_char);
             }
             nlevels = nlevels.wrapping_add(1);
         }
     }
     if dirty_inode != 0 {
         if (Some(((*(*ts).below).write).expect("non-null function pointer")))
-            .expect(
-                "non-null function pointer",
-            )(
+            .expect("non-null function pointer")(
             (*ts).below,
             (*ts).below_ino,
             (*snapshot).inode_blockno,
@@ -522,21 +429,21 @@ unsafe extern "C" fn treedisk_write(
     let mut b: block_no = 0;
     let mut parent_no: *mut block_no = &mut (*(*snapshot).inode).root;
     let mut parent_off: block_no = (*snapshot).inode_blockno;
-    let mut parent_block: *mut block_t = &mut (*snapshot).inodeblock
-        as *mut treedisk_block as *mut block_t;
+    let mut parent_block: *mut block_t =
+        &mut (*snapshot).inodeblock as *mut treedisk_block as *mut block_t;
     loop {
-        let mut tib_0: treedisk_indirblock = treedisk_indirblock {
-            refs: [0; 128],
-        };
+        let mut tib_0: treedisk_indirblock = treedisk_indirblock { refs: [0; 128] };
         b = *parent_no;
         if b == 0 as cty::c_int as cty::c_uint {
             *parent_no = treedisk_alloc_block(ts, snapshot);
             b = *parent_no;
             if (Some(((*(*ts).below).write).expect("non-null function pointer")))
-                .expect(
-                    "non-null function pointer",
-                )((*ts).below, (*ts).below_ino, parent_off, parent_block)
-                < 0 as cty::c_int
+                .expect("non-null function pointer")(
+                (*ts).below,
+                (*ts).below_ino,
+                parent_off,
+                parent_block,
+            ) < 0 as cty::c_int
             {
                 panic(b"treedisk_write: parent\0" as *const u8 as *const cty::c_char);
             }
@@ -553,9 +460,7 @@ unsafe extern "C" fn treedisk_write(
                 break;
             }
             if (Some(((*(*ts).below).read).expect("non-null function pointer")))
-                .expect(
-                    "non-null function pointer",
-                )(
+                .expect("non-null function pointer")(
                 (*ts).below,
                 (*ts).below_ino,
                 b,
@@ -566,14 +471,12 @@ unsafe extern "C" fn treedisk_write(
             }
         }
         nlevels = nlevels.wrapping_sub(1);
-        let mut index: cty::c_uint = (log_shift_r(offset, nlevels.wrapping_mul(log_rpb))
-            as cty::c_ulong)
-            .wrapping_rem(
+        let mut index: cty::c_uint =
+            (log_shift_r(offset, nlevels.wrapping_mul(log_rpb)) as cty::c_ulong).wrapping_rem(
                 (512 as cty::c_int as cty::c_ulong)
                     .wrapping_div(::std::mem::size_of::<block_no>() as cty::c_ulong),
             ) as cty::c_uint;
-        parent_no = &mut *(tib_0.refs).as_mut_ptr().offset(index as isize)
-            as *mut block_no;
+        parent_no = &mut *(tib_0.refs).as_mut_ptr().offset(index as isize) as *mut block_no;
         parent_block = &mut tib_0 as *mut treedisk_indirblock as *mut block_t;
         parent_off = b;
     }
@@ -595,16 +498,16 @@ pub unsafe extern "C" fn treedisk_init(
             log_rpb = log_rpb.wrapping_add(1);
             if !((512 as cty::c_int as cty::c_ulong)
                 .wrapping_div(::std::mem::size_of::<block_no>() as cty::c_ulong)
-                .wrapping_sub(1 as cty::c_int as cty::c_ulong) >> log_rpb
+                .wrapping_sub(1 as cty::c_int as cty::c_ulong)
+                >> log_rpb
                 != 0 as cty::c_int as cty::c_ulong)
             {
                 break;
             }
         }
     }
-    let mut ts: *mut treedisk_state = malloc(
-        ::std::mem::size_of::<treedisk_state>() as cty::c_ulong,
-    ) as *mut treedisk_state;
+    let mut ts: *mut treedisk_state =
+        malloc(::std::mem::size_of::<treedisk_state>() as cty::c_ulong) as *mut treedisk_state;
     memset(
         ts as *mut cty::c_void,
         0 as cty::c_int,
@@ -613,9 +516,8 @@ pub unsafe extern "C" fn treedisk_init(
     let ref mut fresh1 = (*ts).below;
     *fresh1 = below;
     (*ts).below_ino = below_ino;
-    let mut this_bs: *mut inode_store_t = malloc(
-        ::std::mem::size_of::<inode_store_t>() as cty::c_ulong,
-    ) as *mut inode_store_t;
+    let mut this_bs: *mut inode_store_t =
+        malloc(::std::mem::size_of::<inode_store_t>() as cty::c_ulong) as *mut inode_store_t;
     memset(
         this_bs as *mut cty::c_void,
         0 as cty::c_int,
@@ -625,17 +527,12 @@ pub unsafe extern "C" fn treedisk_init(
     *fresh2 = ts as *mut cty::c_void;
     let ref mut fresh3 = (*this_bs).getsize;
     *fresh3 = Some(
-        treedisk_getsize
-            as unsafe extern "C" fn(*mut inode_store_t, cty::c_uint) -> cty::c_int,
+        treedisk_getsize as unsafe extern "C" fn(*mut inode_store_t, cty::c_uint) -> cty::c_int,
     );
     let ref mut fresh4 = (*this_bs).setsize;
     *fresh4 = Some(
         treedisk_setsize
-            as unsafe extern "C" fn(
-                *mut inode_store_t,
-                cty::c_uint,
-                block_no,
-            ) -> cty::c_int,
+            as unsafe extern "C" fn(*mut inode_store_t, cty::c_uint, block_no) -> cty::c_int,
     );
     let ref mut fresh5 = (*this_bs).read;
     *fresh5 = Some(
@@ -693,9 +590,7 @@ pub unsafe extern "C" fn setup_freelist(
             i = i.wrapping_add(1);
         }
         if (Some(((*below).write).expect("non-null function pointer")))
-            .expect(
-                "non-null function pointer",
-            )(
+            .expect("non-null function pointer")(
             below,
             below_ino,
             freelist_block,
@@ -708,20 +603,15 @@ pub unsafe extern "C" fn setup_freelist(
     return freelist_block;
 }
 
-
 #[no_mangle]
 pub unsafe extern "C" fn treedisk_create(
     mut below: *mut inode_store_t,
     mut below_ino: cty::c_uint,
     mut ninodes: cty::c_uint,
 ) -> cty::c_int {
-    if ::std::mem::size_of::<treedisk_block>() as cty::c_ulong
-        != 512 as cty::c_int as cty::c_ulong
+    if ::std::mem::size_of::<treedisk_block>() as cty::c_ulong != 512 as cty::c_int as cty::c_ulong
     {
-        panic(
-            b"treedisk_create: block has wrong size\0" as *const u8
-                as *const cty::c_char,
-        );
+        panic(b"treedisk_create: block has wrong size\0" as *const u8 as *const cty::c_char);
     }
     let mut n_inodeblocks: cty::c_uint = (ninodes as cty::c_ulong)
         .wrapping_add(
@@ -733,15 +623,11 @@ pub unsafe extern "C" fn treedisk_create(
             (512 as cty::c_int as cty::c_ulong)
                 .wrapping_div(::std::mem::size_of::<treedisk_inode>() as cty::c_ulong),
         ) as cty::c_uint;
-    let mut nblocks: cty::c_uint = (Some(
-        ((*below).getsize).expect("non-null function pointer"),
-    ))
-        .expect("non-null function pointer")(below, below_ino) as cty::c_uint;
+    let mut nblocks: cty::c_uint = (Some(((*below).getsize).expect("non-null function pointer")))
+        .expect("non-null function pointer")(below, below_ino)
+        as cty::c_uint;
     if nblocks < n_inodeblocks.wrapping_add(2 as cty::c_int as cty::c_uint) {
-        ((*earth).tty_printf)
-            .expect(
-                "non-null function pointer",
-            )(
+        ((*earth).tty_printf).expect("non-null function pointer")(
             b"treedisk_create: too few blocks\n\0" as *const u8 as *const cty::c_char,
         );
         return -(1 as cty::c_int);
@@ -750,9 +636,7 @@ pub unsafe extern "C" fn treedisk_create(
         datablock: block_t { bytes: [0; 512] },
     };
     if (Some(((*below).read).expect("non-null function pointer")))
-        .expect(
-            "non-null function pointer",
-        )(
+        .expect("non-null function pointer")(
         below,
         below_ino,
         0 as cty::c_int as block_no,
@@ -771,18 +655,14 @@ pub unsafe extern "C" fn treedisk_create(
             512 as cty::c_int as cty::c_ulong,
         );
         superblock_0.superblock.n_inodeblocks = n_inodeblocks;
-        superblock_0
-            .superblock
-            .free_list = setup_freelist(
+        superblock_0.superblock.free_list = setup_freelist(
             below,
             below_ino,
             n_inodeblocks.wrapping_add(1 as cty::c_int as cty::c_uint),
             nblocks,
         );
         if (Some(((*below).write).expect("non-null function pointer")))
-            .expect(
-                "non-null function pointer",
-            )(
+            .expect("non-null function pointer")(
             below,
             below_ino,
             0 as cty::c_int as block_no,
@@ -794,9 +674,12 @@ pub unsafe extern "C" fn treedisk_create(
         let mut i: cty::c_int = 1 as cty::c_int;
         while i as cty::c_uint <= n_inodeblocks {
             if (Some(((*below).write).expect("non-null function pointer")))
-                .expect(
-                    "non-null function pointer",
-                )(below, below_ino, i as block_no, &mut null_block) < 0 as cty::c_int
+                .expect("non-null function pointer")(
+                below,
+                below_ino,
+                i as block_no,
+                &mut null_block,
+            ) < 0 as cty::c_int
             {
                 return -(1 as cty::c_int);
             }

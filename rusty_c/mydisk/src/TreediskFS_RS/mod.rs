@@ -7,22 +7,25 @@ use crate::bindings::*;
 use core::mem::size_of;
 use alloc::boxed::Box;
 
+const SUPERBLOCK_WIDTH: usize = 4;
+const INODE_TABLE_ENTRY_WIDTH: usize = 8;
+const FAT_TABLE_ENTRY_WIDTH: usize = 4;
 struct Superblock {
-    fat_head: u32,
+    fat_head_value: u32,
     disk_block_index: u32, 
 }
-struct InodeTableEntry {
+struct InodeTableEntryData {
     head: u32,
     size: u32,
-    inode_number: u32,
+    inode_number: u32
 }
 struct InodeTable {
     num_blocks: u32,
-    disk_block_index: u32,
+    disk_block_index: u32
 }
 struct FatTableEntry {
     next: u32,
-    block_number: u32,
+    index: u32
 }
 struct FatTable {
     num_blocks: u32,
@@ -47,29 +50,92 @@ struct FS_C {
 
 impl FS<DiskFS> {
   fn from_(inode_store: *mut inode_store_t) -> Self {
-      unimplemented!()
+    unimplemented!()
   }
 
   fn take_into_(self) -> *mut inode_store_t {
-      unimplemented!()
+    unimplemented!()
   }
 }
 
 impl<T: Stackable + IsDisk> FS<T> {
-  pub fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
-      unimplemented!()
-  }
+    fn calc_inode_table(num_inodes: u32) -> u32 {
+        let total_bytes_needed_for_inode_table = num_inodes * INODE_TABLE_ENTRY_WIDTH as u32;
+        let num_blocks_needed_for_inode_table = libm::ceil(
+            total_bytes_needed_for_inode_table / BLOCK_SIZE
+        ) as u32;
+        return num_blocks_needed_for_inode_table;
+    }
 
-  // theres a fat table which contains pointers, each pointer is 32bits/4 bytes index
-  // the index of the pointer is the index of the block number 
+    fn calc_num_blocks_of_disk() -> u32 {
+        let num_blocks_of_disk = below.get_size() / BLOCK_SIZE;
+        return num_blocks_of_disk;
+    }
 
-  // theres an inode table which is metadata on the fat table, each entry contains a head index 
-  // and a size
+    fn calc_fat_table(
+        num_blocks_of_disk: u32, 
+        num_blocks_needed_for_inode_table: u32,
+        num_blocks_for_superblock: u32
+    ) -> u32 {
+        // x = a - b - 1 - y
+        // y = (x * 4) / 512
+        // solve for y:
+        // y = (4a - 4b - 4) / 516
 
-  // then a superblock which contains one index into the fat table, but that entry in the 
-  // in the fat table starting out just consecutively points to the next index
-  pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
-  }
+        let num_entries = num_blocks_of_disk - num_blocks_needed_for_inode_table - 1;
+        let mut num_blocks_needed_for_fat_table = libm::ceil(
+            (num_entries * FAT_TABLE_ENTRY_WIDTH as u32) / BLOCK_SIZE
+        ) as u32;
+        num_blocks_for_superblock = libm::ceil(
+            ((4 * num_blocks_of_disk) - (4 * num_blocks_needed_for_inode_table) - 4) / 516
+        ) as u32;
+        return num_blocks_needed_for_fat_table;
+    }
+
+    /// new calculates info from setup_disk and stores it, assumes setup_disk is called first
+    pub fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
+
+    }
+
+    /// 1. theres a fat table which contains pointers, each pointer is 32bits/4 bytes index
+    /// the index of the pointer is the index of the block number 
+    /// 2. theres an inode table which is metadata on the fat table, each entry contains a head index and a size
+    /// 3. then a superblock which contains one index into the fat table, but that entry in the in the fat table starting out just consecutively points to the next index
+    /// setup writes to disk with empty data
+    pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+        // the superblock is first 4 bytes and first block on the disk
+        let mut superblock_data = Block::new();
+        superblock_data.write_bytes(&u32::to_le_bytes(0), 0, SUPERBLOCK_WIDTH)?;
+        below.write(below_ino, 0, 0, superblock_data)?;
+
+        // inode table starts at second block
+        // each entry is 8 bytes wide
+        // every 4 bytes is the le representation of -1 starting out
+        // write num_blocks_needed_for_inode_table blocks 
+        let mut inode_table_data = Block::new();
+        for i in 0..BLOCK_SIZE / SUPERBLOCK_WIDTH {
+            inode_table_data.write_bytes(&i32::to_le_bytes(-1), i * SUPERBLOCK_WIDTH, (i * SUPERBLOCK_WIDTH) + SUPERBLOCK_WIDTH)?;
+        }
+        let num_blocks_needed_for_inode_table = calc_inode_table(num_inodes);
+        for block_num in 1..num_blocks_needed_for_inode_table {
+            below.write(below_ino, block_num, 0, inode_table_data)?;
+        }
+
+        // fat table starts at the block after the inode table
+        // each entry is 4 bytes wide, aaps directly to a block
+        // every 4 bytes is the le representation of -1 to represent null
+        // how many entries needed? depends on number of blocks we have left
+        let num_blocks_needed_for_fat_table = calc_fat_table(
+            calc_num_blocks_of_disk(), 
+            num_blocks_needed_for_inode_table,
+            1
+        );
+        let fat_table_data = inode_table_data;
+        for block_num in (1 + num_blocks_needed_for_inode_table)..(1 + num_blocks_needed_for_inode_table + num_blocks_needed_for_fat_table) {
+            below.write(below_ino, block_num, 0, fat_table_data)?;
+        }
+        Ok(0)
+    }
 }
 
 impl<T: Stackable + IsDisk> Stackable for FS<T> {

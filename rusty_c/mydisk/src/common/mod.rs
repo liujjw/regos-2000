@@ -52,7 +52,7 @@ pub enum Error {
 pub trait Stackable {
     fn get_size(&self) -> Result<u32, Error>;
     fn set_size(&mut self, size: u32) -> Result<i32, Error>;
-    // &mut for compatiblity with C, since below will call read and needs a *mut 
+    // &mut for compatiblity with C, since below will call read and needs a *mut
     fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error>;
 }
@@ -73,6 +73,7 @@ impl Block {
         &self.bytes
     }
 
+    /// beg and end is the index range to write to in the block
     pub fn write_bytes<'a>(&'a mut self, src: &[cty::c_char], beg: usize, end: usize) {
         if src.len() > Self::BLOCK_SIZE || end - beg != src.len() {
             panic!("src improperly sized")
@@ -89,13 +90,11 @@ impl Block {
             }
         }
     }
-    
+
     // TODO lock
     // TODO better lifetime bound
     pub fn share_from_(block: *mut block_t) -> &'static mut Self {
-        unsafe {
-            &mut *(block as *mut _ as *mut Block)
-        }
+        unsafe { &mut *(block as *mut _ as *mut Block) }
     }
 
     pub fn copy_into_(&self) -> *mut block_t {
@@ -127,10 +126,7 @@ pub struct DiskFS {
         block: *mut block_t,
     ) -> cty::c_int,
     // in real diskfs.c, inconsistent function signatures with no arguments
-    ds_get_size: unsafe extern "C" fn(
-        this_bs: *mut inode_store, 
-        ino: cty::c_uint
-    ) -> cty::c_int,
+    ds_get_size: unsafe extern "C" fn(this_bs: *mut inode_store, ino: cty::c_uint) -> cty::c_int,
     ds_set_size: unsafe extern "C" fn(
         this_bs: *mut inode_store,
         ino: cty::c_uint,
@@ -163,13 +159,13 @@ impl DiskFS {
 }
 
 impl Stackable for DiskFS {
-    pub fn get_size(&self) -> Result<u32, Error> {
+    fn get_size(&self) -> Result<u32, Error> {
         // make up dummy arguments
         // https://stackoverflow.com/questions/36005527/why-can-functions-with-no-arguments-defined-be-called-with-any-number-of-argumen
         unsafe { Ok((self.ds_get_size)(core::ptr::null_mut(), 0) as u32) }
     }
 
-    pub fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    fn set_size(&mut self, size: u32) -> Result<i32, Error> {
         // make up dummy arguments, the real diskfs.c has no arguments
         unsafe {
             match (self.ds_set_size)(core::ptr::null_mut(), 0, 0) {
@@ -179,7 +175,7 @@ impl Stackable for DiskFS {
         }
     }
 
-    pub fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         unsafe {
             match (self.ds_read)(self.share_into_(), ino, offset, buf.share_into_()) {
                 -1 => Err(Error::UnknownFailure),
@@ -188,7 +184,7 @@ impl Stackable for DiskFS {
         }
     }
 
-    pub fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
+    fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
         unsafe {
             match (self.ds_write)(self.share_into_(), ino, offset, buf.copy_into_()) {
                 -1 => Err(Error::UnknownFailure),

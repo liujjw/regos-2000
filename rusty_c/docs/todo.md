@@ -67,5 +67,4 @@ obrm + refernces for memory safety
 (real rust filesystem for egos)
 1. refactoring and modularizing existing code to reuse
 2. automation of porting c code to rust? not there yet...
-3. rewriting, fatdisk with existing code simpler, asap
-4. TDD
+3. rewriting, fatdisk with existing code simpler, asap, write tests as i go

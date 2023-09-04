@@ -307,18 +307,24 @@ pub unsafe extern "C" fn simplefs_init(
     #[cfg(unix)]
     {
         dbg!("ramdisk addr in rust {:p} before wrapping", below);
-        dbg!("ramdisk write addr in rust {:p} before wrapping", (*below).write);
+        dbg!(
+            "ramdisk write addr in rust {:p} before wrapping",
+            (*below).write
+        );
     }
 
     let myfs: *mut inode_store_t =
-    (SimpleFS::new(DiskFS::from_(below), below_ino, num_inodes)).take_into_();
+        (SimpleFS::new(DiskFS::from_(below), below_ino, num_inodes)).take_into_();
 
-    #[cfg(unix)] 
+    #[cfg(unix)]
     {
         let state = (*myfs).state as *mut SimpleFS_C;
         let below = (*state).below;
         dbg!("ramdisk addr in rust {:p} after wrapping", below);
-        dbg!("ramdisk write addr in rust {:p} after wrapping", (*below).write);
+        dbg!(
+            "ramdisk write addr in rust {:p} after wrapping",
+            (*below).write
+        );
     }
 
     return myfs;
