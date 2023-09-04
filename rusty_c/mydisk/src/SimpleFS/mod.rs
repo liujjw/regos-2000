@@ -17,6 +17,7 @@ use crate::bindings::*;
 /// TODO To implement this "ownership", we use something like a mutex wrapper for more memory safety. For example, nothing prevents another of the following call and another owned instance referring to the samr data:
 /// SimpleFS::setup_disk(&mut DiskFS::from(below), below_ino, ninodes).unwrap_or(-1)
 
+/// Representation of filesystem metadata.
 struct Metadata {
     row_width: u32,
     num_blocks_needed: u32,
@@ -27,6 +28,7 @@ impl Metadata {
     pub const SUGGESTED_ROW_WIDTH: usize = 4;
 }
 
+/// Rust struct.
 struct SimpleFS<T: Stackable> {
     below: T,
     below_ino: u32,
@@ -34,6 +36,7 @@ struct SimpleFS<T: Stackable> {
     metadata: Option<Metadata>,
 }
 
+/// C struct exactly, in Rust.
 #[repr(C)]
 struct SimpleFS_C {
     below: *mut inode_store_t,
@@ -41,6 +44,7 @@ struct SimpleFS_C {
     num_inodes: cty::c_uint,
 }
 
+/// Wrapper methods.
 impl SimpleFS<DiskFS> {
     // TODO lock
     fn from_(inode_store: *mut inode_store_t) -> Self {
@@ -136,16 +140,18 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         })
     }
 
+    /// Return representation of metadata.
     pub fn get_metadata<'a>(&'a self) -> Result<&'a Metadata, Error> {
         self.metadata.as_ref().ok_or(Error::UnknownFailure)
     }
 
+    /// No-op
     pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
         // TODO markers for when reading past already written blocks
         Ok(0)
     }
 
-    /// Determine which metadata block this inode row lives on and which 4-bytes
+    /// Helper to determine which metadata block this inode row lives on and which 4-bytes
     /// in that block to look at.
     fn compute_indices(&self, ino: u32) -> Result<(u32, u32), Error> {
         // floor since zero indexed ino
@@ -157,6 +163,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         Ok((block_no, byte_index))
     }
 
+    /// Helper to read the metadata about an inode, from a metadata block.
     // beware endianness and alignment, assume 4 bytes of size info
     // riscv is little endian, so prefer little endian
     fn compute_inode_metadata_at(buf: &mut Block, ibyte: u32) -> u32 {
@@ -176,6 +183,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         u32::from_le_bytes(arr)
     }
 
+    /// Helper to write metadata for an inode.
     fn set_new_inode_metadata_at(buf: &mut Block, ibyte: u32, val: u32) {
         if Metadata::SUGGESTED_ROW_WIDTH != 4 {
             panic!("row width assumed to be 32");
@@ -218,6 +226,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
         Self::compute_inode_metadata_at(&mut buf, byte_index)
     }
 
+    /// Set the number of blocks used per inode.
     pub fn write_blocks_used(&mut self, ino: u32, val: u32) {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
@@ -230,10 +239,10 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
 }
 
 impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
-    /// # of blocks per inode, constant for all inodes
+    /// Return # of blocks per inode, constant for all inodes.
     // TODO update to the appropriate read_blocks_used impl?
-    fn get_size(&self) -> Result<u32, Error> {
-        let num = self.below.get_size()?;
+    fn get_size(&self, ino: u32) -> Result<u32, Error> {
+        let num = self.below.get_size(ino)?;
         let denom = self.num_inodes;
         if denom == 0 || num == 0 || num < denom {
             return Err(Error::UnknownFailure);
@@ -242,10 +251,13 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
         Ok(num / denom)
     }
 
-    fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    /// No-op.
+    fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, Error> {
         return Err(Error::UnknownFailure);
     }
 
+    /// An inode contains a set of blocks. The offset selects the block within the inode.
+    /// Thus, read the block specified by ino and offset.
     // We will need to shift reads and writes over by the size of the metadata blocks.
     // Assume we start writing at offset 0.
     fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
@@ -254,7 +266,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
             return Err(Error::UnknownFailure);
         }
         let metadata_offset = self.get_metadata()?.num_blocks_needed;
-        let blocks_per_node = self.get_size()?;
+        let blocks_per_node = self.get_size(ino)?;
         if ino >= self.num_inodes || offset >= blocks_per_node {
             return Err(Error::UnknownFailure);
         }
@@ -262,9 +274,10 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
         self.below.read(self.below_ino, full_offset, buf)
     }
 
+    /// Write the block specified by ino and offset.
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
         let metadata_offset = self.get_metadata()?.num_blocks_needed;
-        let blocks_per_node = self.get_size()?;
+        let blocks_per_node = self.get_size(ino)?;
         if ino >= self.num_inodes || offset >= blocks_per_node {
             return Err(Error::UnknownFailure);
         }
@@ -288,7 +301,6 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
             self.write_blocks_used(ino, blocks_used);
         }
 
-        // success
         Ok(res)
     }
 }
@@ -339,7 +351,7 @@ unsafe extern "C" fn simfs_get_size(
     inode_store: *mut inode_store_t,
     ino: cty::c_uint,
 ) -> cty::c_int {
-    match SimpleFS::from_(inode_store).get_size() {
+    match SimpleFS::from_(inode_store).get_size(ino) {
         Ok(val) => val as i32,
         Err(_) => -1,
     }
@@ -356,7 +368,7 @@ unsafe extern "C" fn simfs_set_size(
         panic!("size must be non-negative");
     }
     SimpleFS::from_(inode_store)
-        .set_size(newsize as u32)
+        .set_size(0, newsize as u32)
         .unwrap_or(-1)
 }
 

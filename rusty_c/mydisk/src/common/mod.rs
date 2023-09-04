@@ -49,17 +49,19 @@ pub enum Error {
     UnknownFailure,
 }
 
+/// Interface of every virtual layer in a filesystem.Functionality is implementation specific.
 pub trait Stackable {
-    fn get_size(&self) -> Result<u32, Error>;
-    fn set_size(&mut self, size: u32) -> Result<i32, Error>;
+    fn get_size(&self, ino: u32) -> Result<u32, Error>;
+    fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, Error>;
     // &mut for compatiblity with C, since below will call read and needs a *mut
     fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error>;
 }
 
-// Structs implementing this trait are the disk itself
+/// Structs implementing this trait are the disk itself
 pub trait IsDisk {}
 
+/// Wrapper over a physical filesystem block.
 impl Block {
     pub const BLOCK_SIZE: usize = BLOCK_SIZE as usize;
 
@@ -69,11 +71,12 @@ impl Block {
         }
     }
 
+    /// Read all the bytes from the block.
     pub fn read_bytes<'a>(&'a self) -> &'a [cty::c_char] {
         &self.bytes
     }
 
-    /// beg and end is the index range to write to in the block
+    /// Write bytes to block, where beg and end is the index range to write to in the block.
     pub fn write_bytes<'a>(&'a mut self, src: &[cty::c_char], beg: usize, end: usize) {
         if src.len() > Self::BLOCK_SIZE || end - beg != src.len() {
             panic!("src improperly sized")
@@ -82,6 +85,7 @@ impl Block {
         byte_slice.copy_from_slice(src);
     }
 
+    /// Wrapper methods to go from/to C.
     // TODO lock
     pub fn copy_from_(block: *mut block_t) -> Self {
         unsafe {
@@ -109,7 +113,7 @@ impl Block {
     }
 }
 
-// standard c pointers to functions
+/// Wrapper of disk layer, with standard c pointers to functions.
 #[cfg_attr(unix, derive(Debug))]
 pub struct DiskFS {
     _og: inode_intf,
@@ -136,6 +140,7 @@ pub struct DiskFS {
 
 impl IsDisk for DiskFS {}
 
+/// Wrapper methods to and from Rust/C data types.
 impl DiskFS {
     pub fn take_into_(self) -> inode_intf {
         return self._og;
@@ -159,13 +164,15 @@ impl DiskFS {
 }
 
 impl Stackable for DiskFS {
-    fn get_size(&self) -> Result<u32, Error> {
+    /// Returns total number of blocks on disk. Inodes are not a concept on disk layer.
+    fn get_size(&self, ino: u32) -> Result<u32, Error> {
         // make up dummy arguments
         // https://stackoverflow.com/questions/36005527/why-can-functions-with-no-arguments-defined-be-called-with-any-number-of-argumen
         unsafe { Ok((self.ds_get_size)(core::ptr::null_mut(), 0) as u32) }
     }
 
-    fn set_size(&mut self, size: u32) -> Result<i32, Error> {
+    /// No-op.
+    fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, Error> {
         // make up dummy arguments, the real diskfs.c has no arguments
         unsafe {
             match (self.ds_set_size)(core::ptr::null_mut(), 0, 0) {
@@ -175,6 +182,7 @@ impl Stackable for DiskFS {
         }
     }
 
+    /// Read the block specified by offset, ino is unused.
     fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         unsafe {
             match (self.ds_read)(self.share_into_(), ino, offset, buf.share_into_()) {
@@ -184,6 +192,7 @@ impl Stackable for DiskFS {
         }
     }
 
+    /// Write the block specified by offset, ino is unused.
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
         unsafe {
             match (self.ds_write)(self.share_into_(), ino, offset, buf.copy_into_()) {
