@@ -10,6 +10,9 @@ use alloc::boxed::Box;
 const SUPERBLOCK_WIDTH: usize = 4;
 const INODE_TABLE_ENTRY_WIDTH: usize = 8;
 const FAT_TABLE_ENTRY_WIDTH: usize = 4;
+const NEXT_BLOCK: i32 = -2;
+const NULL_POINTER: i32 = -1;
+/// Snapshot superblock data, contains true disk block offset, and fat head value.
 struct Superblock {
     fat_head_value: u32,
     disk_block_index: u32, 
@@ -59,6 +62,7 @@ impl FS<DiskFS> {
 }
 
 impl<T: Stackable + IsDisk> FS<T> {
+    /// Returns the number of blocks needed for the inode table.
     fn calc_inode_table(num_inodes: u32) -> u32 {
         let total_bytes_needed_for_inode_table = num_inodes * INODE_TABLE_ENTRY_WIDTH as u32;
         let num_blocks_needed_for_inode_table = libm::ceil(
@@ -67,11 +71,13 @@ impl<T: Stackable + IsDisk> FS<T> {
         return num_blocks_needed_for_inode_table;
     }
 
+    /// Returns the number of blocks on the disk.
     fn calc_num_blocks_of_disk() -> u32 {
         let num_blocks_of_disk = below.get_size(-1) / BLOCK_SIZE;
         return num_blocks_of_disk;
     }
 
+    /// Returns the number of blocks needed for the fat table.
     fn calc_fat_table(
         num_blocks_of_disk: u32, 
         num_blocks_needed_for_inode_table: u32,
@@ -143,6 +149,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         // fat table starts at the block after the inode table
         // each entry is 4 bytes wide, maps directly to a block
         // every 4 bytes is the le representation of -2 to represent pointing to the next block
+        // -1 means null
         // how many entries needed? depends on number of blocks we have left
         let num_blocks_needed_for_fat_table = calc_fat_table(
             calc_num_blocks_of_disk(), 
@@ -151,7 +158,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         );
         let fat_table_data = Block::new();
         for i in 0..BLOCK_SIZE / SUPERBLOCK_WIDTH {
-            fat_table_data.write_bytes(&i32::to_le_bytes(-2), i * SUPERBLOCK_WIDTH, (i * SUPERBLOCK_WIDTH) + SUPERBLOCK_WIDTH)
+            fat_table_data.write_bytes(&i32::to_le_bytes(NEXT_BLOCK), i * SUPERBLOCK_WIDTH, (i * SUPERBLOCK_WIDTH) + SUPERBLOCK_WIDTH)
         }
         let beg = 1 + num_blocks_needed_for_inode_table;
         let end = 1 + num_blocks_needed_for_inode_table + num_blocks_needed_for_fat_table;
@@ -160,25 +167,68 @@ impl<T: Stackable + IsDisk> FS<T> {
         }
         Ok(0)
     }
-}
 
-impl<T: Stackable + IsDisk> Stackable for FS<T> {
-    /// TODO
+    /// Return the block number and offset inside the block within the inode table.
+    /// Does not account for the true disk block offset.
     fn calc_inode_table_indices(&self, ino: u32) -> (u32, u32) {
         // if start_byte is 8, block num is 0
         // if start_byte is 512, block num is 1
         let start_byte = ino * INODE_TABLE_ENTRY_WIDTH;
-        let block_num = start_byte / BLOCK_SIZE;
+        let inner_block_num = start_byte / BLOCK_SIZE;
         let start_byte_within_block = start_byte % BLOCK_SIZE;
-        return (block_num, start_byte_within_block);
+        return (inner_block_num, start_byte_within_block);
     }
 
-    /// Read the ino'th entry of the inode table 
-    fn get_size(&self, ino: u32) -> Result<u32, Error> {
-        let (block_num, start_byte_within_block) = calc_inode_table_indices(ino);
+    /// Return the block number and offset inside the block within the fat table.
+    /// Does not account for the true disk block offset.
+    fn calc_fat_table_indices(&self, idx: u32) -> (u32, u32) {
+        // if start_byte is 4, block num is 0
+        // if start_byte is 512, block num is 1
+        let start_byte = idx * FAT_TABLE_ENTRY_WIDTH;
+        let inner_block_num = start_byte / BLOCK_SIZE;
+        let start_byte_within_block = start_byte % BLOCK_SIZE;
+        return (inner_block_num, start_byte_within_block);
+    }
+
+    /// Return the next block number index in the fat table for a given index.
+    fn get_fat_table_info(&self, idx: u32) -> i32 {
+        let (inner_block_num, start_byte_within_block) = calc_fat_table_indices(idx);
 
         let mut block = Block::new();
-        self.below.read(-1, self.InodeTable.disk_block_index + block_num, block);
+        self.below.read(-1, self.FatTable.disk_block_index + inner_block_num, block);
+
+        let bytes = block.read_bytes();
+        let beg = start_byte_within_block;
+        let end = start_byte_within_block + FAT_TABLE_ENTRY_WIDTH;
+        let next_ = &bytes[beg..end];
+        let next = i32::from_le_bytes(next_);
+        if next == NEXT_BLOCK {
+            return idx + 1;
+        } else if next == NULL_POINTER {
+            return NULL_POINTER;
+        } 
+        return next;
+    }
+
+    fn update_fat_table_info(&mut self, idx: u32, next: u32) -> Result<i32, Error> {
+        let (inner_block_num, start_byte_within_block) = calc_fat_table_indices(idx);
+
+        let mut block = Block::new();
+        self.below.read(-1, self.FatTable.disk_block_index + inner_block_num, block);
+
+        let next_bytes = u32::to_le_bytes(next);
+        let beg = start_byte_within_block;
+        let end = start_byte_within_block + FAT_TABLE_ENTRY_WIDTH;
+        block.write_bytes(next_bytes, beg, end);
+        self.below.write(-1, self.FatTable.disk_block_index + inner_block_num, block);
+    }
+
+    /// Return the head and size of the inode.
+    fn get_inode_info(&self, ino: u32) -> Result<(u32, u32), Error> {
+        let (inner_block_num, start_byte_within_block) = calc_inode_table_indices(ino);
+
+        let mut block = Block::new();
+        self.below.read(-1, self.InodeTable.disk_block_index + inner_block_num, block);
 
         let bytes = block.read_bytes();
         // if start byte is 513, block num is 1, % 512 is 1
@@ -191,30 +241,122 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
         if head <= -1 || size <= -1 {
             return Error::UnknownFailure();
         }
-        return size as u32;
+        return (head as u32, size as u32);
+    }
+
+    fn update_inode_info(&mut self, ino: u32, head: u32, size: u32) -> Result<i32, Error> {
+        let (inner_block_num, start_byte_within_block) = calc_inode_table_indices(ino);
+
+        let mut block = Block::new();
+        self.below.read(-1, self.InodeTable.disk_block_index + inner_block_num, block);
+
+        let head_bytes = u32::to_le_bytes(head);
+        let size_bytes = u32::to_le_bytes(size);
+        let beg = start_byte_within_block;
+        let end = start_byte_within_block + SUPERBLOCK_WIDTH;
+        block.write_bytes(head_bytes, beg, end);
+        block.write_bytes(size_bytes, end, end + SUPERBLOCK_WIDTH);
+        self.below.write(-1, self.InodeTable.disk_block_index + inner_block_num, block);
+    }
+
+    /// Update the superblock with the next block number, returning the current head.
+    fn get_and_update_superblock(&mut self) -> Result<u32, Error> {
+        let cur_head = self.superblock.fat_head_value;
+
+        let mut block = Block::new();
+        self.below.read(-1, 0, block);
+        let new_head = get_fat_table_info(cur_head);
+        let new_head_bytes = u32::to_le_bytes(new_head);
+        block.write_bytes(new_head_bytes, 0, SUPERBLOCK_WIDTH);
+        self.below.write(-1, 0, block);
+
+        self.superblock.fat_head_value = new_head;
+
+        Ok(cur_head)
+    }
+}
+
+impl<T: Stackable + IsDisk> Stackable for FS<T> {
+    /// Read the ino'th entry of the inode table 
+    fn get_size(&self, ino: u32) -> Result<u32, Error> {
+        let (_, size) = get_inode_info(ino);
+        return size;
     }
 
     // TODO what if size is invalid?
     fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, Error> {
-        let (block_num, start_byte_within_block) = calc_inode_table_indices(ino);
+        let (inner_block_num, start_byte_within_block) = calc_inode_table_indices(ino);
         
         let mut block = Block::new();
-        self.below.read(-1, self.InodeTable.disk_block_index + block_num, block);
+        self.below.read(-1, self.InodeTable.disk_block_index + inner_block_num, block);
         let new_size = u32::to_le_bytes(size);
         // size comes after head
         let beg = start_byte_within_block + SUPERBLOCK_WIDTH;
         let end = beg + SUPERBLOCK_WIDTH;
         block.write_bytes(new_size, beg, end);
-        self.below.write(-1, self.InodeTable.disk_block_index + block_num, block);
+        self.below.write(-1, self.InodeTable.disk_block_index + inner_block_num, block);
     }
 
-
+    /// Read the block at the offset'th block of the ino'th inode.
     fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
-        unimplemented!()
+        let (head, size) = get_inode_info(ino);
+        if offset >= size {
+            return Error::UnknownFailure();
+        }
+
+        let mut block_idx = head;
+        for i in 0..offset + 1 {
+            let next = get_fat_table_info(block_idx);
+            if next == NULL_POINTER && i != offset {
+                return Error::UnknownFailure();
+            }
+            block_idx = next;
+        }
+
+        let data_block_start_index = self.FatTable.disk_block_index + self.FatTable.num_blocks;
+        self.below.read(-1, data_block_start_index + block_idx, buf);
+        Ok(0)
     }
 
+    /// Write the block at the offset'th block of the ino'th inode.
+    /// If offset < size, then overwrite the block at offset.
+    /// If offset == size, then append the block at offset from freelist, updating the superblock, inode table, and fat table.
+    /// If offset > size, then return an error.
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
-        unimplemented!()
+        let (head, size) = get_inode_info(ino);
+        if offset > size {
+            unimplemented!();
+        } else if offset < size {
+            let mut block_idx = head;
+            for i in 0..offset + 1 {
+                let next = get_fat_table_info(block_idx);
+                if next == NULL_POINTER && i != offset {
+                    return Error::UnknownFailure();
+                }
+                block_idx = next;
+            }
+            self.below.write(-1, self.FatTable.disk_block_index + self.FatTable.num_blocks + block_idx, buf);
+        } else {
+            let mut last_block_idx = head;
+            for i in 0..offset + 1 {
+                let next = get_fat_table_info(last_block_idx);
+                if next == NULL_POINTER && i != offset {
+                    return Error::UnknownFailure();
+                }
+                last_block_idx = next;
+            }
+            if last_block_idx != NULL_POINTER {
+                return Error::UnknownFailure();
+            }
+
+            let new_block_idx = self.get_and_update_superblock();
+            self.update_inode_info(ino, head, size + 1);
+            self.update_fat_table_info(last_block_idx, new_block_idx);
+            self.update_fat_table_info(new_block_idx, NULL_POINTER);
+            
+            self.below.write(-1, self.FatTable.disk_block_index + self.FatTable.num_blocks + new_block_idx, buf);
+        }
+        Ok(0)
     }
 }
 
@@ -298,4 +440,3 @@ pub unsafe extern "C" fn fs_create(
 ) -> cty::c_int {
     FS::setup_disk(&mut DiskFS::from_(below), below_ino, ninodes).unwrap_or(-1)
 }
-// in the init step we create the internal data structures we need
