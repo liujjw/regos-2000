@@ -68,3 +68,7 @@ obrm + refernces for memory safety
 1. refactoring and modularizing existing code to reuse
 2. automation of porting c code to rust? not there yet...
 3. rewriting, fatdisk with existing code simpler, asap, write tests as i go
+
+# todo sep 5
+generate an exhaustive test suite to test everything, full coverage, edge cases, list of operations to do read write block and inode 0, same and differnt blocks in inodes, every sequence of one operation, every sequence of two, every seq of three, and so on, compare with treedisk or in mem filesytem of array of bytes, small number of blocks?, we get teh shortest possible sequence from this method enumerating all cases
+yunhao full solutions

@@ -22,12 +22,14 @@ fn main() {
 
     // also remove this line
     println!("cargo:rustc-link-lib=static=egos_file");
+    // end remove
 
     println!("cargo:rerun-if-changed={}", headers_path_str);
 
     // TODO remove build and linkage from egos compilation or remove from here
     let mut cc_builder = cc::Build::new();
 
+    // TODO remove cc_builder code
     #[cfg(not(unix))]
     {
         cc_builder.compiler(riscv_gcc_path);
@@ -50,6 +52,7 @@ fn main() {
             .flag("-fdata-sections");
     }
     cc_builder.out_dir(&directory).compile("egos_file");
+    // end remove
 
     let bindings = bindgen::Builder::default()
         .header(headers_path_str)

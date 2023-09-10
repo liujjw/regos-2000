@@ -202,3 +202,21 @@ impl Stackable for DiskFS {
         }
     }
 }
+
+pub fn unix_fix_u8_to_i8(bytes: &[u8]) -> [i8; 4] {
+    // fix for &[i8] instead of &[u8]
+    let mut sbytes: [i8; 4] = [0; 4];
+    for (idx, &byte) in bytes.iter().enumerate() {
+        sbytes[idx] = byte as i8;
+    }
+    sbytes
+}
+
+pub fn unix_fix_i8_to_u8(bytes: &[i8]) -> [u8; 4] {
+    // fix for &[i8] instead of &[u8]
+    let mut sbytes: [u8; 4] = [0; 4];
+    for (idx, &byte) in bytes.iter().enumerate() {
+        sbytes[idx] = byte as u8;
+    }
+    sbytes
+}
