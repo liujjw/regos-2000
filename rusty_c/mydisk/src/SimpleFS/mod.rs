@@ -217,7 +217,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     }
 
     /// Number of used blocks per inode.
-    pub fn read_blocks_used(&mut self, ino: u32) -> u32 {
+    pub fn read_blocks_used(&self, ino: u32) -> u32 {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -260,7 +260,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     /// Thus, read the block specified by ino and offset.
     // We will need to shift reads and writes over by the size of the metadata blocks.
     // Assume we start writing at offset 0.
-    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         let blocks_used = self.read_blocks_used(ino);
         if offset >= blocks_used {
             return Err(Error::UnknownFailure);

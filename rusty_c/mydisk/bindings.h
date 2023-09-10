@@ -56,6 +56,10 @@ block_no setup_freelist(inode_store_t *below,
 
 int treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes);
 
+inode_store_t *fs_init(inode_store_t *below, unsigned int below_ino, unsigned int num_inodes);
+
+int fs_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes);
+
 extern void *malloc(size_t size);
 
 extern void free(void *ptr);

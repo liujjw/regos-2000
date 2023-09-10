@@ -54,8 +54,9 @@ pub enum Error {
 pub trait Stackable {
     fn get_size(&self, ino: u32) -> Result<u32, Error>;
     fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, Error>;
-    // &mut for compatiblity with C, since below will call read and needs a *mut
-    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
+    // &mut is safer for compatiblity with C, since below will call read and needs a *mut
+    // however, assume read does not mutate 
+    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error>;
 }
 
@@ -151,6 +152,12 @@ impl DiskFS {
         return self._og;
     }
 
+    /// assume whoever receives the mutable pointer does not really 
+    /// mutate the data (i.e. reads)
+    pub fn unchecked_share_into(&self) -> inode_intf {
+        return self._og;
+    }
+ 
     // TODO lock from >1 instantiation
     // TODO lock _og from being freed before take_into
     pub fn from_(inode_store: inode_intf) -> Self {
@@ -184,9 +191,9 @@ impl Stackable for DiskFS {
     }
 
     /// Read the block specified by offset, ino is unused.
-    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         unsafe {
-            match (self.ds_read)(self.share_into_(), ino, offset, buf.share_into_()) {
+            match (self.ds_read)(self.unchecked_share_into(), ino, offset, buf.share_into_()) {
                 -1 => Err(Error::UnknownFailure),
                 x => Ok(x),
             }

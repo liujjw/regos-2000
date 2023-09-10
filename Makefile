@@ -81,6 +81,19 @@ rust_test:
 	cd $(TOOLS); ./rust_test
 ################################################################################
 
+################################################################################
+rust_test_fatdisk:
+	@echo "$(CYAN)-------- Build Rust archive for x86 linux --------$(END)"
+	cd rusty_c/;\
+	source ./exports.sh;\
+	cd mydisk;\
+	cargo build --target x86_64-unknown-linux-gnu;\
+	cd ../..
+	@echo "$(YELLOW)-------- Build C program, link with Rust, and call FFI --------$(END)"
+	$(CC) -g -L$(RUST_HOST_LIBRARY_PATH_DBG) $(TOOLS)/rust_test_fatdisk.c -std=c99 -DMKFS $(RUST_INCLUDE) -o $(TOOLS)/rust_test_fatdisk -l$(RUST_LIB_NAME)
+	cd $(TOOLS); ./rust_test_fatdisk
+################################################################################
+
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
 	cd $(TOOLS)/fpga/openocd; time openocd -f 7series.txt

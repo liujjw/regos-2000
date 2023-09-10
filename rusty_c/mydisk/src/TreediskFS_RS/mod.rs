@@ -4,15 +4,15 @@ extern crate alloc;
 
 use crate::common::*;
 use crate::bindings::*;
-use core::mem::size_of;
-use alloc::boxed::Box;
 
 const SUPERBLOCK_WIDTH: usize = 4;
 const INODE_TABLE_ENTRY_WIDTH: usize = 8;
 const FAT_TABLE_ENTRY_WIDTH: usize = 4;
 const NULL_POINTER: i32 = -1;
 /// Snapshot superblock data, contains true disk block offset, and fat head value.
-/// -1 means no free space left
+/// -1 means no free space left, 
+// TODO write -1 when no space is left
+// TODO proper i32 vs u32: cast i32 -> u32 ok if i32 >= 0, u32 -> i32 for large u32 will be incorrect
 struct Superblock {
     fat_head_value: i32,
     disk_block_index: u32, 
@@ -34,7 +34,6 @@ struct FatTable {
     num_blocks: u32,
     disk_block_index: u32,
 }
-
 struct FS<T: Stackable> {
     below: T,
     below_ino: u32,
@@ -227,8 +226,11 @@ impl<T: Stackable + IsDisk> FS<T> {
     }
 
     /// Return the next block number index in the fat table for a given index.
-    fn get_fat_table_info(&self, idx: u32) -> i32 {
-        let (inner_block_num, start_byte_within_block) = Self::calc_fat_table_indices(idx);
+    fn get_fat_table_info(&self, idx: i32) -> i32 {
+        if idx < 0 {
+            return NULL_POINTER;
+        }
+        let (inner_block_num, start_byte_within_block) = Self::calc_fat_table_indices(idx as u32);
 
         let mut block = Block::new();
         self.below.read(0, self.fat_table.disk_block_index + inner_block_num, &mut block);
@@ -244,13 +246,13 @@ impl<T: Stackable + IsDisk> FS<T> {
         return next;
     }
 
-    fn update_fat_table_info(&mut self, idx: u32, next: u32) {
+    fn update_fat_table_info(&mut self, idx: u32, next: i32) {
         let (inner_block_num, start_byte_within_block) = Self::calc_fat_table_indices(idx);
 
         let mut block = Block::new();
         self.below.read(0, self.fat_table.disk_block_index + inner_block_num, &mut block);
 
-        let next_bytes = u32::to_le_bytes(next);
+        let next_bytes = i32::to_le_bytes(next);
         let beg = start_byte_within_block as usize;
         let end = start_byte_within_block as usize + FAT_TABLE_ENTRY_WIDTH as usize;
         #[cfg(unix)] {
@@ -296,7 +298,8 @@ impl<T: Stackable + IsDisk> FS<T> {
         self.below.write(0, self.inode_table.disk_block_index + inner_block_num, &block);
     }
 
-    /// Update the superblock with the next block number, returning the current head.
+    /// Update the superblock with the next free block number, returning the current head.
+    /// Error is returned if there is no space left.
     fn get_and_update_superblock(&mut self) -> Result<u32, Error> {
         let cur_head = self.superblock.fat_head_value;
         if cur_head == -1 {
@@ -304,7 +307,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         }
         let mut block = Block::new();
         self.below.read(0, 0, &mut block);
-        let new_head = Self::get_fat_table_info(&self, cur_head as u32);
+        let new_head = self.get_fat_table_info(cur_head);
         let new_head_bytes = i32::to_le_bytes(new_head);
         block.write_bytes(&unix_fix_u8_to_i8(&new_head_bytes), 0, SUPERBLOCK_WIDTH);
         self.below.write(0, 0, &block);
@@ -340,23 +343,26 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
     }
 
     /// Read the block at the offset'th block of the ino'th inode.
-    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
-        let (head, size) = Self::get_inode_info(&self, ino);
-        if offset >= size {
+    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+        let (head, size) = self.get_inode_info(ino)?;
+        if offset as i32 >= size {
+            return Err(Error::UnknownFailure);
+        }
+        if head < 0 {
             return Err(Error::UnknownFailure);
         }
 
         let mut block_idx = head;
         for i in 0..offset + 1 {
-            let next = get_fat_table_info(block_idx);
+            let next = self.get_fat_table_info(block_idx);
             if next == NULL_POINTER && i != offset {
                 return Err(Error::UnknownFailure);
             }
             block_idx = next;
         }
 
-        let data_block_start_index = self.FatTable.disk_block_index + self.FatTable.num_blocks;
-        self.below.read(-1, data_block_start_index + block_idx, buf);
+        let data_block_start_index = self.fat_table.disk_block_index + self.fat_table.num_blocks;
+        self.below.read(0, data_block_start_index + block_idx as u32, buf)?;
         Ok(0)
     }
 
@@ -366,37 +372,40 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
     /// If offset > size, then return an error.
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
         let (head, size) = self.get_inode_info(ino)?;
-        if offset > size {
+        if head < 0 || size < 0 {
+            return Err(Error::UnknownFailure);
+        }
+        if offset > size as u32 {
             unimplemented!();
-        } else if offset < size {
+        } else if offset < size as u32 {
             let mut block_idx = head;
             for i in 0..offset + 1 {
-                let next = get_fat_table_info(block_idx);
+                let next = self.get_fat_table_info(block_idx);
                 if next == NULL_POINTER && i != offset {
-                    return Error::UnknownFailure();
+                    return Err(Error::UnknownFailure);
                 }
                 block_idx = next;
             }
-            self.below.write(-1, self.FatTable.disk_block_index + self.FatTable.num_blocks + block_idx, buf);
+            self.below.write(0, self.fat_table.disk_block_index + self.fat_table.num_blocks + block_idx as u32, buf)?;
         } else {
             let mut last_block_idx = head;
             for i in 0..offset + 1 {
-                let next = get_fat_table_info(last_block_idx);
+                let next = self.get_fat_table_info(last_block_idx);
                 if next == NULL_POINTER && i != offset {
-                    return Error::UnknownFailure();
+                    return Err(Error::UnknownFailure);
                 }
                 last_block_idx = next;
             }
             if last_block_idx != NULL_POINTER {
-                return Error::UnknownFailure();
+                return Err(Error::UnknownFailure);
             }
 
-            let new_block_idx = self.get_and_update_superblock();
-            self.update_inode_info(ino, head, size + 1);
-            self.update_fat_table_info(last_block_idx, new_block_idx);
+            let new_block_idx = self.get_and_update_superblock()?;
+            self.update_inode_info(ino, head as u32, size as u32 + 1);
+            self.update_fat_table_info(last_block_idx as u32, new_block_idx as i32);
             self.update_fat_table_info(new_block_idx, NULL_POINTER);
             
-            self.below.write(-1, self.FatTable.disk_block_index + self.FatTable.num_blocks + new_block_idx, buf);
+            self.below.write(0, self.fat_table.disk_block_index + self.fat_table.num_blocks + new_block_idx, buf)?;
         }
         Ok(0)
     }
@@ -442,9 +451,6 @@ unsafe extern "C" fn fs_set_size(
     ino: cty::c_uint,
     newsize: block_no,
 ) -> cty::c_int {
-    if newsize < 0 {
-        panic!("size must be non-negative");
-    }
     FS::from_(inode_store)
         .set_size(0, newsize as u32)
         .unwrap_or(-1)

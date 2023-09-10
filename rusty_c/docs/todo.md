@@ -72,3 +72,6 @@ obrm + refernces for memory safety
 # todo sep 5
 generate an exhaustive test suite to test everything, full coverage, edge cases, list of operations to do read write block and inode 0, same and differnt blocks in inodes, every sequence of one operation, every sequence of two, every seq of three, and so on, compare with treedisk or in mem filesytem of array of bytes, small number of blocks?, we get teh shortest possible sequence from this method enumerating all cases
 yunhao full solutions
+
+# sep 12
+1. TODO fix issue with compiling for make rust_apps rv32i, related to modules?

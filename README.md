@@ -20,15 +20,15 @@ Now `cd /vagrant/rusty_c/` into the Rust project and run the setup scripts for t
 **If error for missing binaries re-export (`source ./exports.sh`) or add build tools into PATH variable.**
 **If `cargo` not found restart the terminal after setup.**
 
-# build and run 
+# build and run on rv32i/qemu
 1. Switch to `/mydisk`. Make sure the `build.rs` file is setup properly. It is needed to generate the `C` bindings for the Rust code called `bindings.h`. The Rust bindings to C have a canonical path where they will be found (see `bindings/` module).
 2. Set the target in `.cargo`, 
 3. then `cargo build --release`. 
 4. Make sure the generated `C` bindings are up to date and placed in the right folders for the `C` code. 
 5. Then follow the `egos` build process: `make rust_apps` ==> `make rust_install` ==> `make qemu`. 
 
-# Debugging, testing, and verifying Rust code is running
-The makefile target `make rust_test` runs a basic test and produces a binary `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`.
+# Debugging + testing + running on x86
+The makefile target `make rust_test` and `make rust_test_fatdisk` runs a basic test and produces binaries like `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`. T
 
 # miscellaneous
 # c2rust treedisk
