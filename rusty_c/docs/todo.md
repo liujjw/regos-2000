@@ -75,3 +75,6 @@ yunhao full solutions
 
 # sep 12
 1. TODO fix issue with compiling for make rust_apps rv32i, related to modules?
+2. sanity check rust and c working together
+3. built-in rust test on x86
+4. bindgen memory layout issues, the sizes from rust and c earth, grass, and inode_store, are not the same, the only problem is that inode_store because i interact with it

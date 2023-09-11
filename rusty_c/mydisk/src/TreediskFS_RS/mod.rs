@@ -3,6 +3,7 @@
 extern crate alloc;
 
 use crate::common::*;
+use alloc::boxed::Box;
 use crate::bindings::*;
 
 const SUPERBLOCK_WIDTH: usize = 4;
@@ -34,7 +35,7 @@ struct FatTable {
     num_blocks: u32,
     disk_block_index: u32,
 }
-struct FS<T: Stackable> {
+pub struct FS<T: Stackable> {
     below: T,
     below_ino: u32,
     num_inodes: u32,
@@ -52,11 +53,59 @@ struct FS_C {
 
 impl FS<DiskFS> {
   fn from_(inode_store: *mut inode_store_t) -> Self {
-    unimplemented!()
+    let raw_state = unsafe { (*inode_store).state };
+    let cur_state: &mut FS_C = unsafe { &mut *(raw_state as *mut FS_C) };
+    let below = DiskFS::from_(cur_state.below);
+    let below_ino = cur_state.below_ino;
+    let num_inodes = cur_state.num_inodes;
+    FS::new(below, below_ino, num_inodes)
   }
 
   fn take_into_(self) -> *mut inode_store_t {
-    unimplemented!()
+    let cur_state = Box::new(FS_C {
+        below: self.below.take_into_(),
+        below_ino: self.below_ino,
+        num_inodes: self.num_inodes,
+    });
+
+    // pointers owned by box must NOT live past their lifetime
+    // TODO every into_raw'ed pointer must be freed by C, what api is cleanest?
+    let raw_state: *mut FS_C = Box::into_raw(cur_state);
+    let void_state_ptr = unsafe { raw_state as *mut cty::c_void };
+    let inode_store = Box::new(inode_store_t {
+        state: void_state_ptr,
+        getsize: Some(
+            fs_get_size
+                as unsafe extern "C" fn(*mut inode_store_t, cty::c_uint) -> cty::c_int,
+        ),
+        setsize: Some(
+            fs_set_size
+                as unsafe extern "C" fn(
+                    *mut inode_store_t,
+                    cty::c_uint,
+                    block_no,
+                ) -> cty::c_int,
+        ),
+        read: Some(
+            fs_read
+                as unsafe extern "C" fn(
+                    *mut inode_store_t,
+                    cty::c_uint,
+                    block_no,
+                    *mut block_t,
+                ) -> cty::c_int,
+        ),
+        write: Some(
+            fs_write
+                as unsafe extern "C" fn(
+                    *mut inode_store_t,
+                    cty::c_uint,
+                    block_no,
+                    *mut block_t,
+                ) -> cty::c_int,
+        ),
+    });
+    return Box::into_raw(inode_store);
   }
 }
 
@@ -72,7 +121,7 @@ impl<T: Stackable + IsDisk> FS<T> {
 
     /// Returns the number of blocks on the disk.
     fn calc_num_blocks_of_disk(below: &T) -> Result<u32, Error> {
-        let num_blocks_of_disk = below.get_size(0)? / BLOCK_SIZE;
+        let num_blocks_of_disk = below.get_size(0)?;
         return Ok(num_blocks_of_disk);
     }
 
@@ -87,6 +136,9 @@ impl<T: Stackable + IsDisk> FS<T> {
         // solve for y:
         // y = (4a - 4b - 4) / 516
 
+        if num_blocks_of_disk <= num_blocks_for_superblock - 1 {
+            panic!("disk too small");
+        }
         let num_entries = num_blocks_of_disk - num_blocks_needed_for_inode_table - 1;
         let mut num_blocks_needed_for_fat_table = libm::ceil(
             (num_entries * FAT_TABLE_ENTRY_WIDTH as u32) as f64 / BLOCK_SIZE as f64
@@ -98,7 +150,7 @@ impl<T: Stackable + IsDisk> FS<T> {
     }
 
     /// new calculates info from setup_disk and stores it, assumes setup_disk is called first
-    pub fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
+    fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
         let num_blocks_inode_table = Self::calc_inode_table(num_inodes);
         let num_blocks_superblock = 1;
         let num_blocks_of_disk = match Self::calc_num_blocks_of_disk(&below) {
@@ -130,7 +182,7 @@ impl<T: Stackable + IsDisk> FS<T> {
 
     /// see https://www.cs.cornell.edu/courses/cs4411/2020sp/schedule/slides/06-Filesystems-FAT.pdf
     /// setup writes to disk with empty data
-    pub fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
+    fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
         // the superblock is first 4 bytes and first block on the disk
         // the 4 bytes represent a i32
         let mut superblock_data = Block::new();
@@ -434,6 +486,14 @@ pub unsafe extern "C" fn fs_init(
     return myfs;
 }
 
+pub fn fs_init_rs<T>(
+    below: T,
+    below_ino: u32,
+    num_inodes: u32,
+) -> FS<T> where T: Stackable + IsDisk {
+    FS::new(below, below_ino, num_inodes)
+}
+
 #[no_mangle]
 unsafe extern "C" fn fs_get_size(
     inode_store: *mut inode_store_t,
@@ -487,4 +547,102 @@ pub unsafe extern "C" fn fs_create(
     ninodes: cty::c_uint,
 ) -> cty::c_int {
     FS::setup_disk(&mut DiskFS::from_(below), below_ino, ninodes).unwrap_or(-1)
+}
+
+// list of operations to do read write block and inode 0, same and differnt blocks in inodes, every sequence of one operation, every sequence of two, every seq of three, and so on, compare with treedisk or in mem filesytem of array of bytes, small number of blocks?, 
+// edge cases?
+// code coverage?
+/// Test in Rust, with Rust mock objects (instead of C mock objects), 
+/// assume in the future all modules are written in Rust. Only a 
+/// thin C wrapper to export, which is tested separately.
+#[cfg(test)]
+mod tests {
+    const DEBUG_SIZE: usize = 8192;
+    const BLOCK_SIZE: usize = 512;
+    mod Default {
+        use crate::common::Stackable;
+        use crate::common::IsDisk;
+        use super::*;
+
+        #[derive(PartialEq)]
+        #[derive(Debug)]
+        pub(super) struct RamFS {
+            mem: Box<[u8; DEBUG_SIZE as usize]>,
+        }
+
+        /// Return an inode_intf.
+        pub(super) fn default() {
+            unimplemented!()
+        }
+
+        impl RamFS {
+            pub(super) fn new() -> Self {
+                RamFS {
+                    mem: Box::new([0; DEBUG_SIZE as usize]),
+                }
+            }
+        }
+        impl IsDisk for RamFS {}
+
+        impl Stackable for RamFS {
+            fn get_size(&self, ino: u32) -> Result<u32, crate::common::Error> {
+                Ok((DEBUG_SIZE / BLOCK_SIZE) as u32)
+            }
+
+            fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, crate::common::Error> {
+                Ok(0)
+            }
+
+            fn read(
+                &self,
+                ino: u32,
+                offset: u32,
+                buf: &mut crate::common::Block,
+            ) -> Result<i32, crate::common::Error> {
+                let bytes = &self.mem[offset as usize * BLOCK_SIZE..(offset as usize + 1) * BLOCK_SIZE];
+                buf.write_bytes(&unix_fix_u8_to_i8(bytes), 0, BLOCK_SIZE);
+                Ok(0)
+            }
+
+            fn write(
+                &mut self,
+                ino: u32,
+                offset: u32,
+                buf: &crate::common::Block,
+            ) -> Result<i32, crate::common::Error> {
+                self.mem[offset as usize * BLOCK_SIZE..(offset as usize + 1) * BLOCK_SIZE].copy_from_slice(&unix_fix_i8_to_u8(buf.read_bytes()));
+                Ok(0)
+            }
+        }
+    }
+
+    use super::*;  
+    type DiskFS = Default::RamFS;
+
+    // Test that the 'fs_init_rs' function initializes a new FS instance with valid arguments.
+    #[test]
+    fn test_initialize_new_fs_instance() {
+        // Arrange
+        let below = DiskFS::new();
+        let below_ino = 0;
+        let num_inodes = 10;
+
+        // Act
+        let fs = fs_init_rs(below, below_ino, num_inodes);
+
+        // Assert
+        // assert_eq!(fs.below, below);
+        assert_eq!(fs.below_ino, below_ino);
+        assert_eq!(fs.num_inodes, num_inodes);
+        assert_eq!(fs.superblock.fat_head_value, 0);
+        assert_eq!(fs.superblock.disk_block_index, 0);
+        assert_eq!(fs.inode_table.num_blocks, 80);
+        assert_eq!(fs.inode_table.disk_block_index, 1);
+        assert_eq!(fs.fat_table.num_blocks, 3);
+        assert_eq!(fs.fat_table.disk_block_index, 81);
+    }
+
+
+
+    // Add more test functions as needed
 }

@@ -27,8 +27,11 @@ Now `cd /vagrant/rusty_c/` into the Rust project and run the setup scripts for t
 4. Make sure the generated `C` bindings are up to date and placed in the right folders for the `C` code. 
 5. Then follow the `egos` build process: `make rust_apps` ==> `make rust_install` ==> `make qemu`. 
 
-# Debugging + testing + running on x86
-The makefile target `make rust_test` and `make rust_test_fatdisk` runs a basic test and produces binaries like `rust_test` in the `tools/` directory. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`. T
+# Testing just Rust on x86
+Standard code testing (`cargo test`).
+
+# Testing both C with Rust on x86
+The makefile target `make rust_test` and `make rust_test_fatdisk` runs a basic test and produces binaries like `rust_test` in the `tools/` directory, as `egos` would call the Rust code from C. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`. These tests are meant to be a sanity check that Rust and C are running together.
 
 # miscellaneous
 # c2rust treedisk

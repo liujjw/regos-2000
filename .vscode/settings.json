@@ -6,6 +6,10 @@
         "inode.h": "c"
     },
     "rust-analyzer.linkedProjects": [
-        "/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/Cargo.toml"
+        "/home/liujjw/Documents/CODE/regos-2000/rusty_c/mydisk/Cargo.toml",
+        "./rusty_c/mydisk/Cargo.toml",
+        "./rusty_c/mydisk/Cargo.toml",
+        "./rusty_c/mydisk/Cargo.toml",
+        "./rusty_c/mydisk/Cargo.toml"
     ]
 }

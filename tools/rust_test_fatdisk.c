@@ -11,7 +11,7 @@
 // MARK where Rust code was imported
 #include "bindings.h"
 
-// generate an exhaustive test suite to test everything, full coverage, edge cases, list of operations to do read write block and inode 0, same and differnt blocks in inodes, every sequence of one operation, every sequence of two, every seq of three, and so on, compare with treedisk or in mem filesytem of array of bytes, small number of blocks?, we get teh shortest possible sequence from this method enumerating all cases
+// TODO adapt for Fatdisk (e.g. remove and update metadata checks)
 
 
 #define NINODE 3
@@ -25,7 +25,7 @@ char* multi_block_contents[] = {
 
 };
 
-#define DEBUG_SIZE 2048
+#define DEBUG_SIZE 4096
 // add one to the metadata offset for each (4 * NINODE) > 512 bytes block 
 // each inode takes 4 bytes of metadata
 #define METADATA_BLOCK_OFFSET 1 

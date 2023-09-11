@@ -6,6 +6,7 @@ edition = "2021"
 [lib]
 name = "mydisk"
 crate-type = ["staticlib"]
+test = true
 
 [dependencies]
 cty = "0.2.2"

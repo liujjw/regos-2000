@@ -28,7 +28,7 @@
 
 
 
-
+# default to x86
 [target.x86_64-unknown-linux-gnu]
 rustflags = [
   # "-C", "link-arg=-Thifive1-link.x",

@@ -21,37 +21,37 @@ fn main() {
     println!("cargo:rustc-link-search={}", directory.to_str().unwrap());
 
     // also remove this line
-    println!("cargo:rustc-link-lib=static=egos_file");
+    // println!("cargo:rustc-link-lib=static=egos_file");
     // end remove
 
     println!("cargo:rerun-if-changed={}", headers_path_str);
 
     // TODO remove build and linkage from egos compilation or remove from here
-    let mut cc_builder = cc::Build::new();
+    // let mut cc_builder = cc::Build::new();
 
     // TODO remove cc_builder code
-    #[cfg(not(unix))]
-    {
-        cc_builder.compiler(riscv_gcc_path);
-    }
-    cc_builder
-        .file(directory.join("disk.h"))
-        .file(directory.join("egos.h"))
-        .file(directory.join("file.h"))
-        .file(directory.join("inode.h"))
-        .file(directory.join("disk.c"));
+    // #[cfg(not(unix))]
+    // {
+    //     cc_builder.compiler(riscv_gcc_path);
+    // }
+    // cc_builder
+    //     .file(directory.join("disk.h"))
+    //     .file(directory.join("egos.h"))
+    //     .file(directory.join("file.h"))
+    //     .file(directory.join("inode.h"))
+    //     .file(directory.join("disk.c"));
 
-    #[cfg(not(unix))]
-    {
-        cc_builder
-            .no_default_flags(true)
-            .flag("-mcmodel=medlow")
-            .flag("-march=rv32i")
-            .flag("-mabi=ilp32")
-            .flag("-ffunction-sections")
-            .flag("-fdata-sections");
-    }
-    cc_builder.out_dir(&directory).compile("egos_file");
+    // #[cfg(not(unix))]
+    // {
+    //     cc_builder
+    //         .no_default_flags(true)
+    //         .flag("-mcmodel=medlow")
+    //         .flag("-march=rv32i")
+    //         .flag("-mabi=ilp32")
+    //         .flag("-ffunction-sections")
+    //         .flag("-fdata-sections");
+    // }
+    // cc_builder.out_dir(&directory).compile("egos_file");
     // end remove
 
     let bindings = bindgen::Builder::default()
