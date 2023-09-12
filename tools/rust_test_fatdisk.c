@@ -11,9 +11,6 @@
 // MARK where Rust code was imported
 #include "bindings.h"
 
-// TODO adapt for Fatdisk (e.g. remove and update metadata checks)
-
-
 #define NINODE 3
 char* contents[] = {
     "With only 2000 lines of code, egos-2000 implements all the basics.",
@@ -25,20 +22,11 @@ char* multi_block_contents[] = {
 
 };
 
-#define DEBUG_SIZE 4096
-// add one to the metadata offset for each (4 * NINODE) > 512 bytes block 
-// each inode takes 4 bytes of metadata
-#define METADATA_BLOCK_OFFSET 1 
+#define DEBUG_SIZE 16384
+#define METADATA_BLOCK_OFFSET 2 
 int numblocks = DEBUG_SIZE / BLOCK_SIZE;
 
-// 1 block for metadata, 1 block for each inode, 4 blocks total
 char fs[DEBUG_SIZE];
-char expected_metadata[] = {
-    '\x01', '\x00', '\x00', '\x00',
-    '\x01', '\x00', '\x00', '\x00',
-    '\x01', '\x00', '\x00', '\x00'
-}; 
-#define NUM_METADATA_BYTES NINODE * 4
 
 inode_intf ramdisk_init();
 bool areArraysEqual(const char array1[], const char array2[], int size);
@@ -73,8 +61,6 @@ int main() {
         fprintf(stderr, "[INFO] Success!\n");
 
     }
-    // TEST metadata
-    assert(areArraysEqual(expected_metadata, fs, NUM_METADATA_BYTES));
     free(ramdisk);
     free(mydisk->state);
     free(mydisk);

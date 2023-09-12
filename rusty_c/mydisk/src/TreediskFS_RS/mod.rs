@@ -197,7 +197,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         below.write(0, 0, &superblock_data)?;
 
         // inode table starts at second block
-        // each entry is 8 bytes wide
+        // each entry for each inode is 8 bytes wide
         // every 4 bytes is the le representation of -1 starting out
         // write num_blocks_needed_for_inode_table blocks 
         // the 4 bytes represent an i32
@@ -222,7 +222,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         }
         let num_blocks_needed_for_inode_table = Self::calc_inode_table(num_inodes);
         for block_num in 1..num_blocks_needed_for_inode_table {
-            below.write(block_num, 0, &inode_table_data)?;
+            below.write(0, block_num, &inode_table_data)?;
         }
 
         // fat table starts at the block after the inode table
@@ -250,7 +250,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         let beg = 1 + num_blocks_needed_for_inode_table;
         let end = 1 + num_blocks_needed_for_inode_table + num_blocks_needed_for_fat_table;
         for block_num in beg..end {
-            below.write(block_num, 0, &fat_table_data)?;
+            below.write(0, block_num, &fat_table_data)?;
         }
         Ok(0)
     }
@@ -298,6 +298,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         return next;
     }
 
+    /// Update the fat table with the next block number index for a given index.
     fn update_fat_table_info(&mut self, idx: u32, next: i32) {
         let (inner_block_num, start_byte_within_block) = Self::calc_fat_table_indices(idx);
 
@@ -549,6 +550,15 @@ pub unsafe extern "C" fn fs_create(
     FS::setup_disk(&mut DiskFS::from_(below), below_ino, ninodes).unwrap_or(-1)
 }
 
+pub fn fs_create_rs<T>(
+    below: &mut T,
+    below_ino: u32,
+    ninodes: u32,
+) -> i32 where T: Stackable + IsDisk {
+    FS::setup_disk(below, below_ino, ninodes).unwrap_or(-1)
+}
+
+
 // list of operations to do read write block and inode 0, same and differnt blocks in inodes, every sequence of one operation, every sequence of two, every seq of three, and so on, compare with treedisk or in mem filesytem of array of bytes, small number of blocks?, 
 // edge cases?
 // code coverage?
@@ -557,8 +567,28 @@ pub unsafe extern "C" fn fs_create(
 /// thin C wrapper to export, which is tested separately.
 #[cfg(test)]
 mod tests {
-    const DEBUG_SIZE: usize = 8192;
+    // 32 blocks
+    const DEBUG_SIZE: usize = 16384;
     const BLOCK_SIZE: usize = 512;
+    const NUM_BLOCKS: u32 = 32;
+
+    const NUM_INODES: u32 = 10;
+    const ONE_BLOCK_STRING: &str = "With only 2000 lines of code, egos-2000 implements all the basics";
+    const TWO_BLOCK_STRING: &str = "Two households, both alike in dignity
+    (In fair Verona, where we lay our scene),
+    From ancient grudge break to new mutiny,
+    Where civil blood makes civil hands unclean.
+    From forth the fatal loins of these two foes
+    A pair of star-crossed lovers take their life;
+    Whose misadventured piteous overthrows
+    Doth with their death bury their parents’ strife.
+    The fearful passage of their death-marked love
+    And the continuance of their parents’ rage,
+    Which, but their children’s end, naught could remove,
+    Is now the two hours’ traffic of our stage;
+    The which, if you with patient ears attend,
+    What here shall miss, our toil shall strive to mend.";
+
     mod Default {
         use crate::common::Stackable;
         use crate::common::IsDisk;
@@ -600,7 +630,7 @@ mod tests {
                 buf: &mut crate::common::Block,
             ) -> Result<i32, crate::common::Error> {
                 let bytes = &self.mem[offset as usize * BLOCK_SIZE..(offset as usize + 1) * BLOCK_SIZE];
-                buf.write_bytes(&unix_fix_u8_to_i8(bytes), 0, BLOCK_SIZE);
+                buf.write_bytes(unix_fix_u8_to_i8_full(bytes), 0, BLOCK_SIZE);
                 Ok(0)
             }
 
@@ -610,7 +640,8 @@ mod tests {
                 offset: u32,
                 buf: &crate::common::Block,
             ) -> Result<i32, crate::common::Error> {
-                self.mem[offset as usize * BLOCK_SIZE..(offset as usize + 1) * BLOCK_SIZE].copy_from_slice(&unix_fix_i8_to_u8(buf.read_bytes()));
+                let bytes = buf.read_bytes();
+                self.mem[offset as usize * BLOCK_SIZE..(offset as usize + 1) * BLOCK_SIZE].copy_from_slice(unix_fix_i8_to_u8_full(bytes));
                 Ok(0)
             }
         }
@@ -620,12 +651,13 @@ mod tests {
     type DiskFS = Default::RamFS;
 
     // Test that the 'fs_init_rs' function initializes a new FS instance with valid arguments.
+    // Coverage on table calculation methods.
     #[test]
     fn test_initialize_new_fs_instance() {
         // Arrange
         let below = DiskFS::new();
         let below_ino = 0;
-        let num_inodes = 10;
+        let num_inodes = NUM_INODES;
 
         // Act
         let fs = fs_init_rs(below, below_ino, num_inodes);
@@ -636,13 +668,94 @@ mod tests {
         assert_eq!(fs.num_inodes, num_inodes);
         assert_eq!(fs.superblock.fat_head_value, 0);
         assert_eq!(fs.superblock.disk_block_index, 0);
-        assert_eq!(fs.inode_table.num_blocks, 80);
+        // 80 bytes needed for 10 inodes
+        assert_eq!(fs.inode_table.num_blocks, 1);
         assert_eq!(fs.inode_table.disk_block_index, 1);
-        assert_eq!(fs.fat_table.num_blocks, 3);
-        assert_eq!(fs.fat_table.disk_block_index, 81);
+        // 32 blocks - 1 for superblock - 1 for inode table = 30 blocks
+        // 30 blocks * 4 bytes per block = 120 bytes
+        // 120 bytes / 512 bytes per block = 0.234375 blocks
+        assert_eq!(fs.fat_table.num_blocks, 1);
+        assert_eq!(fs.fat_table.disk_block_index, 2);
     }
 
+    // Test if the 'fs_create_rs' function successfully sets up the disk with the correct number of blocks and writes the superblock, inode table, and fat table data.
+    // Coverage on disk table read and writes.
+    #[test]
+    fn fs_create_rs_setup_disk_test() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
 
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
 
-    // Add more test functions as needed
+        // Assert that the superblock data is correct
+        // Get the current free head for a write, update the free head.
+        assert_eq!(result_.get_and_update_superblock().unwrap(), 0);
+        assert_eq!(result_.get_and_update_superblock().unwrap(), 1);
+
+        // Set ino 1 to have head and size at 1.
+        result_.update_inode_info(1, 1, 1);
+        assert_eq!(result_.get_inode_info(1).unwrap(), (1, 1));
+
+        // Set the fat table next pointer at idx 0 to idx 2.
+        result_.update_fat_table_info(0, 2);
+        assert_eq!(result_.get_fat_table_info(0), 2);
+    }
+
+    #[test]
+    fn fs_get_size_test() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
+
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
+
+        result_.update_inode_info(1, 1, 1);
+        assert_eq!(result_.get_size(1).unwrap(), 1);
+    }
+
+    #[test]
+    fn fs_set_size_test() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
+
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
+
+        result_.set_size(1, 5);
+        assert_eq!(result_.get_size(1).unwrap(), 5);
+    }
+
+    #[test]
+    fn fs_write_test() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
+
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
+
+        let bytes = ONE_BLOCK_STRING.as_bytes();
+        let mut block = Block::new();
+        block.write_bytes(unix_fix_u8_to_i8_full(bytes), 0, bytes.len());
+        let res = result_.write(1, 0, &block);
+        assert_eq!(res.unwrap(), 0);
+
+        let res_ = result_.read(1, 0, &mut block);
+        assert_eq!(res_.unwrap(), 0);
+        let bytes_ = unix_fix_i8_to_u8_full(block.read_bytes());
+        assert_eq!(std::str::from_utf8(bytes_), Ok(ONE_BLOCK_STRING));
+
+    }
 }

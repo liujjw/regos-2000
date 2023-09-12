@@ -228,3 +228,15 @@ pub fn unix_fix_i8_to_u8(bytes: &[i8]) -> [u8; 4] {
     }
     sbytes
 }
+
+pub fn unix_fix_i8_to_u8_full<'a>(i8slice: &'a [i8]) -> &'a [u8] {
+    unsafe { 
+        &*(i8slice as *const [i8] as *const [u8]) 
+    }
+}
+
+pub fn unix_fix_u8_to_i8_full<'a>(u8slice: &'a [u8]) -> &'a [i8] {
+    unsafe { 
+        &*(u8slice as *const [u8] as *const [i8]) 
+    }
+}
