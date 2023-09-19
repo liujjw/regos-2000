@@ -10,6 +10,7 @@ const SUPERBLOCK_WIDTH: usize = 4;
 const INODE_TABLE_ENTRY_WIDTH: usize = 8;
 const FAT_TABLE_ENTRY_WIDTH: usize = 4;
 const NULL_POINTER: i32 = -1;
+const SUPERBLOCK_BLOCK_SIZE: u32 = 1;
 /// Snapshot superblock data, contains true disk block offset, and fat head value.
 /// -1 means no free space left, 
 // TODO write -1 when no space is left
@@ -35,15 +36,16 @@ struct FatTable {
     num_blocks: u32,
     disk_block_index: u32,
 }
+/// In memory snapshot of disk, immutable fields.
 pub struct FS<T: Stackable> {
     below: T,
     below_ino: u32,
     num_inodes: u32,
+    num_data_blocks: u32,
     superblock: Superblock,
     inode_table: InodeTable,
     fat_table: FatTable,
 }
-
 #[repr(C)]
 struct FS_C {
     below: *mut inode_store_t,
@@ -125,6 +127,19 @@ impl<T: Stackable + IsDisk> FS<T> {
         return Ok(num_blocks_of_disk);
     }
 
+    fn calc_number_of_total_data_blocks(
+        num_blocks_needed_for_fat_table: u32,
+        num_blocks_for_superblock: u32,
+        num_blocks_needed_for_inode_table: u32,
+        num_blocks_of_disk: u32
+    ) -> Result<u32, Error> {
+        if num_blocks_of_disk <= num_blocks_needed_for_fat_table + num_blocks_for_superblock + num_blocks_needed_for_inode_table {
+            return Err(Error::DiskTooSmall);
+        } else {
+            return Ok(num_blocks_of_disk - (num_blocks_needed_for_fat_table + num_blocks_for_superblock + num_blocks_needed_for_inode_table));
+        }
+    }
+
     /// Returns the number of blocks needed for the fat table.
     fn calc_fat_table(
         num_blocks_of_disk: u32, 
@@ -139,7 +154,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         if num_blocks_of_disk <= num_blocks_for_superblock - 1 {
             panic!("disk too small");
         }
-        let num_entries = num_blocks_of_disk - num_blocks_needed_for_inode_table - 1;
+        let num_entries = num_blocks_of_disk - num_blocks_needed_for_inode_table - num_blocks_for_superblock;
         let mut num_blocks_needed_for_fat_table = libm::ceil(
             (num_entries * FAT_TABLE_ENTRY_WIDTH as u32) as f64 / BLOCK_SIZE as f64
         ) as u32;
@@ -149,7 +164,9 @@ impl<T: Stackable + IsDisk> FS<T> {
         return num_blocks_needed_for_fat_table;
     }
 
-    /// new calculates info from setup_disk and stores it, assumes setup_disk is called first
+    /// new calculates info from setup_disk and stores it in memory (snapshot)
+    /// assumes setup_disk is called first
+    /// invariant: all params are equal to ones called on setup_disk and immutable
     fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
         let num_blocks_inode_table = Self::calc_inode_table(num_inodes);
         let num_blocks_superblock = 1;
@@ -157,31 +174,39 @@ impl<T: Stackable + IsDisk> FS<T> {
             Ok(ans) => ans,
             Err(e) => 0
         };
+        let num_blocks_fat_table = Self::calc_fat_table(
+            num_blocks_of_disk, 
+            num_blocks_inode_table,
+            num_blocks_superblock
+        );
         FS {
             below: below,
             below_ino: below_ino,
             num_inodes: num_inodes,
+            num_data_blocks: Self::calc_number_of_total_data_blocks(
+                num_blocks_fat_table,
+                SUPERBLOCK_BLOCK_SIZE,
+                num_blocks_inode_table,
+                num_blocks_of_disk
+            ).unwrap(),
             superblock: Superblock {
                 fat_head_value: 0,
                 disk_block_index: 0
             },
             inode_table: InodeTable {
                 num_blocks: num_blocks_inode_table,
-                disk_block_index: num_blocks_superblock
+                disk_block_index: SUPERBLOCK_BLOCK_SIZE
             },
             fat_table: FatTable {
-                num_blocks: Self::calc_fat_table(
-                    num_blocks_of_disk, 
-                    num_blocks_inode_table,
-                    num_blocks_superblock
-                ),
-                disk_block_index: num_blocks_superblock + num_blocks_inode_table
+                num_blocks: num_blocks_fat_table,
+                disk_block_index: SUPERBLOCK_BLOCK_SIZE + num_blocks_inode_table
             }
         }
     }
 
     /// see https://www.cs.cornell.edu/courses/cs4411/2020sp/schedule/slides/06-Filesystems-FAT.pdf
-    /// setup writes to disk with empty data
+    /// setup persists to disk with empty data
+    /// invariant: all params are equal to the ones passed into init() and immuatable
     fn setup_disk(below: &mut T, below_ino: u32, num_inodes: u32) -> Result<i32, Error> {
         // the superblock is first 4 bytes and first block on the disk
         // the 4 bytes represent a i32
@@ -199,8 +224,10 @@ impl<T: Stackable + IsDisk> FS<T> {
         // inode table starts at second block
         // each entry for each inode is 8 bytes wide
         // every 4 bytes is the le representation of -1 starting out
+        // the the -1 means that the size is unitialized, and the head is unitialized
         // write num_blocks_needed_for_inode_table blocks 
         // the 4 bytes represent an i32
+        // if a rw operation on an out of bounds inode, snapshot (data from init) will error
         let mut inode_table_data = Block::new();
         let bytes = i32::to_le_bytes(-1);
         for i in 0..BLOCK_SIZE as usize / SUPERBLOCK_WIDTH as usize {
@@ -221,8 +248,10 @@ impl<T: Stackable + IsDisk> FS<T> {
             }
         }
         let num_blocks_needed_for_inode_table = Self::calc_inode_table(num_inodes);
-        for block_num in 1..num_blocks_needed_for_inode_table {
-            below.write(0, block_num, &inode_table_data)?;
+        let beg = SUPERBLOCK_BLOCK_SIZE as usize;
+        let end = (SUPERBLOCK_BLOCK_SIZE + num_blocks_needed_for_inode_table) as usize;
+        for block_num in beg..end {
+            below.write(0, block_num as u32, &inode_table_data)?;
         }
 
         // fat table starts at the block after the inode table
@@ -231,13 +260,15 @@ impl<T: Stackable + IsDisk> FS<T> {
         // -1 means null
         // how many entries needed? depends on number of blocks we have left
         // the 4 bytes are an i32
+        // if no more space left, snapshot (data from init) will error
         let num_blocks_needed_for_fat_table = Self::calc_fat_table(
             Self::calc_num_blocks_of_disk(&below)?, 
             num_blocks_needed_for_inode_table,
             1
         );
         let mut fat_table_data = Block::new();
-        for i in 0..BLOCK_SIZE as usize / SUPERBLOCK_WIDTH {
+        let end = BLOCK_SIZE as usize / SUPERBLOCK_WIDTH;
+        for i in 0..end {
             let bytes = i32::to_le_bytes(i as i32 + 1);
             #[cfg(unix)] {
                 let bytes = unix_fix_u8_to_i8(&bytes);
@@ -247,10 +278,10 @@ impl<T: Stackable + IsDisk> FS<T> {
                 fat_table_data.write_bytes(&bytes, i * SUPERBLOCK_WIDTH, (i * SUPERBLOCK_WIDTH) + SUPERBLOCK_WIDTH);
             }
         }
-        let beg = 1 + num_blocks_needed_for_inode_table;
-        let end = 1 + num_blocks_needed_for_inode_table + num_blocks_needed_for_fat_table;
+        let beg = (SUPERBLOCK_BLOCK_SIZE + num_blocks_needed_for_inode_table) as usize;
+        let end = (SUPERBLOCK_BLOCK_SIZE + num_blocks_needed_for_inode_table + num_blocks_needed_for_fat_table) as usize;
         for block_num in beg..end {
-            below.write(0, block_num, &fat_table_data)?;
+            below.write(0, block_num as u32, &fat_table_data)?;
         }
         Ok(0)
     }
@@ -357,6 +388,8 @@ impl<T: Stackable + IsDisk> FS<T> {
         let cur_head = self.superblock.fat_head_value;
         if cur_head == -1 {
             return Err(Error::UnknownFailure);
+        } else if cur_head >= self.num_data_blocks as i32 {
+            return Err(Error::OutOfSpace);
         }
         let mut block = Block::new();
         self.below.read(0, 0, &mut block);
@@ -397,16 +430,19 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
 
     /// Read the block at the offset'th block of the ino'th inode.
     fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+        if ino >= self.num_inodes {
+            return Err(Error::InodeOutOfBounds);
+        }
         let (head, size) = self.get_inode_info(ino)?;
         if offset as i32 >= size {
-            return Err(Error::UnknownFailure);
+            return Err(Error::ReadOffsetTooLarge);
         }
         if head < 0 {
-            return Err(Error::UnknownFailure);
+            return Err(Error::UnitializedInode);
         }
 
         let mut block_idx = head;
-        for i in 0..offset + 1 {
+        for i in 0..offset {
             let next = self.get_fat_table_info(block_idx);
             if next == NULL_POINTER && i != offset {
                 return Err(Error::UnknownFailure);
@@ -421,18 +457,25 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
 
     /// Write the block at the offset'th block of the ino'th inode.
     /// If offset < size, then overwrite the block at offset.
-    /// If offset == size, then append the block at offset from freelist, updating the superblock, inode table, and fat table.
+    /// If offset == size, then append the block at offset from freelist, updating the superblock, inode table, and fat table. Update size.
     /// If offset > size, then return an error.
+    /// Finally, if the ino has never been written, initialize it.
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error> {
-        let (head, size) = self.get_inode_info(ino)?;
-        if head < 0 || size < 0 {
-            return Err(Error::UnknownFailure);
+        if ino >= self.num_inodes {
+            return Err(Error::InodeOutOfBounds);
         }
-        if offset > size as u32 {
+        let (head, size) = self.get_inode_info(ino)?;
+        if head < 0 && size < 0 {
+            let new_block_idx = self.get_and_update_superblock()?;
+            self.update_inode_info(ino, new_block_idx as u32, 1);
+            self.update_fat_table_info(new_block_idx, NULL_POINTER);
+            
+            self.below.write(0, self.fat_table.disk_block_index + self.fat_table.num_blocks + new_block_idx, buf)?;
+        } else if offset > size as u32 {
             unimplemented!();
         } else if offset < size as u32 {
             let mut block_idx = head;
-            for i in 0..offset + 1 {
+            for i in 0..offset {
                 let next = self.get_fat_table_info(block_idx);
                 if next == NULL_POINTER && i != offset {
                     return Err(Error::UnknownFailure);
@@ -440,17 +483,11 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
                 block_idx = next;
             }
             self.below.write(0, self.fat_table.disk_block_index + self.fat_table.num_blocks + block_idx as u32, buf)?;
-        } else {
+        } else if offset == size as u32 {
             let mut last_block_idx = head;
-            for i in 0..offset + 1 {
+            for _ in 0..offset-1 {
                 let next = self.get_fat_table_info(last_block_idx);
-                if next == NULL_POINTER && i != offset {
-                    return Err(Error::UnknownFailure);
-                }
                 last_block_idx = next;
-            }
-            if last_block_idx != NULL_POINTER {
-                return Err(Error::UnknownFailure);
             }
 
             let new_block_idx = self.get_and_update_superblock()?;
@@ -459,6 +496,8 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
             self.update_fat_table_info(new_block_idx, NULL_POINTER);
             
             self.below.write(0, self.fat_table.disk_block_index + self.fat_table.num_blocks + new_block_idx, buf)?;
+        } else {
+            return Err(Error::UnknownCase);
         }
         Ok(0)
     }
@@ -662,7 +701,6 @@ mod tests {
         // Act
         let fs = fs_init_rs(below, below_ino, num_inodes);
 
-        // Assert
         // assert_eq!(fs.below, below);
         assert_eq!(fs.below_ino, below_ino);
         assert_eq!(fs.num_inodes, num_inodes);
@@ -671,17 +709,35 @@ mod tests {
         // 80 bytes needed for 10 inodes
         assert_eq!(fs.inode_table.num_blocks, 1);
         assert_eq!(fs.inode_table.disk_block_index, 1);
-        // 32 blocks - 1 for superblock - 1 for inode table = 30 blocks
-        // 30 blocks * 4 bytes per block = 120 bytes
-        // 120 bytes / 512 bytes per block = 0.234375 blocks
+        // 32 blocks - 1 for superblock - 1 for inode table = 30 blocks left
+        // 30 blocks * 4 bytes per block = 120 bytes needed to reference all blocks
+        // 120 bytes / 512 bytes per block = 0.234375 blocks needed 
+        // the fat table itself consumes a block, so its actually 29 blocks * 4 bytes
+        // see system of equations in fs.rs
         assert_eq!(fs.fat_table.num_blocks, 1);
         assert_eq!(fs.fat_table.disk_block_index, 2);
+    }
+
+    #[test]
+    fn setup_disk_test() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
+
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
+
+        assert_eq!(result_.get_inode_info(1).unwrap(), (-1, -1));
+
+        assert_eq!(result_.get_fat_table_info(0), 1);
     }
 
     // Test if the 'fs_create_rs' function successfully sets up the disk with the correct number of blocks and writes the superblock, inode table, and fat table data.
     // Coverage on disk table read and writes.
     #[test]
-    fn fs_create_rs_setup_disk_test() {
+    fn update_metadata_disk_test() {
         // Create a mock DiskFS instance
         let mut disk_fs = DiskFS::new();
 
@@ -736,7 +792,7 @@ mod tests {
     }
 
     #[test]
-    fn fs_write_test() {
+    fn fs_read_write_test() {
         // Create a mock DiskFS instance
         let mut disk_fs = DiskFS::new();
 
@@ -752,10 +808,78 @@ mod tests {
         let res = result_.write(1, 0, &block);
         assert_eq!(res.unwrap(), 0);
 
-        let res_ = result_.read(1, 0, &mut block);
+        let mut block_2 = Block::new();
+        let res_ = result_.read(1, 0, &mut block_2);
         assert_eq!(res_.unwrap(), 0);
-        let bytes_ = unix_fix_i8_to_u8_full(block.read_bytes());
-        assert_eq!(std::str::from_utf8(bytes_), Ok(ONE_BLOCK_STRING));
-
+        // let bytes_ = unix_fix_i8_to_u8_full(block_2.read_bytes());
+        // std::str::from_utf8(bytes_)
+        assert_eq!(block_2.read_bytes(), block.read_bytes());
     }
+
+    #[test]
+    fn fs_read_write_test_2blocks() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
+
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
+
+        let bytes = TWO_BLOCK_STRING.as_bytes();
+
+        let mut block = Block::new();
+        block.write_bytes(unix_fix_u8_to_i8_full(&bytes[0..512]), 0, 512);
+        let res = result_.write(1, 0, &block);
+        assert_eq!(res.unwrap(), 0);
+        let mut block_ = Block::new();
+        block_.write_bytes(unix_fix_u8_to_i8_full(&bytes[512..bytes.len()]), 0, 180);
+        let res = result_.write(1, 1, &block_);
+        assert_eq!(res.unwrap(), 0);
+
+        let mut block_2 = Block::new();
+        let mut res_ = result_.read(1, 0, &mut block_2);
+        assert_eq!(res_.unwrap(), 0);
+        assert_eq!(block_2.read_bytes(), block.read_bytes());
+
+        let mut block_2_ = Block::new();
+        res_ = result_.read(1, 1, &mut block_2_);
+        assert_eq!(res_.unwrap(), 0);
+        assert_eq!(block_2_.read_bytes(), block_.read_bytes());
+    }
+
+    #[test]
+    fn gen_read_write() {
+        // Create a mock DiskFS instance
+        let mut disk_fs = DiskFS::new();
+
+        // Call the fs_create_rs function
+        let result = fs_create_rs(&mut disk_fs, 0, NUM_INODES);
+        let mut result_ = fs_init_rs(disk_fs, 0, NUM_INODES);
+        // Assert that the setup_disk function was called successfully
+        assert_eq!(result, 0);
+
+        let bytes = TWO_BLOCK_STRING.as_bytes();
+
+        let mut block = Block::new();
+        block.write_bytes(unix_fix_u8_to_i8_full(&bytes[0..512]), 0, 512);
+        let res = result_.write(1, 0, &block);
+        assert_eq!(res.unwrap(), 0);
+        let mut block_ = Block::new();
+        block_.write_bytes(unix_fix_u8_to_i8_full(&bytes[512..bytes.len()]), 0, 180);
+        let res = result_.write(1, 1, &block_);
+        assert_eq!(res.unwrap(), 0);
+
+        let mut block_2 = Block::new();
+        let mut res_ = result_.read(1, 0, &mut block_2);
+        assert_eq!(res_.unwrap(), 0);
+        assert_eq!(block_2.read_bytes(), block.read_bytes());
+
+        let mut block_2_ = Block::new();
+        res_ = result_.read(1, 1, &mut block_2_);
+        assert_eq!(res_.unwrap(), 0);
+        assert_eq!(block_2_.read_bytes(), block_.read_bytes());
+    }
+
 }

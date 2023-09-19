@@ -48,6 +48,13 @@ pub struct Block {
 #[derive(Debug)]
 pub enum Error {
     UnknownFailure,
+    InodeOutOfBounds,
+    DiskTooSmall,
+    OutOfSpace,
+    ReadOffsetTooLarge,
+    UnitializedInode,
+    UnterminatedInode,
+    UnknownCase
 }
 
 /// Interface of every virtual layer in a filesystem.Functionality is implementation specific.

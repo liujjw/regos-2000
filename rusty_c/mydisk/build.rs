@@ -54,7 +54,23 @@ fn main() {
     // cc_builder.out_dir(&directory).compile("egos_file");
     // end remove
 
-    let bindings = bindgen::Builder::default()
+    #[cfg(unix)] {
+        let bindings = bindgen::Builder::default()
+        .header(headers_path_str)
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .ctypes_prefix("cty")
+        .use_core()
+        .clang_arg("--target=x86_64-unknown-linux-gnu")
+        .generate()
+        .expect("Unable to generate bindings");
+
+        bindings
+            .write_to_file(bindings_out_path.join("bindings.rs"))
+            .expect("Couldn't write bindings!");
+    }
+
+    #[cfg(not(unix))] {
+        let bindings = bindgen::Builder::default()
         .header(headers_path_str)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .ctypes_prefix("cty")
@@ -63,9 +79,10 @@ fn main() {
         .generate()
         .expect("Unable to generate bindings");
 
-    bindings
-        .write_to_file(bindings_out_path.join("bindings.rs"))
-        .expect("Couldn't write bindings!");
+        bindings
+            .write_to_file(bindings_out_path.join("bindings.rs"))
+            .expect("Couldn't write bindings!");
+    }
 
     cbindgen::Builder::new()
         .with_crate(crate_dir)
