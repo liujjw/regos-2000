@@ -1,3 +1,15 @@
+class Below:
+  def __init__(self):
+    self.mp = {}
+  
+  def read(self, inode, offset, data):
+    self.mp[(inode, offset)] = data
+
+  def write(self, inode, offset, data):
+    self.mp[(inode, offset)] = data
+
+below = Below()
+
 class Block:
   def __init__(self, data: list[bytes], ref_bit: bool, inode, offset, is_dirty):
     self.data = data 
@@ -26,10 +38,10 @@ class ClockCache:
       return self.clock_hand
 
   def read_below(self, inode, offset) -> list[bytes]:
-    return Block([b'0x0'] * 512, True, inode, offset, False)
+    return Block(below.read(inode, offset), True, inode, offset, False)
   
   def write_below(self, inode, offset, data: list[bytes]):
-    pass
+    below.write(inode, offset, data)
 
   def read(self, inode, offset) -> list[bytes]:
     if (inode, offset) in self.lookup:
@@ -79,3 +91,28 @@ class ClockCache:
         self.lookup[(inode, offset)] = idx
         self.clock_hand = idx
         del self.lookup[(block_to_evict.inode, block_to_evict.offset)]
+  
+  def below_get_size(self, inode):
+    return 0
+
+  def get_size(self, inode):
+    return self.below_get_size(inode)
+  
+  def below_set_size(self, inode, size):
+    pass
+  def set_size(self, inode, size):
+    self.below_set_size(inode, size)
+
+  def synch(self, inode):
+    if inode == -1:
+      for block_idx in range(self.len):
+        block = self.arr[block_idx]
+        if block.is_dirty:
+          self.write_below(block.inode, block.offset, block.data)
+          block.is_dirty = False
+    else:
+      for block_idx in range(self.len):
+        block = self.arr[block_idx]
+        if block.is_dirty and block.inode == inode:
+          self.write_below(block.inode, block.offset, block.data)
+          block.is_dirty = False
