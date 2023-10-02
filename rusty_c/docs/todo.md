@@ -102,3 +102,25 @@ struct foobar {
 don't put whitespace 
 
 write a driver prgram that interprets comma separated string of writes and reads of strings for the exhaustive test, but first get the basics to work (sanity check)
+
+# Last week of september
+1. Implement a caching layer.
+2. Clockdisk an lru cache.
+3. Make a write-back cache.
+
+1. Second chance algo different than clock algo.
+2. I'm using a doubly linked list as a queue for the inodes in the cache, at that point I could just implement LRU its way more intutive, but apparently 
+this is the exact reason an LRU cache is inefficient. So I'm supposed to use just raw memory.
+3. Require some thought whether to use reference counting or just rust borrowing system to share the inodes if im using like high level data structures and sharing memory. Then the code is gonna be concurrent in the future as well.
+4. CLock algo has a hand tht points to the last examined inode, which has a reference bit R which is 0, 1. If 0, put page there and advance hand. Otherwise, clear R, increment hand, and do so until we can replace the page.
+
+# Meeting notes
+Trumansburg 10 miles, taug
+
+Clock for free, no LL, dirty bit on evict, make sure to writeback on evicttion with dirty dit, 20 layers, clocks, lrus, raid, debugging, synch()
+RW LOCK the blcoks individually, or a big rw lock on the whole thing and then a marker on in progress
+read(upcall), write(upcall lambda: write to the missing entry where the in progress block is) (innovation on the interface for IO parralelleism)
+upcall based
+demo: constantly write to file block 0, synch, another app rading the same block over and over again (reader very slow in sync impl, reader unaffected by async)
+
+NEXT: new interface for async

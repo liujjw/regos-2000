@@ -33,6 +33,9 @@ Standard code testing (`cargo test`).
 # Testing both C with Rust on x86
 The makefile target `make rust_test` and `make rust_test_fatdisk` runs a basic test and produces binaries like `rust_test` in the `tools/` directory, as `egos` would call the Rust code from C. This binary is built from C code linked with the Rust object code. This binary can be stepped through with `gdb`. These tests are meant to be a sanity check that Rust and C are running together.
 
+# Fuzz and comprehensive testing
+See and compare Rust tests to Python toy implementations/outputs. 
+
 # miscellaneous
 # c2rust treedisk
 Similar process as before, but can now use instructions in `c2rust/` to generate a raw transpilation, which you can modify for `cargo build`.
