@@ -40,6 +40,7 @@ static A: EgosAllocator = EgosAllocator;
 // pub type Block = block_t;
 #[cfg_attr(unix, derive(Debug))]
 #[repr(C)]
+#[derive(Clone)]
 pub struct Block {
     // an i8 or u8 depending on platform
     pub bytes: [cty::c_char; BLOCK_SIZE as usize],

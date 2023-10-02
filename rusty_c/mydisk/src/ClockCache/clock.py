@@ -103,6 +103,7 @@ class ClockCache:
   def set_size(self, inode, size):
     self.below_set_size(inode, size)
 
+  # flushes the cache, writing all dirty blocks to disk
   def synch(self, inode):
     if inode == -1:
       for block_idx in range(self.len):
@@ -116,3 +117,4 @@ class ClockCache:
         if block.is_dirty and block.inode == inode:
           self.write_below(block.inode, block.offset, block.data)
           block.is_dirty = False
+    self.len = 0
