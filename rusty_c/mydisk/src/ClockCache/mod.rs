@@ -3,7 +3,7 @@
 extern crate alloc;
 
 // no_std hashmap, could use alloc::collections::HashMap instead as well
-use hashbrown::hash_map::{HashMap, DefaultState, RandomState};
+use hashbrown::HashMap;
 use crate::common::*;
 use alloc::boxed::Box;
 use crate::bindings::*;
@@ -12,11 +12,12 @@ use crate::TreediskFS_RS::*;
 struct CacheBlock {
     data: Block,
     ref_bit: bool,
-    inode: i32,
-    offset: i32,
+    inode: u32,
+    offset: u32,
     is_dirty: bool,
 }
 
+const INIT: Option<CacheBlock> = None;
 // Configuration paramters for the cache, must be set statically
 const MAX_SIZE: usize = 10000; 
 struct ClockCache<T: Stackable> {
@@ -25,7 +26,7 @@ struct ClockCache<T: Stackable> {
     // choose primitive array over vecdeque/linked list for performance
     arr: [Option<CacheBlock>; MAX_SIZE],
     clock_hand: usize,
-    lookup: HashMap<(i32, i32), usize, DefaultState<RandomState>>,
+    lookup: HashMap<(u32, u32), usize>,
     below: T,
     below_ino: u32,
     num_inodes: u32,
@@ -36,9 +37,9 @@ impl<T: Stackable> ClockCache<T> {
         ClockCache {
             capacity: MAX_SIZE,
             len: 0,
-            arr: [None; MAX_SIZE],
+            arr: [INIT; MAX_SIZE],
             clock_hand: 0,
-            lookup: HashMap::with_hasher(RandomState::default()),
+            lookup: HashMap::new(),
             below: below,
             below_ino: below_ino,
             num_inodes: num_inodes,
@@ -58,19 +59,22 @@ impl<T: Stackable> ClockCache<T> {
     }
 
     fn synch(&mut self, inode: i32) {
+        if inode < -1 {
+          panic!("inode must be -1 or greater");
+        }
         if inode == -1 {
             for block_idx in 0..self.len {
                 if let Some(block) = self.arr[block_idx].take() {
                     if block.is_dirty {
-                        self.below.write(block.inode, block.offset, block.data);
+                        self.below.write(block.inode, block.offset, &block.data);
                     }
                 }
             }
         } else {
             for block_idx in 0..self.len {
                 if let Some(block) = self.arr[block_idx].take() {
-                    if block.is_dirty && block.inode == inode {
-                        self.below.write(block.inode, block.offset, block.data);
+                    if block.is_dirty && block.inode == inode as u32 {
+                        self.below.write(block.inode, block.offset, &block.data);
                     }
                 }
             }
@@ -80,15 +84,17 @@ impl<T: Stackable> ClockCache<T> {
 }
 
 impl<T: Stackable> Stackable for ClockCache<T> {
-    fn get_size(&mut self, inode: u32) -> Result<i32, Error> {
-        self.below.get_size(inode)?
+    fn get_size(&self, inode: u32) -> Result<u32, Error> {
+        let size = self.below.get_size(inode)?;
+        Ok(size)
     }
 
     fn set_size(&mut self, inode: u32, size: u32) -> Result<i32, Error> {
-        self.below.set_size(inode, size)?
+        self.below.set_size(inode, size)?;
+        Ok(0)
     }
 
-    fn write(&mut self, inode: u32, offset: u32, data: &Block) {
+    fn write(&mut self, inode: u32, offset: u32, data: &Block) -> Result<i32, Error> {
         if let Some(&block_idx) = self.lookup.get(&(inode, offset)) {
             self.arr[block_idx] = Some(CacheBlock {
                 data: data.clone(),
@@ -98,6 +104,7 @@ impl<T: Stackable> Stackable for ClockCache<T> {
                 is_dirty: true,
             });
             self.clock_hand = block_idx;
+            Ok(0)
         } else {
             if self.len < self.capacity {
                 let block = CacheBlock {
@@ -109,15 +116,17 @@ impl<T: Stackable> Stackable for ClockCache<T> {
                 };
                 let idx = self.len;
                 self.arr[idx] = Some(block);
-                self.lookup.insert(&(inode, offset), idx);
+                self.lookup.insert((inode, offset), idx);
                 self.clock_hand = idx;
                 self.len += 1;
+                Ok(0)
             } else {
                 let idx = self.clock_find();
                 if let Some(block_to_evict) = self.arr[idx].take() {
                     if block_to_evict.is_dirty {
                         self.write(block_to_evict.inode, block_to_evict.offset, &block_to_evict.data);
                     }
+                    self.lookup.remove(&(block_to_evict.inode, block_to_evict.offset));
                 }
                 let block = CacheBlock {
                     data: data.clone(),
@@ -127,9 +136,9 @@ impl<T: Stackable> Stackable for ClockCache<T> {
                     is_dirty: true,
                 };
                 self.arr[idx] = Some(block);
-                self.lookup.insert(&(inode, offset), idx);
+                self.lookup.insert((inode, offset), idx);
                 self.clock_hand = idx;
-                self.lookup.remove(&(block_to_evict.inode, block_to_evict.offset));
+                Ok(0)
             }
         }
     }
@@ -138,12 +147,12 @@ impl<T: Stackable> Stackable for ClockCache<T> {
         if let Some(&block_idx) = self.lookup.get(&(inode, offset)) {
             self.arr[block_idx].as_mut().unwrap().ref_bit = true;
             self.clock_hand = block_idx;
-            buf.write_bytes(self.arr[block_idx].as_ref().unwrap().data.read_bytes(), 0, BLOCK_SIZE);
+            buf.write_bytes(self.arr[block_idx].as_ref().unwrap().data.read_bytes(), 0, BLOCK_SIZE as usize);
             Ok(0)
         } else {
             if self.len < self.capacity {
                 let block = Block::new();
-                self.below.read(inode, offset, block)?;
+                self.below.read(inode, offset, &mut block)?;
                 let idx = self.len;
                 let cacheblock = CacheBlock {
                     data: block,
@@ -153,20 +162,21 @@ impl<T: Stackable> Stackable for ClockCache<T> {
                     is_dirty: false,
                 };
                 self.arr[idx] = Some(cacheblock);
-                self.lookup.insert(&(inode, offset), idx);
+                self.lookup.insert((inode, offset), idx);
                 self.clock_hand = idx;
                 self.len += 1;
-                buf.write_bytes(self.arr[idx].as_ref().unwrap().data.read_bytes(), 0, BLOCK_SIZE);
+                buf.write_bytes(self.arr[idx].as_ref().unwrap().data.read_bytes(), 0, BLOCK_SIZE as usize);
                 Ok(0)
             } else {
                 let idx = self.clock_find();
                 if let Some(block_to_evict) = self.arr[idx].take() {
                     if block_to_evict.is_dirty {
-                        self.below.write(block_to_evict.inode, block_to_evict.offset, block_to_evict.data);
+                        self.below.write(block_to_evict.inode, block_to_evict.offset, &block_to_evict.data);
                     }
+                    self.lookup.remove(&(block_to_evict.inode, block_to_evict.offset));
                 }
                 let block = Block::new();
-                self.below.read(inode, offset, block)?;
+                self.below.read(inode, offset, &mut block)?;
                 let cacheblock = CacheBlock {
                     data: block,
                     ref_bit: true,
@@ -175,10 +185,9 @@ impl<T: Stackable> Stackable for ClockCache<T> {
                     is_dirty: false,
                 };
                 self.arr[idx] = Some(cacheblock);
-                self.lookup.insert(&(inode, offset), idx);
+                self.lookup.insert((inode, offset), idx);
                 self.clock_hand = idx;
-                self.lookup.remove(&(block_to_evict.inode, block_to_evict.offset));
-                buf.write_bytes(self.arr[idx].as_ref().unwrap().data.read_bytes(), 0, BLOCK_SIZE);
+                buf.write_bytes(self.arr[idx].as_ref().unwrap().data.read_bytes(), 0, BLOCK_SIZE as usize);
                 Ok(0)
             }
         }
