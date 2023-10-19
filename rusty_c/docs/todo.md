@@ -114,13 +114,29 @@ this is the exact reason an LRU cache is inefficient. So I'm supposed to use jus
 3. Require some thought whether to use reference counting or just rust borrowing system to share the inodes if im using like high level data structures and sharing memory. Then the code is gonna be concurrent in the future as well.
 4. CLock algo has a hand tht points to the last examined inode, which has a reference bit R which is 0, 1. If 0, put page there and advance hand. Otherwise, clear R, increment hand, and do so until we can replace the page.
 
-# Meeting notes
-Trumansburg 10 miles, taug
-
+# Pre-fall break Meeting notes
 Clock for free, no LL, dirty bit on evict, make sure to writeback on evicttion with dirty dit, 20 layers, clocks, lrus, raid, debugging, synch()
 RW LOCK the blcoks individually, or a big rw lock on the whole thing and then a marker on in progress
 read(upcall), write(upcall lambda: write to the missing entry where the in progress block is) (innovation on the interface for IO parralelleism)
-upcall based
+upcall based (async)
 demo: constantly write to file block 0, synch, another app rading the same block over and over again (reader very slow in sync impl, reader unaffected by async)
 
-NEXT: new interface for async
+# progress since fall break 
+## impl caching layer 
+write behind, synch will flush dirty blocks in write behind, synch(specific inode), sync(-1) flush all dirty blocks, clock algorithm for cache evicton
+
+demo: constantly write to file block 0, synch, another app rading the same block over and over again (reader very slow in sync impl, reader unaffected by async)
+
+## concurrent/async filesystem
+rw lock on inodes
+RW LOCK the blcoks individually, or a big rw lock on the whole thing and then a marker on in progress
+read(upcall), write(upcall lambda: write to the missing entry where the in progress block is) (innovation on the interface for IO parralelleism)
+upcall based (async)
+
+## benchmarking?
+flamegraphs, profiling 
+
+# meet oct 19
+
+# new progress post oct 19
+
