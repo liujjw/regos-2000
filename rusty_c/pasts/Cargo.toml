@@ -5,4 +5,13 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[dependencies.async_main]
+version = "0.4"
+features = ["pasts"]
+
+[dependencies.pasts]
+version = "0.14"
+default-features = false
+
+[dependencies.rlsf]
+version = "0.2"

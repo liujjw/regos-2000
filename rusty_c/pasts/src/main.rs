@@ -7,6 +7,11 @@
 //! cargo +nightly run                                                           
 //! ```
 
+
+// TODO testing with RISCV: rustup default nightly, (switch toolchain to nightly)
+// added riscv32imac-unknown-none-elf target (install and switch target to riscv)
+// switched default target to riscv32imac-unknown-none-elf
+
 #![no_std]
 #![no_main]
 #![feature(lang_items)]
