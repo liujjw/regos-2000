@@ -124,19 +124,48 @@ demo: constantly write to file block 0, synch, another app rading the same block
 # progress since fall break 
 ## impl caching layer 
 write behind, synch will flush dirty blocks in write behind, synch(specific inode), sync(-1) flush all dirty blocks, clock algorithm for cache evicton
+clock cache done, 
+# TODO im working on theres some annoying design implementation details ,exhaustive testing working on a demo and benchmarks
+# generally wrapping up and demoing the layering and synchronous filesystem stuff
+## benchmarking?
+flamegraphs, profiling 
 
-demo: constantly write to file block 0, synch, another app rading the same block over and over again (reader very slow in sync impl, reader unaffected by async)
+## oct 17th progress
+barriers: tokio doesn't work on embedded, theres a very basic mutex and CAS in the cortex-m crate, but it doesn't work on riscv32i, so i look at something in between from the rust for linux project
 
-## concurrent/async filesystem
+concurrency model
+couple stages to extend the filesytem interface to be upcall based:
+implement a reader writer lock, i need to atomically update and read the read and write counts, but one challenge is i think im limited to a spinlock for a mutex operation, in general a lot of the concurrency primitives are bugged in the riscv rust compiler, its very technical i dont really understand it
+
+# oct17th meeting notes
+## opcalls
+link and load for riscv or store and release opcalls
+read and later store, read the value and only store if no one else changed the value in the meantime (store and release)
+## coop multitasking
+theres native async await syntax and passing functions around as upcalls, theres an embedded runtime for it called pasts, 
+
+bag of upcalls (like event set) to upcalls to complete next, try this or try the other approach
+
+otherwise upcalls are reentrant, and need to syncrhonize, so try different approaches, be careful of SYNC, one thread vs multiple threads, prioritize the upcalls? more difficult to code
+
 rw lock on inodes
 RW LOCK the blcoks individually, or a big rw lock on the whole thing and then a marker on in progress
 read(upcall), write(upcall lambda: write to the missing entry where the in progress block is) (innovation on the interface for IO parralelleism)
 upcall based (async)
 
-## benchmarking?
-flamegraphs, profiling 
+# nov 9th progress
+constrained by what libraries or existing design patterns that are already available for me because i dont think i have enough expertise to design my own things, riscv is a tier 2 platform so a lot of embedded libraries dont work that well or at all
 
-# meet oct 19
+start with something simple just to get an idea of the interface im gonna make
+bag of upcalls, single thread, no sync
 
-# new progress post oct 19
+cooperative multitasking, an executor which will schedule the calls, concurrency comes in when
+we need to wait on the io to complete, the executor will just schedule the next upcall to run, and the upcall will return a future, and the executor will run the future, and the future will return a value, and the upcall will return the value, and the executor will schedule the next upcall to run, and so on
+(pasts crate)
+mpsc channel is another approach, the io are the produceers and the single consumer is the ?  
+see design note for more info
 
+# post nov9th testing
+constantly write to file block 0, synch, another app rading the same block over and over again (reader very slow in sync impl, reader unaffected by async)
+
+# nov 9th meeting
