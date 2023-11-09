@@ -58,11 +58,18 @@ lazy(Rust Tokio) vs eager(JS) engine
 in nostd, runtime/executor/engine: pasts vs Tokio
 
 in tokio:
-`async fn run() { tokio::join! {task1, task2, task3} }` // lazy, async and unrelated
+`async fn run() { tokio::join! {task1, task2, task3} }` // async and unrelated
 `async fn run() { tokio::spawn(async {task1.await?; task2.await?; task3.await?;}) }` // eager, illusion of synchronous
 let future = run(); // lazy future
 let rt = runtime::new();
 rt.block_on(future) // blocking
 the executor must go over the specific tasks and run them, the executor does not go over all your code, hence top level call is blocking
+
+# progress
+toy code running on x86
+REWRITE NECESSAERY
+
+# riscv
+works on x86, not riscv yet
 
 # rw-lock

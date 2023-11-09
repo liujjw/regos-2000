@@ -68,6 +68,8 @@ pub trait Stackable {
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error>;
 }
 
+
+
 /// Structs implementing this trait are the disk itself
 pub trait IsDisk {}
 

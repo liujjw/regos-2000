@@ -137,8 +137,26 @@ concurrency model
 couple stages to extend the filesytem interface to be upcall based:
 implement a reader writer lock, i need to atomically update and read the read and write counts, but one challenge is i think im limited to a spinlock for a mutex operation, in general a lot of the concurrency primitives are bugged in the riscv rust compiler, its very technical i dont really understand it
 
+# cache stuff
+benchmarking TODO
+layering TODO
+async operations future TODO async or concurrent 
+cache blocks: layers: synch inode: write thru cache, wrrite behiond cache(synch
+what does synch do?
+sizse of cache? diminishing return
+lrucache? clock strategy is approx for speed...
+cc fs: io concurrency: rw lock on inodes 
+layers..
+impl caching layer 
+both write thru and write behind
+synch will flush dirty blocks in write behind 
+synch(specific inode), sync(-1) flush all dirty blocks
+fsync 
+clock algorithm for cache evicton
+
+
 # oct17th meeting notes
-## opcalls
+## opcodes
 link and load for riscv or store and release opcalls
 read and later store, read the value and only store if no one else changed the value in the meantime (store and release)
 ## coop multitasking
@@ -167,5 +185,8 @@ see design note for more info
 
 # post nov9th testing
 constantly write to file block 0, synch, another app rading the same block over and over again (reader very slow in sync impl, reader unaffected by async)
+
+# todo
+get tested and working with riscv!
 
 # nov 9th meeting

@@ -12,7 +12,14 @@ test = true
 cty = "0.2.2"
 libm = "0.2.7"
 hashbrown = "0.14.1"
-pasts = "0.14.3"
+
+[dependencies.pasts]
+version = "0.14.3"
+default-features = false
+
+[dependencies.async_main]
+version = "0.4"
+features = ["pasts"]
 
 [build-dependencies]
 bindgen = "0.65.1"
