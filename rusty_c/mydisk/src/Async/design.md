@@ -1,7 +1,7 @@
 # info 
 build concurency into the kernel directly to speed up io
-use a single thread, bag of upcalls, these upcalls can be nested, values passed, and look synchronous if desired
-implement a rw-lock
+use a single thread, set of upcalls, these upcalls can be nested, values passed, and look synchronous if desired
+implement a rw-lock on inodes
 the upcalls can also be unrelated, be synchronized like the the fork-join pattern from c
 basically, a scheduler runtime will determine which task to run, and yield the task when waiting on disk for example
 
@@ -17,6 +17,14 @@ c_async_b("read", 1, 1, buf, upcall1),
 ```
 the semantics of the above will be eager blocking synchrnonous execution of the first read,
 however we cannot pass values to nested upcalls
+
+* reentrancy of upcalls, timer?
+* queue of func arg (timer) pointer pairs (thunks), an eager event loop that checks the queue of thunks algol60
+* the timer is for relative order in simulations
+* read(ino, offset, thunk) // the thunks can create further downcalls or further thunks, put new thunks at the end of the queue, 
+* no nesting (if calling up that would be reentrant, so just call down and put a thunk at the end of the queue) 
+* continuations with async/awaits? saving context and restoring context so bad, prev system not necessary
+* use a makefile to encode 
 
 then blocking asynchronous execution within the nested upcalls as needed we could also do
 ```
@@ -73,3 +81,4 @@ REWRITE NECESSAERY
 works on x86, not riscv yet
 
 # rw-lock
+the instructions for riscv 
