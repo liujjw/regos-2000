@@ -9,6 +9,13 @@ use alloc::boxed::Box;
 use crate::bindings::*;
 use crate::TreediskFS_RS::*;
 
+// async
+use async_main::{async_main, LocalSpawner};
+use pasts::{prelude::*, Loop};
+
+// 512 * 100 = 512,000 bytes or 512 KB
+const BATCH_SIZE: usize = 100;
+
 struct CacheBlock {
     data: Block,
     ref_bit: bool,
@@ -84,7 +91,7 @@ impl<T: Stackable> ClockCache<T> {
 }
 
 impl<T: Stackable> Stackable for ClockCache<T> {
-    fn get_size(&self, inode: u32) -> Result<u32, Error> {
+    fn get_size(&mut self, inode: u32) -> Result<u32, Error> {
         let size = self.below.get_size(inode)?;
         Ok(size)
     }
@@ -143,7 +150,7 @@ impl<T: Stackable> Stackable for ClockCache<T> {
         }
     }
 
-    fn read(&self, inode: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, inode: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         if let Some(&block_idx) = self.lookup.get(&(inode, offset)) {
             self.arr[block_idx].as_mut().unwrap().ref_bit = true;
             self.clock_hand = block_idx;
@@ -151,7 +158,7 @@ impl<T: Stackable> Stackable for ClockCache<T> {
             Ok(0)
         } else {
             if self.len < self.capacity {
-                let block = Block::new();
+                let mut block = Block::new();
                 self.below.read(inode, offset, &mut block)?;
                 let idx = self.len;
                 let cacheblock = CacheBlock {
@@ -175,7 +182,7 @@ impl<T: Stackable> Stackable for ClockCache<T> {
                     }
                     self.lookup.remove(&(block_to_evict.inode, block_to_evict.offset));
                 }
-                let block = Block::new();
+                let mut block = Block::new();
                 self.below.read(inode, offset, &mut block)?;
                 let cacheblock = CacheBlock {
                     data: block,

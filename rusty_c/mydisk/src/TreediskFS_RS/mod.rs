@@ -122,7 +122,7 @@ impl<T: Stackable + IsDisk> FS<T> {
     }
 
     /// Returns the number of blocks on the disk.
-    fn calc_num_blocks_of_disk(below: &T) -> Result<u32, Error> {
+    fn calc_num_blocks_of_disk(below: &mut T) -> Result<u32, Error> {
         let num_blocks_of_disk = below.get_size(0)?;
         return Ok(num_blocks_of_disk);
     }
@@ -167,10 +167,10 @@ impl<T: Stackable + IsDisk> FS<T> {
     /// new calculates info from setup_disk and stores it in memory (snapshot)
     /// assumes setup_disk is called first
     /// invariant: all params are equal to ones called on setup_disk and immutable
-    fn new(below: T, below_ino: u32, num_inodes: u32) -> Self {
+    fn new(mut below: T, below_ino: u32, num_inodes: u32) -> Self {
         let num_blocks_inode_table = Self::calc_inode_table(num_inodes);
         let num_blocks_superblock = 1;
-        let num_blocks_of_disk = match Self::calc_num_blocks_of_disk(&below) {
+        let num_blocks_of_disk = match Self::calc_num_blocks_of_disk(&mut below) {
             Ok(ans) => ans,
             Err(e) => 0
         };
@@ -262,7 +262,7 @@ impl<T: Stackable + IsDisk> FS<T> {
         // the 4 bytes are an i32
         // if no more space left, snapshot (data from init) will error
         let num_blocks_needed_for_fat_table = Self::calc_fat_table(
-            Self::calc_num_blocks_of_disk(&below)?, 
+            Self::calc_num_blocks_of_disk(below)?, 
             num_blocks_needed_for_inode_table,
             1
         );
@@ -309,7 +309,7 @@ impl<T: Stackable + IsDisk> FS<T> {
     }
 
     /// Return the next block number index in the fat table for a given index.
-    fn get_fat_table_info(&self, idx: i32) -> i32 {
+    fn get_fat_table_info(&mut self, idx: i32) -> i32 {
         if idx < 0 {
             return NULL_POINTER;
         }
@@ -350,7 +350,7 @@ impl<T: Stackable + IsDisk> FS<T> {
     }
 
     /// Return the head and size of the inode.
-    fn get_inode_info(&self, ino: u32) -> Result<(i32, i32), Error> {
+    fn get_inode_info(&mut self, ino: u32) -> Result<(i32, i32), Error> {
         let (inner_block_num, start_byte_within_block) = Self::calc_inode_table_indices(ino);
 
         let mut block = Block::new();
@@ -406,7 +406,7 @@ impl<T: Stackable + IsDisk> FS<T> {
 
 impl<T: Stackable + IsDisk> Stackable for FS<T> {
     /// Read the ino'th entry of the inode table 
-    fn get_size(&self, ino: u32) -> Result<u32, Error> {
+    fn get_size(&mut self, ino: u32) -> Result<u32, Error> {
         let (_, size) = self.get_inode_info(ino)?;
         if size <= -1 {
             return Err(Error::UnknownFailure);
@@ -429,7 +429,7 @@ impl<T: Stackable + IsDisk> Stackable for FS<T> {
     }
 
     /// Read the block at the offset'th block of the ino'th inode.
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         if ino >= self.num_inodes {
             return Err(Error::InodeOutOfBounds);
         }
@@ -651,7 +651,7 @@ mod tests {
         impl IsDisk for RamFS {}
 
         impl Stackable for RamFS {
-            fn get_size(&self, ino: u32) -> Result<u32, crate::common::Error> {
+            fn get_size(&mut self, ino: u32) -> Result<u32, crate::common::Error> {
                 Ok((DEBUG_SIZE / BLOCK_SIZE) as u32)
             }
 

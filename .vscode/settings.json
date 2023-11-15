@@ -10,6 +10,7 @@
         "./rusty_c/mydisk/Cargo.toml",
         "./rusty_c/mydisk/Cargo.toml",
         "./rusty_c/mydisk/Cargo.toml",
+        "./rusty_c/mydisk/Cargo.toml",
         "./rusty_c/mydisk/Cargo.toml"
     ],
     "python.linting.enabled": false

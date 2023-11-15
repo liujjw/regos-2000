@@ -18,14 +18,6 @@ c_async_b("read", 1, 1, buf, upcall1),
 the semantics of the above will be eager blocking synchrnonous execution of the first read,
 however we cannot pass values to nested upcalls
 
-* reentrancy of upcalls, timer?
-* queue of func arg (timer) pointer pairs (thunks), an eager event loop that checks the queue of thunks algol60
-* the timer is for relative order in simulations
-* read(ino, offset, thunk) // the thunks can create further downcalls or further thunks, put new thunks at the end of the queue, 
-* no nesting (if calling up that would be reentrant, so just call down and put a thunk at the end of the queue) 
-* continuations with async/awaits? saving context and restoring context so bad, prev system not necessary
-* use a makefile to encode 
-
 then blocking asynchronous execution within the nested upcalls as needed we could also do
 ```
 void join(an array of function pointers)
@@ -82,3 +74,25 @@ works on x86, not riscv yet
 
 # rw-lock
 the instructions for riscv 
+
+# meeting nov 9
+* reentrancy of upcalls, timer?
+* queue of func arg (timer) pointer pairs (thunks), an eager event loop that checks the queue of thunks algol60
+* the timer is for relative order in simulations
+* read(ino, offset, thunk) // the thunks can create further downcalls or further thunks, put new thunks at the end of the queue, 
+* no nesting (if calling up that would be reentrant, so just call down and put a thunk at the end of the queue) 
+* continuations with async/awaits? saving context and restoring context so bad, prev system not necessary
+* use a makefile to encode 
+
+# code progess for nov 16
+clock cache will contain an event loop, if the elem is not in the cache, then we will submit those disk ops to the event loop, 
+we can only have a fixed vector to loop on, so everytime we add a set of operations to our queue, we will loop some of them to run, and then keep looping until there are no more left (batch processing, i cant add to the event loop while its already running a batch, ie not dynamic)
+
+need to figure out how long one of them takes though, ideally by running on the arduino board,
+or i can just set configuration parameters and benchmark the best batch size
+
+we target x86 no_std for now
+
+compiling using nightly
+nightly-x86_64-unknown-linux-gnu (default)
+rustc 1.74.0-nightly (9f5fc1bd4 2023-09-02)

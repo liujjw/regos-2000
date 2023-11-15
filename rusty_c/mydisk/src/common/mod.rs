@@ -59,12 +59,13 @@ pub enum Error {
 }
 
 /// Interface of every virtual layer in a filesystem.Functionality is implementation specific.
+/// All self referenced are mutable for simplicity; RefCell unavailable in no_std.
 pub trait Stackable {
-    fn get_size(&self, ino: u32) -> Result<u32, Error>;
+    fn get_size(&mut self, ino: u32) -> Result<u32, Error>;
     fn set_size(&mut self, ino: u32, size: u32) -> Result<i32, Error>;
     // &mut is safer for compatiblity with C, since below will call read and needs a *mut
     // however, assume read does not mutate 
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error>;
     fn write(&mut self, ino: u32, offset: u32, buf: &Block) -> Result<i32, Error>;
 }
 
@@ -183,7 +184,7 @@ impl DiskFS {
 
 impl Stackable for DiskFS {
     /// Returns total number of blocks on disk. Inodes are not a concept on disk layer.
-    fn get_size(&self, ino: u32) -> Result<u32, Error> {
+    fn get_size(&mut self, ino: u32) -> Result<u32, Error> {
         // make up dummy arguments
         // https://stackoverflow.com/questions/36005527/why-can-functions-with-no-arguments-defined-be-called-with-any-number-of-argumen
         unsafe { Ok((self.ds_get_size)(core::ptr::null_mut(), 0) as u32) }
@@ -201,7 +202,7 @@ impl Stackable for DiskFS {
     }
 
     /// Read the block specified by offset, ino is unused.
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         unsafe {
             match (self.ds_read)(self.unchecked_share_into(), ino, offset, buf.share_into_()) {
                 -1 => Err(Error::UnknownFailure),

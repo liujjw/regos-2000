@@ -10,7 +10,7 @@ use core::mem::size_of;
 // include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 use crate::bindings::*;
 
-/// For type inconsistencies from egos C, favor the inode_store_t struct when interfacing with egos C code as canonical; favor Rust Stackable trait otherwise.
+/// For type inconsistencies from egos C, favor the inode_store_t struct when interfacing with egos C code as canonical; favor Rust 223 trait otherwise.
 /// Type inconsistencies may result in undefined behavior, but we leave it to egos C to handle that if it comes up.
 
 /// To convert to and from egos C types, we take memory pointers with the intent to own them (copying and freeing the original memory has some limitations). We return pointers heap memory to egos C when needed, but then memory management responsibility is on egos C.
@@ -217,7 +217,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
     }
 
     /// Number of used blocks per inode.
-    pub fn read_blocks_used(&self, ino: u32) -> u32 {
+    pub fn read_blocks_used(&mut self, ino: u32) -> u32 {
         let (block_no, byte_index) = self.compute_indices(ino).unwrap();
 
         let mut buf = Block::new();
@@ -241,7 +241,7 @@ impl<T: Stackable + IsDisk> SimpleFS<T> {
 impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     /// Return # of blocks per inode, constant for all inodes.
     // TODO update to the appropriate read_blocks_used impl?
-    fn get_size(&self, ino: u32) -> Result<u32, Error> {
+    fn get_size(&mut self, ino: u32) -> Result<u32, Error> {
         let num = self.below.get_size(ino)?;
         let denom = self.num_inodes;
         if denom == 0 || num == 0 || num < denom {
@@ -260,7 +260,7 @@ impl<T: Stackable + IsDisk> Stackable for SimpleFS<T> {
     /// Thus, read the block specified by ino and offset.
     // We will need to shift reads and writes over by the size of the metadata blocks.
     // Assume we start writing at offset 0.
-    fn read(&self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
+    fn read(&mut self, ino: u32, offset: u32, buf: &mut Block) -> Result<i32, Error> {
         let blocks_used = self.read_blocks_used(ino);
         if offset >= blocks_used {
             return Err(Error::UnknownFailure);
