@@ -9,13 +9,6 @@ use alloc::boxed::Box;
 use crate::bindings::*;
 use crate::TreediskFS_RS::*;
 
-// async
-use async_main::{async_main, LocalSpawner};
-use pasts::{prelude::*, Loop};
-
-// 512 * 100 = 512,000 bytes or 512 KB
-const BATCH_SIZE: usize = 100;
-
 struct CacheBlock {
     data: Block,
     ref_bit: bool,

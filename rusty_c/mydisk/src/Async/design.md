@@ -85,12 +85,37 @@ the instructions for riscv
 * use a makefile to encode 
 
 # code progess for nov 16
-clock cache will contain an event loop, if the elem is not in the cache, then we will submit those disk ops to the event loop, 
-we can only have a fixed vector to loop on, so everytime we add a set of operations to our queue, we will loop some of them to run, and then keep looping until there are no more left (batch processing, i cant add to the event loop while its already running a batch, ie not dynamic)
+## clock cache
+clock cache will contain an event loop, if the elem is not in the cache, then we will submit those disk ops to the event loop
 
-need to figure out how long one of them takes though, ideally by running on the arduino board,
-or i can just set configuration parameters and benchmark the best batch size
 
+
+## batch processing
+we can  have a fixed vector to loop on, so everytime we add a set of operations to our queue, we will loop some of them to run, and then keep looping until there are no more left (not dynamic)
+
+need to figure out how long one of them takes though, ideally by running on the arduino board, or i can just set configuration parameters and benchmark the best batch size
+
+## spawn
+or i can spawn to put task on a queue, once the number of tasks on the queue is greater than the batch size, then we can run the batch, but no upcalls
+or have a background daemon that runs the batch every so often, or if the batch is full
+or just run the batch on reads, or if the batch is full (need logs for recovery on power loss)
+
+## additional layer
+have an additional layer which contains the event loop handler?
+
+## clock cache no good
+having an async wrapper over slow sync code wont make it faster, we need to rewrite the entire code down to be async
+1. start with the lowest level disk read and write at the hardware level, make it async (rewrite all the code)
+2. then have a layer on top of all async layers which contains the event loop handler (basically use pasts as the high level api, its the queue, and all the upcalls)
+3. now the hard part is actually making the the low level code async, with interrupts or threads
+
+## upcalls
+we can register upcalls as described in the api
+
+## api
+figuring out the types and api, quite complicated
+
+## config
 we target x86 no_std for now
 
 compiling using nightly
