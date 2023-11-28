@@ -121,3 +121,29 @@ we target x86 no_std for now
 compiling using nightly
 nightly-x86_64-unknown-linux-gnu (default)
 rustc 1.74.0-nightly (9f5fc1bd4 2023-09-02)
+
+
+instead off interrupt vector theres a single interrupt handler that determines the source of the interrupt
+
+address of the interrupt handler (buffer block of memory) []
+disk block regsiter # []
+command control register []      the ram the disk ()
+
+instead of polling the command control register for when teh control bit is set for when the read/write is done, we can use interrupts
+
+interupts disabled in kernel but enabled in userspace, interruptsa reanbled on returned
+
+it is safe for the interrupt handler to call the upcall since the ineterrupts are disabled in the kernel
+
+read (modify the disk controller code to immediately return) -> complete immediately and move on -> interrupt will happen, there will be an interrupt handler (so modify the interrupt handler), and which will call the upcall we have specified, the upcall will be called in the interrupt handler, and the interrupt handler will return, and the kernel will return to the user space code, and the user space code will continue executing 
+
+run queue (timesharing)
+keyboard queue, network queue, disk queue, timer queue, in our case its the disk queue, remove from disk queue and stick it on the run queue
+2 queues
+
+* be careful about processes that want to read the same block so dont do the same operation make sure to read the same block only once
+
+* moving from c to rust, its interesting in this case as a reasearch case
+* egos 1 thing at a time, no async now, unusable
+
+no locks needed since no threads
