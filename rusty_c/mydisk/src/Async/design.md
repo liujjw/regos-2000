@@ -122,7 +122,7 @@ compiling using nightly
 nightly-x86_64-unknown-linux-gnu (default)
 rustc 1.74.0-nightly (9f5fc1bd4 2023-09-02)
 
-
+## pre nov 28
 instead off interrupt vector theres a single interrupt handler that determines the source of the interrupt
 
 address of the interrupt handler (buffer block of memory) []
@@ -147,3 +147,17 @@ keyboard queue, network queue, disk queue, timer queue, in our case its the disk
 * egos 1 thing at a time, no async now, unusable
 
 no locks needed since no threads
+
+# nov 28
+read sifive (they make the arty board) and riscv manuals, maybe theres a rust library for riscv cores that already implements a few things i need (critical section, disabling interrupts)
+
+nothing compiles yet so i dont have demo
+
+my general work flow is:
+1. modify the sd card driver, sp1 chatper 19, instead of busy waiting in `sd_rw.c` for `recv_data_byte`, we enqueue reads and writes, then when we receive interrupts for when the device is ready, we continue with `sd_exec_cmd` which returns immediately, then instead of busy waiting for the response, we return until interrupted again, when we receive it we finish our upcalls (async)
+1.5 not sure if all the registers are automatically saved when the interrupt handler is called in kernel mode
+2. register and modify the interrupt handler, disabling interrupts while in the handler, (set the interrupts from SP1 controller from step 1) enable interrupts in the 1) `SPI1` controller interface chapter19 2) and in `PLIC` interface, and return from handler with setting an `mepc` program counter and an `mret` instruction
+
+
+1. contacting yunhao with a list of questions 
+2. hard to test on qemu since only supports ROM

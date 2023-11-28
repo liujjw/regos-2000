@@ -1,0 +1,6 @@
+[target.riscv32i-unknown-none-elf]
+runner = "riscv64-unknown-elf-gdb -q -x gdb_init"
+rustflags = []
+
+[build]
+target = "riscv32i-unknown-none-elf"
