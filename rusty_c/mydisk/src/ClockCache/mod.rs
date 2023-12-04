@@ -7,7 +7,7 @@ use hashbrown::HashMap;
 use crate::common::*;
 use alloc::boxed::Box;
 use crate::bindings::*;
-use crate::TreediskFS_RS::*;
+use crate::FATdiskFS::*;
 
 struct CacheBlock {
     data: Block,

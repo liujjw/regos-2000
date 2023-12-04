@@ -154,10 +154,23 @@ read sifive (they make the arty board) and riscv manuals, maybe theres a rust li
 nothing compiles yet so i dont have demo
 
 my general work flow is:
-1. modify the sd card driver, sp1 chatper 19, instead of busy waiting in `sd_rw.c` for `recv_data_byte`, we enqueue reads and writes, then when we receive interrupts for when the device is ready, we continue with `sd_exec_cmd` which returns immediately, then instead of busy waiting for the response, we return until interrupted again, when we receive it we finish our upcalls (async)
-1.5 not sure if all the registers are automatically saved when the interrupt handler is called in kernel mode
-2. register and modify the interrupt handler, disabling interrupts while in the handler, (set the interrupts from SP1 controller from step 1) enable interrupts in the 1) `SPI1` controller interface chapter19 2) and in `PLIC` interface, and return from handler with setting an `mepc` program counter and an `mret` instruction
+1. (`sd-rw.c`) modify the sd card driver, sp1 chatper 19, instead of busy waiting in `sd_rw.c` for `recv_data_byte`, we enqueue reads and writes, then when we receive interrupts for when the device is ready, we continue with `sd_exec_cmd` which returns immediately, then instead of busy waiting for the response, we return until interrupted again, when we receive it we finish our upcalls (async)
+1.5 not sure if all the registers are automatically saved when the interrupt handler is called in kernel mode (we can instruct the compiler to insert instructions to save certain registers for us, or we can use assembly to manually save certain registers)
+2. (`main.rs`) register (`process.c`) and modify the interrupt handler (`void intr_entry(int id)`), disabling interrupts while in the handler, (set the interrupts from SP1 controller from step 1) enable interrupts in the 1) `SPI1` controller interface chapter19 2) and in `PLIC` interface, and return from handler with setting an `mepc` program counter and an `mret` instruction
 
 
 1. contacting yunhao with a list of questions 
 2. hard to test on qemu since only supports ROM
+
+# nov 28
+keyboard another process can run
+t2i server deals with keyboard io, so do the same thing as the keyboard driver
+interruot mask auto set
+programmable logic interrupt controller
+multiplex controller, we can read the right register to figure out the device
+one handler instead of interruot vector
+c compiler automatically saves and resotres registers from the c atttribute
+return from the handler auto generated??
+if doing syscall then we need instruction dealing with special register in interrupt handler
+fix stack pointer in interrupt handler
+switch to kernel stack instead of saving stuff to user stack
