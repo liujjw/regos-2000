@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# udev rules for openocd https://docs.rust-embedded.org/book/intro/install/linux.html#udev-rules
-# openocd from sifive
-# echo "[!] Installing openocd and adding to path"
-# wget https://static.dev.sifive.com/dev-tools/riscv-openocd-0.10.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-# tar -zxvf riscv-openocd-0.10.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-# rm -rf riscv-openocd-0.10.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-# export PATH=$PATH:$(pwd)/riscv-openocd-0.10.0-2019.02.0-x86_64-linux-ubuntu14/bin
-
 # clang for cargo bindgen
 # clang from ubuntu14 package manager is outdated for cargo bindgen (3.x < 5.0)
 # sudo apt-get install llvm-dev libclang-dev clang

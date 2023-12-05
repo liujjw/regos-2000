@@ -1,3 +1,6 @@
+# cloning
+submodule freedom-e-sdk?
+
 # info
 See the [slides](https://docs.google.com/presentation/d/10hhuhs7llfoi1PVC1HcoEz6FisEelULdneU84EUE_8o/edit?usp=sharing) for a high level overview and more context. egos-2000 with drop-in rust modules. regos-2000 invokes rust -> earth -> grass, because rust code permeates the original egos-2000.
 

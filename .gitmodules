@@ -1,0 +1,3 @@
+[submodule "rusty_c/sifive-freedom-e-sdk"]
+	path = rusty_c/sifive-freedom-e-sdk
+	url = https://github.com/sifive/freedom-e-sdk

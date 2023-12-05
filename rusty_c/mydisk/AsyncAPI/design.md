@@ -174,3 +174,20 @@ return from the handler auto generated??
 if doing syscall then we need instruction dealing with special register in interrupt handler
 fix stack pointer in interrupt handler
 switch to kernel stack instead of saving stuff to user stack
+
+# dec 5
+make a toy kernel to run on the hardware board to run tests on, its not gonna have anything except the sd card driver, the interrupt handler, and the uart driver from egos to print to the screen
+although in egos its easy to swap out the interrupt handler, but there's a lot of missing code in my copy and egos is too heavyweight too much code to consider for me, and i know how to integrate the driver later into egos
+
+the part where im struggling is that 
+the only keyboard driver i can find is uart based, the interface for the sd card is i2c or spi, at least in my copy of egos i dont think theres any complete interrupt handling code that i can reference
+
+ive found the memory mapped io address for the interrupt register in the spi interface, but im still trying to figure out how to program it
+ive also been looking at things like hardware abstraction layers to see if they help
+
+trying to wrap my head around the spi interface in the sifve manual and the sd card spefication for the sd card, sending an interrupt, but trying to read various manuals theres a lot of electrical engineering and hardware terminology, really struggling 
+
+finally found something called a hardware abstraction layer devloped by the makers of the board, starting using it
+its in C, but we can use Rust with C so its fine
+
+
