@@ -185,9 +185,12 @@ the only keyboard driver i can find is uart based, the interface for the sd card
 ive found the memory mapped io address for the interrupt register in the spi interface, but im still trying to figure out how to program it
 ive also been looking at things like hardware abstraction layers to see if they help
 
-trying to wrap my head around the spi interface in the sifve manual and the sd card spefication for the sd card, sending an interrupt, but trying to read various manuals theres a lot of electrical engineering and hardware terminology, really struggling 
+trying to wrap my head around the spi interface in the sifve manual and the sd card spefication for the sd card, sending an interrupt, but trying to read various manuals theres a lot of electrical engineering and hardware terminology
 
 finally found something called a hardware abstraction layer devloped by the makers of the board, starting using it
 its in C, but we can use Rust with C so its fine
 
 
+in the interrupts section, theres an HAL api i can use to register a PLIC interrupt
+and then perform reads and writes using the HAL api for the spi interface
+"metal_interrupt_register_handler"
