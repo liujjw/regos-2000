@@ -58,18 +58,10 @@ static void proc_hardware_intr() {
     int mtval;
     asm("csrr %0, mtval" : "=r"(mtval));
     if (mtval == UART0_BASE) {
-        // TODO keep reading from RX FIFO until ip pending register is cleared
+        // keep reading from RX FIFO until ip pending register is cleared
         while (REGW(UART0_BASE, UART0_IP) & (1 << 1)) {
-            int c = REGW(UART0_BASE, UART0_RXDATA);
-            if (c == 3) {
-                // ctrl+c
-                // kill the current process
-                INFO("process %d killed by interrupt", curr_pid);
-                asm("csrw mepc, %0" ::"r"(0x800500C));
-                return;
-            }
-            // TODO enqueue the character
-            // TODO if the process is waiting for input, dequeue and run
+            // TODO assign read chars FIFO to reads in queue
+            // TODO not re-enqueuing tty_read process for simplicity
         }
     }
 }
