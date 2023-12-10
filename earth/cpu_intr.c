@@ -37,9 +37,8 @@ int intr_enable() {
     asm("csrw mstatus, %0" ::"r"(mstatus_val | 0x8));
     asm("csrr %0, mie" : "=r"(mie_val));
     /* For now, egos-2000 only uses timer and software interrupts */
-    asm("csrw mie, %0" ::"r"(mie_val | 0x88));
-    // TODO enable hardware interrupts
-    
+    // ^ ENABLED HARDWARE INTERRUPTS (bit 11, the 12th bit)
+    asm("csrw mie, %0" ::"r"(mie_val | 0x888));
 }
 
 void intr_init() {

@@ -11,10 +11,12 @@
 #include "egos.h"
 #include "process.h"
 #include "syscall.h"
+#include "bus_uart.c"
 #include <string.h>
 
 #define INTR_ID_SOFT       3
 #define INTR_ID_TIMER      7
+#define INTR_ID_HARDWARE   11
 
 static void proc_yield();
 static void proc_syscall();
@@ -41,11 +43,35 @@ void intr_entry(int id) {
         kernel_entry = proc_syscall;
     else if (id == INTR_ID_TIMER)
         kernel_entry = proc_yield;
+    else if (id == INTR_ID_HARDWARE)
+        kernel_entry = proc_hardware_intr;
     else
         FATAL("intr_entry: got unknown interrupt %d", id);
 
     /* Switch to the kernel stack */
     ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
+}
+
+static void proc_hardware_intr() {
+    // TODO figure out what hardware interrupt it is and handle it
+    // read the mtval register
+    int mtval;
+    asm("csrr %0, mtval" : "=r"(mtval));
+    if (mtval == UART0_BASE) {
+        // TODO keep reading from RX FIFO until ip pending register is cleared
+        while (REGW(UART0_BASE, UART0_IP) & (1 << 1)) {
+            int c = REGW(UART0_BASE, UART0_RXDATA);
+            if (c == 3) {
+                // ctrl+c
+                // kill the current process
+                INFO("process %d killed by interrupt", curr_pid);
+                asm("csrw mepc, %0" ::"r"(0x800500C));
+                return;
+            }
+            // TODO enqueue the character
+            // TODO if the process is waiting for input, dequeue and run
+        }
+    }
 }
 
 void ctx_entry() {
@@ -71,7 +97,7 @@ void ctx_entry() {
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
-static int next_idx() {
+int next_idx() {
     /* Find the next runnable process */
     int next_idx = -1;
     for (int i = 1; i <= MAX_NPROCESS; i++) {

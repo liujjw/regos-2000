@@ -16,12 +16,19 @@
 #define UART0_RXDATA  4UL
 #define UART0_TXCTRL  8UL
 #define UART0_RXCTRL  12UL
+#define UART0_IE      16UL
+#define UART0_IP      20UL
 #define UART0_DIV     24UL
 
 void uart_init(long baud_rate) {
     REGW(UART0_BASE, UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
     REGW(UART0_BASE, UART0_TXCTRL) |= 1;
     REGW(UART0_BASE, UART0_RXCTRL) |= 1;
+
+    // "The rxwm condition becomes raised when the number of entries in the receive FIFO is strictly greater than the count specified by the rxcnt field of the rxctrl register"
+    REGW(UART0_BASE, UART0_RXCTRL) |= (0 << 16);
+    // enable receive interrupt
+    REGW(UART0_BASE, UART0_IE) |= (1 << 1);
 
     /* UART0 send/recv are mapped to GPIO pin16 and pin17 */
     REGW(GPIO0_BASE, GPIO0_IOF_ENABLE) |= (1 << 16) | (1 << 17);
