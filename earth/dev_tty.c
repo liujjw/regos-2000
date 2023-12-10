@@ -19,16 +19,36 @@ void uart_putc(int c);
 void uart_init(long baud_rate);
 
 static int c, is_reading;
+// return 1 if EXT(end of text) control character, otherwise return 0 if reading
+// TODO implement a true interrupt
+// pull from the queue and try to run again
+// assuming everything is saved
 int tty_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
 
 int tty_write(char* buf, int len) {
     for (int i = 0; i < len; i++) uart_putc(buf[i]);
 }
 
+int enq(char* buf, int len, int start) {
+    // TODO add a queue
+}
+
 int tty_read(char* buf, int len) {
     is_reading = 1;
     for (int i = 0; i < len - 1; i++) {
-        for (c = -1; c == -1; uart_getc(&c));
+
+        // busy wait
+        // for (c = -1; c == -1; uart_getc(&c));
+
+        // yield on wait
+        c = -1;
+        uart_getc(&c);
+        if (c == -1) {
+            enq(buf, len - i, i);
+            // TODO invoke scheduler through a software interrupt
+            // DO NOT return, else parent call will continue to busy wait
+        }
+
         buf[i] = (char)c;
 
         switch (c) {

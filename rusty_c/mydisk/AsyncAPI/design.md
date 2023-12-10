@@ -190,7 +190,19 @@ trying to wrap my head around the spi interface in the sifve manual and the sd c
 finally found something called a hardware abstraction layer devloped by the makers of the board, starting using it
 its in C, but we can use Rust with C so its fine
 
-
 in the interrupts section, theres an HAL api i can use to register a PLIC interrupt
 and then perform reads and writes using the HAL api for the spi interface
 "metal_interrupt_register_handler"
+
+
+# dec 12
+check clock for when a character is delivered
+scheduler.c
+
+theres a riscv instruction for waiting when no process wants to run
+wfi (wait for interrupt) not in egos-2000
+scheduler may panic if no process in queeu
+fix for tty.c first
+
+
+look at dev_tty.c > cpu_intr.c > scheduler.c > process.h > context.S > ult.c
