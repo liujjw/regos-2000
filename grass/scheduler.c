@@ -61,7 +61,7 @@ static void proc_hardware_intr() {
         // keep reading from RX FIFO until ip pending register is cleared
         while (REGW(UART0_BASE, UART0_IP) & (1 << 1)) {
             // TODO assign read chars FIFO to reads in queue
-            // TODO not re-enqueuing tty_read process for simplicity
+            // TODO need to re-enqueuing tty_read process to return to the parent 
         }
     }
 }
