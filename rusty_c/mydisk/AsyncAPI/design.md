@@ -194,15 +194,18 @@ in the interrupts section, theres an HAL api i can use to register a PLIC interr
 and then perform reads and writes using the HAL api for the spi interface
 "metal_interrupt_register_handler"
 
-
-# dec 12
+notes
+theres a riscv instruction for waiting when no process wants to run
+wfi (wait for interrupt) not in egos-2000
+scheduler may panic if no process in queeu (fixed)
+fix for tty.c first
 check clock for when a character is delivered
 scheduler.c
 
-theres a riscv instruction for waiting when no process wants to run
-wfi (wait for interrupt) not in egos-2000
-scheduler may panic if no process in queeu
-fix for tty.c first
+# dec 12
+look at 
+sys_call.c
+bus_uart.c 
+dev_tty.c > queue.h, queue.c > cpu_intr.c > scheduler.c > process.h > context.S > ult.c
 
-
-look at dev_tty.c > cpu_intr.c > scheduler.c > process.h > context.S > ult.c
+finish todos
