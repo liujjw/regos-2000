@@ -11,14 +11,17 @@
 
 #define LIBC_STDIO
 #include "egos.h"
+#include "app.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include "queue.h"
 
 int uart_getc(int* c);
 void uart_putc(int c);
 void uart_init(long baud_rate);
 
 static int c, is_reading;
+static Queue* q;
 // return 1 if EXT(end of text) control character, otherwise return 0 if reading
 // TODO implement a true interrupt
 // pull from the queue and try to run again
@@ -29,8 +32,12 @@ int tty_write(char* buf, int len) {
     for (int i = 0; i < len; i++) uart_putc(buf[i]);
 }
 
-int enq(char* buf, int len, int start) {
-    // TODO add a queue
+void enq(char* buf, int len, int start) {
+    enqueue(q, buf, len, start);
+}
+
+ReturnData deq() {
+    return dequeue(q);
 }
 
 int tty_read(char* buf, int len) {
@@ -45,7 +52,12 @@ int tty_read(char* buf, int len) {
         uart_getc(&c);
         if (c == -1) {
             enq(buf, len - i, i);
-            // TODO invoke scheduler through a software interrupt
+            if (grass->sys_yield() == -1) {
+                // no runable processes to yield to, continue busy wait
+                deq();
+                i--;
+                continue;
+            } // else never return
             // DO NOT return, else parent call will continue to busy wait
         }
 
@@ -119,4 +131,6 @@ void tty_init() {
     earth->tty_fatal = tty_fatal;
     earth->tty_success = tty_success;
     earth->tty_critical = tty_critical;
+
+    q = createQueue();
 }

@@ -6,7 +6,8 @@ enum syscall_type {
 	SYS_UNUSED,
 	SYS_RECV,
 	SYS_SEND,
-	SYS_NCALLS
+	SYS_NCALLS,
+    SYS_YIELD
 };
 
 struct sys_msg {
@@ -24,3 +25,4 @@ struct syscall {
 void sys_exit(int status);
 int  sys_send(int pid, char* msg, int size);
 int  sys_recv(int* pid, char* buf, int size);
+int  sys_yield();

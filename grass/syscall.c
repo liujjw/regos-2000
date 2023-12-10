@@ -20,6 +20,20 @@ static void sys_invoke() {
     while (sc->type != SYS_UNUSED);
 }
 
+int sys_yield() {
+    // invoke scheduler through a software interrupt/syscall
+    // use machine software interrupt over supervisor software interrupt
+    // use ssip (supervisor software interrupt pending) over usip bit
+    // section 3.1.4 in riscv manual
+
+    // int mip_var;
+    // asm("csrr %0, mip" : "=r"(mip_var));
+    // asm("csrw mip, %0" :: "r"(mip_var | (0x1 << 1)));
+    sc->type = SYS_YIELD;
+    sys_invoke();
+    return sc->retval;
+}
+
 int sys_send(int receiver, char* msg, int size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 

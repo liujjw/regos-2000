@@ -71,7 +71,7 @@ void ctx_entry() {
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
-static void proc_yield() {
+static int next_idx() {
     /* Find the next runnable process */
     int next_idx = -1;
     for (int i = 1; i <= MAX_NPROCESS; i++) {
@@ -81,7 +81,11 @@ static void proc_yield() {
             break;
         }
     }
+    return next_idx;
+}
 
+static void proc_yield() {
+    int next_idx = next_idx();
     if (next_idx == -1) FATAL("proc_yield: no runnable process");
     if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
@@ -182,6 +186,13 @@ static void proc_syscall() {
         break;
     case SYS_SEND:
         proc_send(sc);
+        break;
+    case SYS_YIELD:
+        if (next_idx() == -1) {
+            sc->retval = -1;
+        } else {
+            proc_yield();
+        }
         break;
     default:
         FATAL("proc_syscall: got unknown syscall type=%d", type);
