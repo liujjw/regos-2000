@@ -209,3 +209,8 @@ bus_uart.c
 dev_tty.c > queue.h, queue.c > cpu_intr.c > scheduler.c > process.h > context.S > ult.c
 
 finish todos
+
+
+sys_recv
+sys_send
+use WFI if no process
